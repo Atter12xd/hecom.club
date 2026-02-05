@@ -1149,7 +1149,8 @@
             max-width: 1100px;
             margin: 120px auto;
             padding: 0 20px;
-            overflow: hidden;
+            overflow: visible;
+            padding-bottom: 40px;
         }
 
         .testimonials-wrapper {
@@ -1177,7 +1178,7 @@
             overflow-y: hidden;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
-            padding: 8px 0 24px;
+            padding: 8px 0 80px;
             scrollbar-width: thin;
             scrollbar-color: rgba(0, 242, 234, 0.3) transparent;
         }
@@ -1200,6 +1201,7 @@
             flex: 0 0 auto;
             width: min(340px, 85vw);
             min-width: 280px;
+            min-height: 200px;
             scroll-snap-align: center;
             scroll-snap-stop: always;
             background: linear-gradient(145deg, rgba(20, 20, 26, 0.95) 0%, rgba(14, 14, 20, 0.98) 100%);
@@ -1207,6 +1209,13 @@
             border-radius: 20px;
             padding: 32px;
             transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .testimonial-card .testimonial-text {
+            flex: 1;
+            overflow: visible;
         }
 
         .testimonial-card:hover {
@@ -1270,7 +1279,7 @@
         /* Final CTA */
         .final-cta {
             text-align: center;
-            padding: 100px 20px 120px;
+            padding: 100px 20px 140px;
             position: relative;
         }
 
@@ -1294,9 +1303,15 @@
         }
 
         /* Footer */
+        main {
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+
         footer {
             text-align: center;
-            padding: 50px 20px;
+            padding: 50px 20px 30px;
+            padding-bottom: calc(30px + env(safe-area-inset-bottom, 20px));
+            margin-top: 60px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -1589,6 +1604,15 @@
             .testimonial-card {
                 width: min(320px, 88vw);
                 min-width: 260px;
+                min-height: 220px;
+            }
+
+            .testimonials-carousel {
+                padding-bottom: 100px;
+            }
+
+            .final-cta {
+                padding-bottom: 120px;
             }
 
             .how-steps {
@@ -1684,7 +1708,8 @@
             }
 
             footer {
-                padding: 40px 20px;
+                padding: 40px 20px 30px;
+                padding-bottom: calc(40px + env(safe-area-inset-bottom, 20px));
             }
 
             .footer-links {
@@ -1806,6 +1831,18 @@
                 right: 80px;
                 bottom: 16px;
             }
+
+            .testimonials-carousel {
+                padding-bottom: 120px;
+            }
+
+            .final-cta {
+                padding-bottom: 140px;
+            }
+
+            footer {
+                padding-bottom: calc(50px + env(safe-area-inset-bottom, 24px));
+            }
         }
     </style>
 </head>
@@ -1914,14 +1951,13 @@
                         </div>
                     </div>
 
-                    <div class="loom-video-container">
+                    <div class="loom-video-container" id="loomVideoContainer">
                         <iframe 
-                            src="https://www.loom.com/embed/1bc54141270a48f9a6ffce57d6a05351?sid=auto&hide_share=true" 
+                            id="loomVideo"
+                            data-src="https://www.loom.com/embed/1bc54141270a48f9a6ffce57d6a05351?sid=auto&hide_share=true&autoplay=1"
+                            src=""
                             frameborder="0" 
                             loading="lazy"
-                            webkitallowfullscreen 
-                            mozallowfullscreen 
-                            allowfullscreen
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                             title="Video Holistic Marketing - Cuentas TikTok Ads"
                         ></iframe>
@@ -2307,6 +2343,23 @@
             el.style.transitionDelay = `${(i % 6) * 0.08}s`;
             revealObserver.observe(el);
         });
+
+        // Video: autoplay al entrar en vista, pausar al salir (móvil/PC)
+        const loomContainer = document.getElementById('loomVideoContainer');
+        const loomIframe = document.getElementById('loomVideo');
+        if (loomContainer && loomIframe) {
+            const loomSrc = loomIframe.getAttribute('data-src');
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (loomIframe.src !== loomSrc) loomIframe.src = loomSrc;
+                    } else {
+                        loomIframe.src = 'about:blank';
+                    }
+                });
+            }, { threshold: 0.4, rootMargin: '0px' });
+            videoObserver.observe(loomContainer);
+        }
 
         // Carrusel testimonials - auto-avance cada 3s + scroll manual
         const carousel = document.getElementById('testimonialsCarousel');
