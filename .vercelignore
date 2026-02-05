@@ -1,0 +1,7 @@
+# Archivos a ignorar en deploy
+.git
+.gitignore
+*.md
+.env*
+.DS_Store
+node_modules

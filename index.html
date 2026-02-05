@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Holistic Marketing es TikTok Partner Oficial. Accede a cuentas de agencia con línea de crédito hasta $50,000 USD. Escala tus campañas de TikTok Ads sin límites.">
+    <title>Cuentas de Agencia TikTok Ads | Holistic Marketing - Partner Oficial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tiktok-cyan: #00f2ea;
+            --tiktok-pink: #ff0050;
+            --accent-gold: #f5d547;
+            --tiktok-black: #010101;
+            --bg-dark: #030306;
+            --bg-elevated: #08080c;
+            --bg-card: #0c0c10;
+            --bg-card-hover: #111116;
+            --text-primary: #f8f8fc;
+            --text-secondary: #8b8b9e;
+            --text-muted: #5c5c6d;
+            --gradient-tiktok: linear-gradient(135deg, var(--tiktok-cyan) 0%, var(--tiktok-pink) 100%);
+            --gradient-subtle: linear-gradient(135deg, rgba(0, 242, 234, 0.08) 0%, rgba(255, 0, 80, 0.08) 100%);
+            --gradient-hero: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 242, 234, 0.15) 0%, transparent 50%), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(255, 0, 80, 0.08) 0%, transparent 50%);
+            --glow-cyan: 0 0 60px rgba(0, 242, 234, 0.35);
+            --glow-pink: 0 0 60px rgba(255, 0, 80, 0.35);
+            --glow-combined: 0 0 80px rgba(0, 242, 234, 0.15), 0 0 120px rgba(255, 0, 80, 0.1);
+            --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+            --shadow-card: 0 4px 24px -4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.65;
+            overflow-x: hidden;
+        }
+
+        /* Custom Cursor - PC only */
+        @media (pointer: fine) {
+            body {
+                cursor: none;
+            }
+
+            .custom-cursor {
+                position: fixed;
+                left: -100px;
+                top: -100px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: radial-gradient(circle, rgba(255, 0, 80, 0.95) 0%, rgba(255, 0, 80, 0.5) 40%, rgba(255, 0, 80, 0.2) 70%, transparent 100%);
+                box-shadow: 0 0 24px rgba(255, 0, 80, 0.7), 0 0 48px rgba(255, 0, 80, 0.35);
+                pointer-events: none;
+                z-index: 9999;
+                transform: translate(-50%, -50%);
+                transition: width 0.25s ease, height 0.25s ease, box-shadow 0.25s ease;
+            }
+
+            .custom-cursor.hover {
+                width: 40px;
+                height: 40px;
+                background: radial-gradient(circle, rgba(255, 0, 80, 0.8) 0%, rgba(0, 242, 234, 0.35) 45%, transparent 75%);
+                box-shadow: 0 0 35px rgba(255, 0, 80, 0.6), 0 0 70px rgba(0, 242, 234, 0.3);
+            }
+
+            a, button {
+                cursor: none;
+            }
+        }
+
+        /* Premium Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 15% 15%, rgba(0, 242, 234, 0.05) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 85%, rgba(255, 0, 80, 0.05) 0%, transparent 45%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 242, 234, 0.02) 0%, transparent 60%);
+            animation: bgPulse 14s ease-in-out infinite;
+        }
+
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-hero), radial-gradient(ellipse at center, transparent 0%, var(--bg-dark) 70%);
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            33% { transform: translate(-2%, -1%) scale(1.02) rotate(1deg); }
+            66% { transform: translate(1%, -2%) scale(1.01) rotate(-1deg); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--tiktok-cyan);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite;
+        }
+
+        .particle:nth-child(2) { left: 10%; animation-delay: -2s; background: var(--tiktok-pink); }
+        .particle:nth-child(3) { left: 20%; animation-delay: -4s; }
+        .particle:nth-child(4) { left: 30%; animation-delay: -6s; background: var(--tiktok-pink); }
+        .particle:nth-child(5) { left: 40%; animation-delay: -8s; }
+        .particle:nth-child(6) { left: 50%; animation-delay: -10s; background: var(--tiktok-pink); }
+        .particle:nth-child(7) { left: 60%; animation-delay: -12s; }
+        .particle:nth-child(8) { left: 70%; animation-delay: -14s; background: var(--tiktok-pink); }
+        .particle:nth-child(9) { left: 80%; animation-delay: -16s; }
+        .particle:nth-child(10) { left: 90%; animation-delay: -18s; background: var(--tiktok-pink); }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+        }
+
+        /* Noise overlay */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Trust Bar */
+        .trust-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: var(--border-subtle);
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeInDown 0.6s ease-out 0.1s forwards;
+        }
+
+        .trust-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .trust-stat-number {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            background: var(--gradient-tiktok);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .trust-stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Header - Sticky */
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(3, 3, 6, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: var(--border-subtle);
+            opacity: 0;
+            animation: fadeInDown 0.8s ease-out 0.2s forwards;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            padding: 14px 40px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--tiktok-cyan);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.35rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-tiktok);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--glow-combined);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .logo-text span:first-child {
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span:last-child {
+            font-size: 0.7rem;
+            font-weight: 500;
+            background: var(--gradient-tiktok);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Partner Badge */
+        .partner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.12) 0%, rgba(255, 0, 80, 0.12) 100%);
+            border: 1px solid rgba(0, 242, 234, 0.25);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 28px;
+            animation: badgeGlow 3s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+
+        .partner-badge svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        @keyframes badgeGlow {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(0, 242, 234, 0.15);
+                border-color: rgba(0, 242, 234, 0.25);
+            }
+            50% { 
+                box-shadow: 0 0 40px rgba(0, 242, 234, 0.3);
+                border-color: rgba(0, 242, 234, 0.4);
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 50px 20px 80px;
+            text-align: center;
+        }
+
+        .hero-content {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.4s forwards;
+        }
+
+        .hook {
+            background: rgba(13, 13, 18, 0.9);
+            border: var(--border-subtle);
+            border-radius: 50px;
+            padding: 14px 28px;
+            display: inline-block;
+            margin-bottom: 36px;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .hook:hover {
+            border-color: rgba(0, 242, 234, 0.3);
+            background: rgba(0, 242, 234, 0.05);
+        }
+
+        .headline {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+            font-weight: 700;
+            line-height: 1.35;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .headline .highlight-cyan {
+            color: var(--tiktok-cyan);
+            text-shadow: var(--glow-cyan);
+            position: relative;
+        }
+
+        .headline .highlight-pink {
+            color: var(--tiktok-pink);
+            text-shadow: var(--glow-pink);
+            position: relative;
+        }
+
+        .subheadline {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 52px;
+            line-height: 1.75;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Video Section */
+        .video-container {
+            position: relative;
+            max-width: 820px;
+            margin: 0 auto 52px;
+            opacity: 0;
+            animation: fadeInScale 1s ease-out 0.6s forwards;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .video-wrapper {
+            position: relative;
+            background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+            border: var(--border-subtle);
+            border-radius: 24px;
+            padding: 28px;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        }
+
+        .video-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-tiktok);
+            opacity: 0.8;
+        }
+
+        .video-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(0, 242, 234, 0.05) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .video-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .video-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .tiktok-logo {
+            width: 34px;
+            height: 34px;
+        }
+
+        .video-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .profile-img {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--gradient-tiktok);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
+        }
+
+        .online-indicator {
+            width: 14px;
+            height: 14px;
+            background: #00ff88;
+            border-radius: 50%;
+            border: 3px solid var(--bg-card);
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0, 255, 136, 0); }
+        }
+
+        /* Loom Video Responsive Container */
+        .loom-video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #0a0a0f 0%, #050508 100%);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) inset;
+        }
+
+        .loom-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 16px;
+        }
+
+        .video-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .social-handle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-handle:hover {
+            color: var(--tiktok-cyan);
+        }
+
+        .video-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 242, 234, 0.1);
+            border-color: rgba(0, 242, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: white;
+            fill: none;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.8s forwards;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--gradient-tiktok);
+            color: white;
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 20px 44px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 10px 30px rgba(0, 242, 234, 0.2),
+                0 10px 30px rgba(255, 0, 80, 0.2);
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 242, 234, 0.3),
+                0 20px 40px rgba(255, 0, 80, 0.3);
+        }
+
+        .cta-button svg {
+            width: 22px;
+            height: 22px;
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover svg {
+            transform: translateX(4px);
+        }
+
+        /* WhatsApp Icon in button */
+        .whatsapp-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Hidden Content (reveals after 30 seconds) */
+        .hidden-content {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hidden-content.revealed {
+            opacity: 1;
+            max-height: 5000px;
+        }
+
+        .hidden-content > section {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease-out;
+        }
+
+        .hidden-content.revealed > section:nth-child(1) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.2s;
+        }
+
+        .hidden-content.revealed > section:nth-child(2) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.5s;
+        }
+
+        .hidden-content.revealed > section:nth-child(3) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.8s;
+        }
+
+        .hidden-content.revealed > section:nth-child(4) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 1.1s;
+        }
+
+        .hidden-content.revealed > section:nth-child(5),
+        .hidden-content.revealed > section:nth-child(6) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 1.4s;
+        }
+
+        /* Benefits Section */
+        .benefits {
+            max-width: 1100px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+
+        .section-label {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .section-label span {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: var(--gradient-tiktok);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .benefits-title {
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 60px;
+            letter-spacing: -0.5px;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .reveal-on-scroll.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .benefit-card {
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(10, 10, 15, 0.8) 100%);
+            border: var(--border-subtle);
+            border-radius: 20px;
+            padding: 36px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .benefit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-tiktok);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .benefit-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-subtle);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 242, 234, 0.2);
+            box-shadow: 
+                0 30px 60px -20px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(0, 242, 234, 0.1);
+        }
+
+        .benefit-card:hover::before {
+            opacity: 1;
+        }
+
+        .benefit-card:hover::after {
+            opacity: 1;
+        }
+
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.12) 0%, rgba(255, 0, 80, 0.12) 100%);
+            border: 1px solid rgba(0, 242, 234, 0.15);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s ease;
+        }
+
+        .benefit-card:hover .benefit-icon {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 242, 234, 0.2);
+        }
+
+        .benefit-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .benefit-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .benefit-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* How It Works Section */
+        .how-it-works {
+            max-width: 1000px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+
+        .how-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .how-step {
+            text-align: center;
+            padding: 36px 24px;
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(10, 10, 15, 0.9) 100%);
+            border: var(--border-subtle);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .how-step::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-tiktok);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .how-step:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 242, 234, 0.15);
+            box-shadow: var(--shadow-card);
+        }
+
+        .how-step:hover::before {
+            opacity: 1;
+        }
+
+        .how-step-number {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.15) 0%, rgba(255, 0, 80, 0.15) 100%);
+            border: 1px solid rgba(0, 242, 234, 0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--tiktok-cyan);
+        }
+
+        .how-step h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .how-step p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Comparison Table */
+        .comparison-section {
+            max-width: 900px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-card);
+            border: var(--border-subtle);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+
+        .comparison-table th {
+            padding: 24px 28px;
+            text-align: left;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .comparison-table th:first-child {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .comparison-table th:nth-child(2) {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+        }
+
+        .comparison-table th:nth-child(3) {
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.1) 0%, rgba(255, 0, 80, 0.1) 100%);
+            border-left: 2px solid rgba(0, 242, 234, 0.3);
+        }
+
+        .comparison-table td {
+            padding: 20px 28px;
+            border-top: var(--border-subtle);
+            font-size: 0.95rem;
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .comparison-table .check {
+            color: var(--tiktok-cyan);
+            font-weight: 600;
+        }
+
+        .comparison-table .cross {
+            color: var(--text-muted);
+        }
+
+        .comparison-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        /* Credit Section */
+        .credit-section {
+            max-width: 940px;
+            margin: 120px auto;
+            padding: 0 20px;
+        }
+
+        .credit-card {
+            background: linear-gradient(145deg, rgba(0, 242, 234, 0.06) 0%, rgba(255, 0, 80, 0.06) 100%);
+            border: 1px solid rgba(0, 242, 234, 0.15);
+            border-radius: 28px;
+            padding: 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 100px rgba(0, 242, 234, 0.1),
+                0 0 100px rgba(255, 0, 80, 0.05);
+        }
+
+        .credit-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(0, 242, 234, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 70% 70%, rgba(255, 0, 80, 0.08) 0%, transparent 40%);
+            animation: creditGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes creditGlow {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(10%, 10%) rotate(10deg); }
+        }
+
+        .credit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 242, 234, 0.15);
+            border: 1px solid rgba(0, 242, 234, 0.4);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 1px;
+        }
+
+        .credit-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .credit-amount {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3.5rem, 10vw, 6rem);
+            font-weight: 800;
+            background: var(--gradient-tiktok);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -2px;
+            text-shadow: 0 0 80px rgba(0, 242, 234, 0.3);
+        }
+
+        .credit-description {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            max-width: 520px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            line-height: 1.7;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            max-width: 1100px;
+            margin: 120px auto;
+            padding: 0 20px;
+        }
+
+        .testimonials .testimonial-card {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        .testimonials-title {
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 60px;
+            letter-spacing: -0.5px;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+
+        .testimonial-card {
+            background: linear-gradient(145deg, rgba(20, 20, 26, 0.95) 0%, rgba(14, 14, 20, 0.98) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.4s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 242, 234, 0.25);
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 242, 234, 0.06);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--gradient-tiktok);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
+        }
+
+        .testimonial-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .testimonial-info span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .testimonial-text {
+            color: #c4c4d4;
+            font-size: 1rem;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        .testimonial-metric {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(0, 242, 234, 0.12) 0%, rgba(255, 0, 80, 0.12) 100%);
+            border: 1px solid rgba(0, 242, 234, 0.2);
+            color: var(--tiktok-cyan);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            text-align: center;
+            padding: 100px 20px 120px;
+            position: relative;
+        }
+
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 80px;
+            background: linear-gradient(180deg, transparent, rgba(0, 242, 234, 0.3), transparent);
+        }
+
+        .final-cta h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            font-weight: 700;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.3));
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-tiktok);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-logo span {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            letter-spacing: 1px;
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--tiktok-cyan);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Floating WhatsApp Button */
+        .floating-whatsapp {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 100;
+            opacity: 0;
+            animation: slideInRight 0.6s ease-out 1.2s forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .floating-whatsapp a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #25D366;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 
+                0 10px 30px rgba(37, 211, 102, 0.3),
+                0 0 0 0 rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            animation: whatsappPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes whatsappPulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3), 0 0 0 0 rgba(37, 211, 102, 0.4); }
+            50% { box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3), 0 0 0 10px rgba(37, 211, 102, 0); }
+        }
+
+        .floating-whatsapp a:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.4);
+        }
+
+        .floating-whatsapp svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Countdown Timer */
+        .countdown-badge {
+            position: fixed;
+            bottom: 28px;
+            left: 28px;
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 242, 234, 0.2);
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            opacity: 0;
+            animation: slideInLeft 0.6s ease-out 1.4s forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .countdown-badge.hidden {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 0.5s ease;
+        }
+
+        .countdown-badge .pulse-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--tiktok-cyan);
+            border-radius: 50%;
+            animation: pulseDot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .countdown-badge span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .countdown-badge .time {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            color: var(--tiktok-cyan);
+        }
+
+        /* ========== RESPONSIVE STYLES ========== */
+        
+        @media (max-width: 992px) {
+            .benefits-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .how-steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .trust-bar {
+                gap: 24px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 16px 20px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .logo-text span:first-child {
+                font-size: 1.15rem;
+            }
+
+            .logo-text span:last-child {
+                font-size: 0.6rem;
+                letter-spacing: 2px;
+            }
+
+            .hero {
+                padding: 40px 16px 60px;
+            }
+
+            .hook {
+                padding: 12px 20px;
+                font-size: 0.85rem;
+            }
+
+            .partner-badge {
+                font-size: 0.75rem;
+                padding: 8px 14px;
+            }
+
+            .headline {
+                font-size: clamp(1.5rem, 4.5vw, 1.95rem);
+            }
+
+            .subheadline {
+                font-size: 1rem;
+                margin-bottom: 36px;
+            }
+
+            .video-wrapper {
+                padding: 16px;
+                border-radius: 18px;
+            }
+
+            .video-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .video-footer {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .benefits {
+                margin: 70px auto;
+            }
+
+            .benefits-title,
+            .testimonials-title {
+                font-size: 1.7rem;
+                margin-bottom: 40px;
+            }
+
+            .benefits-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .how-steps {
+                grid-template-columns: 1fr;
+            }
+
+            .trust-bar {
+                gap: 16px;
+                padding: 12px 16px;
+            }
+
+            .trust-stat-number {
+                font-size: 1rem;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 16px;
+                font-size: 0.85rem;
+            }
+
+            .benefit-card {
+                padding: 28px;
+            }
+
+            .credit-section {
+                margin: 80px auto;
+            }
+
+            .credit-card {
+                padding: 40px 24px;
+                border-radius: 22px;
+            }
+
+            .credit-amount {
+                font-size: 3rem;
+            }
+
+            .cta-button {
+                padding: 18px 32px;
+                font-size: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .final-cta {
+                padding: 70px 20px 90px;
+            }
+
+            .floating-whatsapp {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .floating-whatsapp a {
+                padding: 14px 20px;
+                font-size: 0.9rem;
+            }
+
+            .countdown-badge {
+                bottom: 20px;
+                left: 20px;
+                padding: 12px 16px;
+                font-size: 0.85rem;
+            }
+
+            footer {
+                padding: 40px 20px;
+            }
+
+            .footer-links {
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 32px 12px 50px;
+            }
+
+            .hook {
+                padding: 10px 16px;
+                font-size: 0.8rem;
+                margin-bottom: 28px;
+            }
+
+            .headline {
+                font-size: 1.4rem;
+                margin-bottom: 20px;
+                max-width: 100%;
+            }
+
+            .subheadline {
+                font-size: 0.9rem;
+            }
+
+            .video-wrapper {
+                padding: 12px;
+            }
+
+            .video-brand {
+                font-size: 0.85rem;
+            }
+
+            .tiktok-logo {
+                width: 26px;
+                height: 26px;
+            }
+
+            .profile-img {
+                width: 38px;
+                height: 38px;
+                font-size: 0.85rem;
+            }
+
+            .benefit-card {
+                padding: 22px;
+            }
+
+            .benefit-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .benefit-card h3 {
+                font-size: 1.1rem;
+            }
+
+            .credit-card {
+                padding: 32px 18px;
+            }
+
+            .credit-badge {
+                font-size: 0.75rem;
+                padding: 10px 18px;
+            }
+
+            .credit-title {
+                font-size: 1.4rem;
+            }
+
+            .credit-amount {
+                font-size: 2.4rem;
+            }
+
+            .credit-description {
+                font-size: 0.95rem;
+            }
+
+            .testimonial-card {
+                padding: 24px;
+            }
+
+            .testimonial-avatar {
+                width: 44px;
+                height: 44px;
+                font-size: 0.9rem;
+            }
+
+            .floating-whatsapp a span {
+                display: none;
+            }
+
+            .floating-whatsapp a {
+                padding: 16px;
+                border-radius: 50%;
+            }
+
+            .countdown-badge {
+                left: 12px;
+                right: 80px;
+                bottom: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor" id="customCursor"></div>
+    <div class="bg-animation"></div>
+    
+    <!-- Trust Bar -->
+    <div class="trust-bar">
+        <div class="trust-stat">
+            <span class="trust-stat-number">500+</span>
+            <span class="trust-stat-label">Cuentas activas</span>
+        </div>
+        <div class="trust-stat">
+            <span class="trust-stat-number">$2M+</span>
+            <span class="trust-stat-label">En gasto gestionado</span>
+        </div>
+        <div class="trust-stat">
+            <span class="trust-stat-number">98%</span>
+            <span class="trust-stat-label">Clientes satisfechos</span>
+        </div>
+        <div class="trust-stat">
+            <span class="trust-stat-number">24h</span>
+            <span class="trust-stat-label">Soporte prioritario</span>
+        </div>
+    </div>
+
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="noise"></div>
+
+    <header id="mainHeader">
+        <a href="#" class="logo">
+            <div class="logo-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="3" fill="white"/>
+                    <circle cx="12" cy="12" r="7" stroke="white" stroke-width="1.5" fill="none"/>
+                    <path d="M12 2V5M12 19V22M2 12H5M19 12H22M4.93 4.93L7.05 7.05M16.95 16.95L19.07 19.07M4.93 19.07L7.05 16.95M16.95 7.05L19.07 4.93" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span>Holistic Marketing</span>
+                <span>TikTok Partner</span>
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="#beneficios">Beneficios</a>
+            <a href="#como-funciona">Cómo funciona</a>
+            <a href="#comparativa">Comparativa</a>
+            <a href="#testimonios">Testimonios</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="partner-badge">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="url(#starGrad)"/>
+                        <defs>
+                            <linearGradient id="starGrad" x1="2" y1="2" x2="22" y2="21">
+                                <stop offset="0%" stop-color="#00f2ea"/>
+                                <stop offset="100%" stop-color="#ff0050"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    TikTok Partner Oficial
+                </div>
+
+                <div class="hook">
+                    Si quieres escalar tus campañas de TikTok Ads sin límites...
+                </div>
+
+                <h1 class="headline">
+                    Accede a <span class="highlight-cyan">Cuentas de Agencia</span> con 
+                    <span class="highlight-pink">Línea de Crédito</span> y Escala Sin Restricciones
+                </h1>
+
+                <p class="subheadline">
+                    Somos TikTok Partner Oficial. Te damos acceso a cuentas de agencia premium con línea de crédito, soporte prioritario y todas las ventajas que necesitas para dominar TikTok Ads.
+                </p>
+            </div>
+
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <div class="video-header">
+                        <div class="video-brand">
+                            <svg class="tiktok-logo" viewBox="0 0 48 48" fill="none">
+                                <path d="M34.1451 0H26.0556V32.6956C26.0556 38.4348 21.3757 43.0435 15.5761 43.0435C9.77658 43.0435 5.09668 38.4348 5.09668 32.6956C5.09668 27.0435 9.68994 22.5217 15.3159 22.3478V14.2609C5.18332 14.4348 -3.05176e-05 22.6087 -3.05176e-05 32.6956C-3.05176e-05 42.8696 9.60329 48 15.5761 48C21.5489 48 31.1521 43.1304 31.1521 32.6956V15.6522C34.2319 17.913 38.0519 19.3043 42.0455 19.4783V11.3913C37.279 11.1304 34.1451 7.04348 34.1451 0Z" fill="white"/>
+                            </svg>
+                            TikTok Ads Agency
+                        </div>
+                        <div class="video-profile">
+                            <div class="profile-img">HM</div>
+                            <div class="online-indicator"></div>
+                        </div>
+                    </div>
+
+                    <div class="loom-video-container">
+                        <iframe 
+                            src="https://www.loom.com/embed/1bc54141270a48f9a6ffce57d6a05351?sid=auto" 
+                            frameborder="0" 
+                            loading="lazy"
+                            webkitallowfullscreen 
+                            mozallowfullscreen 
+                            allowfullscreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        ></iframe>
+                    </div>
+
+                    <div class="video-footer">
+                        <div class="social-handle">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                            </svg>
+                            @holistic_marketing
+                        </div>
+                        <div class="video-controls">
+                            <div class="control-btn">
+                                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                </svg>
+                            </div>
+                            <div class="control-btn">
+                                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <a href="http://wa.me/victorminas28" target="_blank" class="cta-button">
+                    <svg class="whatsapp-icon" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Solicitar Cuenta de Agencia
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Main Content - Scroll revealed -->
+        <div class="hidden-content revealed" id="hiddenContent">
+            <section class="benefits" id="beneficios">
+                <div class="section-label"><span>Ventajas Exclusivas</span></div>
+                <h2 class="benefits-title">¿Por qué elegirnos?</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="url(#iconGrad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                                <defs>
+                                    <linearGradient id="iconGrad1" x1="2" y1="2" x2="22" y2="21">
+                                        <stop offset="0%" stop-color="#00f2ea"/>
+                                        <stop offset="100%" stop-color="#ff0050"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>TikTok Partner Oficial</h3>
+                        <p>Somos agencia certificada por TikTok. Acceso directo a soporte premium, betas exclusivas y las mejores condiciones del mercado.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="url(#iconGrad2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                                <defs>
+                                    <linearGradient id="iconGrad2" x1="1" y1="4" x2="23" y2="20">
+                                        <stop offset="0%" stop-color="#00f2ea"/>
+                                        <stop offset="100%" stop-color="#ff0050"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>Línea de Crédito</h3>
+                        <p>Escala tus campañas sin preocuparte por el flujo de caja. Te otorgamos línea de crédito para que inviertas más y pagues después.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="url(#iconGrad3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                <defs>
+                                    <linearGradient id="iconGrad3" x1="3" y1="2" x2="22" y2="22">
+                                        <stop offset="0%" stop-color="#00f2ea"/>
+                                        <stop offset="100%" stop-color="#ff0050"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>Sin Límites de Gasto</h3>
+                        <p>Las cuentas de agencia no tienen los límites de gasto de las cuentas personales. Escala hasta donde tu ROAS te permita.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="url(#iconGrad4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <defs>
+                                    <linearGradient id="iconGrad4" x1="4" y1="2" x2="20" y2="22">
+                                        <stop offset="0%" stop-color="#00f2ea"/>
+                                        <stop offset="100%" stop-color="#ff0050"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>Cuentas Ultra-Seguras</h3>
+                        <p>Nuestras cuentas tienen protección especial contra baneos. Menos restricciones y mayor estabilidad para tus campañas.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="url(#iconGrad5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                <defs>
+                                    <linearGradient id="iconGrad5" x1="1" y1="3" x2="23" y2="21">
+                                        <stop offset="0%" stop-color="#00f2ea"/>
+                                        <stop offset="100%" stop-color="#ff0050"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>Soporte Dedicado</h3>
+                        <p>Account Manager personal de TikTok y nuestro equipo a tu disposición. Resolvemos problemas en horas, no en días.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="url(#iconGrad6)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                                <polyline points="17 6 23 6 23 12"/>
+                                <defs>
+                                    <linearGradient id="iconGrad6" x1="1" y1="6" x2="23" y2="18">
+                                        <stop offset="0%" stop-color="#00f2ea"/>
+                                        <stop offset="100%" stop-color="#ff0050"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </div>
+                        <h3>Mayor Alcance</h3>
+                        <p>Las cuentas de agencia tienen acceso a audiencias premium y mejor distribución de anuncios. Mejores CPMs garantizados.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="how-it-works" id="como-funciona">
+                <div class="section-label"><span>Proceso Simple</span></div>
+                <h2 class="benefits-title">Cómo funciona</h2>
+                <div class="how-steps">
+                    <div class="how-step">
+                        <div class="how-step-number">1</div>
+                        <h3>Solicita tu cuenta</h3>
+                        <p>Completa el formulario o contáctanos por WhatsApp. Te responderemos en menos de 2 horas.</p>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-step-number">2</div>
+                        <h3>Validación rápida</h3>
+                        <p>Revisamos tu negocio y te asignamos un Account Manager dedicado de TikTok.</p>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-step-number">3</div>
+                        <h3>Acceso inmediato</h3>
+                        <p>Recibe tu cuenta de agencia con línea de crédito en 24-48 horas hábiles.</p>
+                    </div>
+                    <div class="how-step">
+                        <div class="how-step-number">4</div>
+                        <h3>Escala sin límites</h3>
+                        <p>Lanza campañas, optimiza y escala. Soporte prioritario disponible siempre.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Comparison Table -->
+            <section class="comparison-section" id="comparativa">
+                <div class="section-label"><span>La Diferencia</span></div>
+                <h2 class="benefits-title">Cuenta Personal vs Cuenta Agencia</h2>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Característica</th>
+                            <th>Cuenta Personal</th>
+                            <th>Cuenta Agencia (nosotros)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Línea de crédito</td>
+                            <td class="cross">❌ No</td>
+                            <td class="check">✅ Hasta $50,000 USD</td>
+                        </tr>
+                        <tr>
+                            <td>Límites de gasto</td>
+                            <td class="cross">❌ Restringidos</td>
+                            <td class="check">✅ Sin límites prácticos</td>
+                        </tr>
+                        <tr>
+                            <td>Soporte TikTok</td>
+                            <td class="cross">❌ Básico / inexistente</td>
+                            <td class="check">✅ Account Manager dedicado</td>
+                        </tr>
+                        <tr>
+                            <td>Protección contra baneos</td>
+                            <td class="cross">❌ Baja</td>
+                            <td class="check">✅ Premium / prioritaria</td>
+                        </tr>
+                        <tr>
+                            <td>CPMs y alcance</td>
+                            <td class="cross">❌ Estándar</td>
+                            <td class="check">✅ Audiencias premium</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="credit-section">
+                <div class="credit-card">
+                    <div class="credit-badge">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                            <line x1="1" y1="10" x2="23" y2="10"/>
+                        </svg>
+                        LÍNEA DE CRÉDITO EXCLUSIVA
+                    </div>
+                    <h2 class="credit-title">Escala sin preocuparte por el flujo de caja</h2>
+                    <div class="credit-amount">Hasta $50,000 USD</div>
+                    <p class="credit-description">
+                        Invierte primero, paga después. Te otorgamos línea de crédito basada en tu historial de performance. Sin garantías, sin trámites bancarios.
+                    </p>
+                </div>
+            </section>
+
+            <section class="testimonials" id="testimonios">
+                <div class="section-label"><span>Casos de Éxito</span></div>
+                <h2 class="testimonials-title">Lo que dicen nuestros clientes</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">JR</div>
+                            <div class="testimonial-info">
+                                <h4>Juan Rodríguez</h4>
+                                <span>E-commerce Owner</span>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            "Pasé de gastar $500/día a $5,000/día en menos de un mes. La línea de crédito me permitió escalar sin descapitalizarme."
+                        </p>
+                        <span class="testimonial-metric">+900% en inversión</span>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">MC</div>
+                            <div class="testimonial-info">
+                                <h4>María Castillo</h4>
+                                <span>Agencia de Marketing</span>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            "El soporte es increíble. Tuve un problema con una cuenta a las 11pm y me lo resolvieron en 2 horas. Nunca había visto eso."
+                        </p>
+                        <span class="testimonial-metric">Soporte 24/7</span>
+                    </div>
+
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">AL</div>
+                            <div class="testimonial-info">
+                                <h4>Andrés López</h4>
+                                <span>Dropshipper</span>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">
+                            "Mis CPMs bajaron un 40% comparado con mi cuenta personal. La diferencia en performance es brutal."
+                        </p>
+                        <span class="testimonial-metric">-40% en CPMs</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="final-cta">
+                <h2>¿Listo para escalar tu negocio con TikTok Ads?</h2>
+                <a href="http://wa.me/victorminas28" target="_blank" class="cta-button">
+                    <svg class="whatsapp-icon" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Solicitar Mi Cuenta Ahora
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-logo">
+            <div class="footer-logo-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="3" fill="white"/>
+                    <circle cx="12" cy="12" r="7" stroke="white" stroke-width="1.5" fill="none"/>
+                </svg>
+            </div>
+            <span>HOLISTIC MARKETING LLC</span>
+        </div>
+        <p>© 2025 HOLISTIC MARKETING LLC | TikTok Marketing Partner Oficial</p>
+        <div class="footer-links">
+            <a href="#">Términos y Condiciones</a>
+            <a href="#">Política de Privacidad</a>
+            <a href="http://wa.me/victorminas28" target="_blank">Contacto</a>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <div class="floating-whatsapp">
+        <a href="http://wa.me/victorminas28" target="_blank">
+            <svg viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            <span>Contáctanos</span>
+        </a>
+    </div>
+
+    <script>
+        // Custom cursor (PC only)
+        if (window.matchMedia('(pointer: fine)').matches) {
+            const cursor = document.getElementById('customCursor');
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            const animateCursor = () => {
+                cursorX += (mouseX - cursorX) * 0.15;
+                cursorY += (mouseY - cursorY) * 0.15;
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                requestAnimationFrame(animateCursor);
+            };
+            animateCursor();
+
+            document.querySelectorAll('a, button, .cta-button, .control-btn, .benefit-card, .testimonial-card').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+            });
+        } else {
+            document.getElementById('customCursor')?.remove();
+        }
+
+        // Sticky header scroll effect
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 80) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+
+        // Scroll reveal animations
+        const revealOptions = { threshold: 0.12, rootMargin: '0px 0px -60px 0px' };
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, revealOptions);
+
+        document.querySelectorAll('.benefit-card, .how-step').forEach((el, i) => {
+            el.classList.add('reveal-on-scroll');
+            el.style.transitionDelay = `${(i % 6) * 0.08}s`;
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
