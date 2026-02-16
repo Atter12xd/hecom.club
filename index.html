@@ -211,10 +211,10 @@ main,header,footer,.alert-bar{position:relative;z-index:1}
 @keyframes amountPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
 
 /* ═══════════════ LAYOUT STYLES ═══════════════ */
-header{padding:20px 24px 20px 40px;display:flex;justify-content:flex-start;align-items:center;opacity:0;animation:luxFD 1s ease-out .2s forwards}
-.logo{display:flex;align-items:center;gap:0}
+header{padding:24px 24px;display:flex;justify-content:center;align-items:center;opacity:0;animation:luxFD 1s ease-out .2s forwards}
+.logo{display:flex;align-items:center;justify-content:center;gap:0}
 .logo a{display:block;line-height:0}
-.logo-img{height:44px;width:auto;max-width:180px;object-fit:contain;object-position:left center;transition:transform .4s ease,opacity .4s ease}
+.logo-img{height:64px;width:auto;max-width:280px;object-fit:contain;object-position:center;transition:transform .4s ease,opacity .4s ease}
 .logo-img:hover{transform:scale(1.04);opacity:.95}
 .logo-icon{width:52px;height:52px;border-radius:15px;overflow:hidden;flex-shrink:0;position:relative;transition:transform .4s ease,box-shadow .4s ease;box-shadow:var(--shadow-md)}
 .logo-icon:hover{transform:scale(1.08) rotate(-2deg);box-shadow:var(--shadow-lg)}
@@ -324,10 +324,10 @@ header{padding:20px 24px 20px 40px;display:flex;justify-content:flex-start;align
 .final-cta .final-sub{color:var(--text-body);font-size:1rem;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7}
 
 footer{text-align:center;padding:44px 24px;border-top:1px solid var(--card-border);color:var(--muted);font-size:.82rem;background:var(--bg-warm);position:relative;overflow:hidden}
-.footer-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
-.footer-logo-icon{height:36px;width:auto;max-width:140px;overflow:hidden;display:flex;align-items:center}
+.footer-logo{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:16px}
+.footer-logo-icon{height:56px;width:auto;max-width:240px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .footer-logo-icon img{width:auto;height:100%;object-fit:contain;object-position:center}
-.footer-logo span{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1rem;color:var(--dark);letter-spacing:1px}
+.footer-logo span{display:none}
 footer a{color:var(--muted);text-decoration:none;transition:color .3s ease}
 footer a:hover{color:var(--cyan)}
 .footer-links{display:flex;justify-content:center;gap:24px;margin-top:14px;flex-wrap:wrap}
@@ -354,7 +354,7 @@ footer a:hover{color:var(--cyan)}
 @media(max-width:768px){
     .cursor-glass,.cursor-core{display:none!important}#cursorTrailCanvas{display:none!important}.scroll-progress{display:none}.spotlight{display:none}
     *,*::before,*::after{cursor:auto!important}html,body{cursor:auto}
-    header{padding:16px 20px;justify-content:flex-start}.logo-img{height:38px;max-width:160px}
+    header{padding:16px 20px;justify-content:center}.logo-img{height:52px;max-width:220px}
     .hero{padding:32px 16px 52px}.hook{padding:10px 20px;font-size:.82rem}.partner-badge{font-size:.72rem;padding:8px 14px}
     .headline{font-size:clamp(1.6rem,6vw,2.1rem);letter-spacing:-1px}.subheadline{font-size:.95rem;margin-bottom:18px}
     .pain-points{gap:10px}.pain-pill{font-size:.75rem;padding:6px 14px}
@@ -365,12 +365,12 @@ footer a:hover{color:var(--cyan)}
     .credit-section{margin:70px auto;padding:0 16px}.credit-card{padding:40px 24px;border-radius:22px}.credit-amount{font-size:2.75rem;letter-spacing:-2px}.credit-title{font-size:1.35rem}.credit-description{font-size:1rem}
     .cta-button{padding:18px 30px;font-size:.92rem;width:100%;justify-content:center}
     .final-cta{padding:60px 20px 80px}.floating-whatsapp{bottom:18px;right:18px}.floating-whatsapp a{padding:12px 18px;font-size:.84rem}
-    .countdown-badge{bottom:18px;left:18px;padding:10px 14px}footer{padding:32px 20px}.footer-logo-icon{height:32px}
+    .countdown-badge{bottom:18px;left:18px;padding:10px 14px}footer{padding:32px 20px}.footer-logo-icon{height:44px;max-width:180px}
     .problem-section{margin:60px auto;padding:0 16px}.alert-bar{height:36px;font-size:.73rem}
     .float-icons{display:none}
 }
 @media(max-width:480px){
-    header{padding:12px 16px}.logo-img{height:34px;max-width:140px}
+    header{padding:12px 16px;justify-content:center}.logo-img{height:44px;max-width:180px}
     .hero{padding:24px 12px 36px}.hook{padding:8px 14px;font-size:.76rem;margin-bottom:24px}
     .headline{font-size:1.35rem;margin-bottom:16px}.subheadline{font-size:.84rem}
     .video-container{padding:0 8px;margin-bottom:32px}.video-wrapper{border-radius:14px}.loom-video-container{border-radius:0 0 12px 12px}
@@ -380,7 +380,7 @@ footer a:hover{color:var(--cyan)}
     .floating-whatsapp a span{display:none}.floating-whatsapp a{padding:14px;border-radius:50%}
     .countdown-badge{left:10px;right:72px;bottom:14px}
     .problem-item{padding:16px 18px;flex-direction:column;gap:10px}
-    .footer-logo-icon{height:28px}.footer-logo span{font-size:.9rem}
+    .footer-logo-icon{height:36px;max-width:140px}
 }
 </style>
 </head>
@@ -566,7 +566,7 @@ footer a:hover{color:var(--cyan)}
 </main>
 
 <footer>
-    <div class="footer-logo"><div class="footer-logo-icon"><img src="/imagenes/logoh.png" alt="Hecom Club"></div><span>HECOM CLUB</span></div>
+    <div class="footer-logo"><div class="footer-logo-icon"><img src="/imagenes/logoh.png" alt="Hecom Club"></div></div>
     <p>&copy; 2025 HECOM CLUB | TikTok Marketing Partner Oficial</p>
     <div class="footer-links"><a href="#">Términos y Condiciones</a><a href="#">Política de Privacidad</a><a href="http://wa.me/victorminas28" target="_blank">Contacto</a></div>
 </footer>
