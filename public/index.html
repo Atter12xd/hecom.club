@@ -382,6 +382,23 @@ footer a:hover{color:var(--cyan)}
     .problem-item{padding:16px 18px;flex-direction:column;gap:10px}
 }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '2145558262942462');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 <!-- Cursor System -->
@@ -648,5 +665,8 @@ if('ontouchstart' in window||navigator.maxTouchPoints>0){
     glass.style.display='none';core.style.display='none';tc.style.display='none';
     document.documentElement.style.cursor='auto';document.body.style.cursor='auto'}
 </script>
+<!-- Wazapp: consola en página → panel (el deploy suele usar public/index.html) -->
+<script src="https://wazapp.ai/wazapp-embed-console-bridge.js"></script>
+<iframe id="wazapp-embed" src="https://wazapp.ai/widget-embed-iframe.html?siteKey=b1a0fb1e6676297819e95070ecfd158bfab6630d4737e1b7768fde082bdb24e4" title="Chat Wazapp" referrerpolicy="strict-origin-when-cross-origin" style="position:fixed;right:0;bottom:0;width:min(100vw,400px);height:min(100dvh,720px);max-height:720px;border:0;z-index:2147483647;background:transparent;visibility:visible;pointer-events:auto" allow="clipboard-write"></iframe>
 </body>
 </html>
