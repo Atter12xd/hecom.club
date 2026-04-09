@@ -665,7 +665,8 @@ if('ontouchstart' in window||navigator.maxTouchPoints>0){
     glass.style.display='none';core.style.display='none';tc.style.display='none';
     document.documentElement.style.cursor='auto';document.body.style.cursor='auto'}
 </script>
-<!-- Wazapp chat (iframe: funciona donde no corren scripts externos) -->
-<iframe src="https://wazapp.ai/widget-embed-iframe.html?siteKey=3f458c11ba9831743129b2c39c51b8f049a17d081c3eae43c187be56bc8d1dc6" title="Chat Wazapp" style="position:fixed;right:0;bottom:0;width:min(100vw,400px);height:min(100dvh,720px);max-height:720px;border:0;z-index:2147483646;background:transparent" allow="clipboard-write"></iframe>
+<!-- Wazapp: console bridge → iframe (orden recomendado) -->
+<script src="https://wazapp.ai/wazapp-embed-console-bridge.js" defer></script>
+<iframe id="wazapp-embed" src="https://wazapp.ai/widget-embed-iframe.html?siteKey=3f458c11ba9831743129b2c39c51b8f049a17d081c3eae43c187be56bc8d1dc6" title="Chat Wazapp" referrerpolicy="strict-origin-when-cross-origin" style="position:fixed;right:0;bottom:0;width:min(100vw,400px);height:min(100dvh,720px);max-height:720px;border:0;z-index:2147483647;background:transparent;visibility:visible;pointer-events:auto" allow="clipboard-write"></iframe>
 </body>
 </html>
