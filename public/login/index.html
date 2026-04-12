@@ -581,7 +581,7 @@ async function init() {
         }
         btn.disabled = true;
         try {
-            var redirectTo = window.location.origin + '/login';
+            var redirectTo = window.location.origin + '/destinos';
             var data = await invokeMagicLinkLogin(email, redirectTo);
             info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
             info.classList.add('visible');

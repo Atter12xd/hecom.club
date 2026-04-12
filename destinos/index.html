@@ -48,17 +48,18 @@ a:hover { text-decoration: underline; }
 
 .page {
     display: flex;
+    flex-direction: column;
     min-height: 100dvh;
     width: 100%;
 }
 
 .panel-left {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 40px 48px 48px;
-    max-width: 720px;
+    padding: 48px clamp(20px, 4vw, 40px) 36px;
+    max-width: 1080px;
     margin: 0 auto;
     width: 100%;
     position: relative;
@@ -154,7 +155,7 @@ a:hover { text-decoration: underline; }
     margin-bottom: 10px;
     line-height: 1.55;
     text-align: center;
-    max-width: 34rem;
+    max-width: 42rem;
     margin-left: auto;
     margin-right: auto;
 }
@@ -165,7 +166,7 @@ a:hover { text-decoration: underline; }
     text-align: center;
     line-height: 1.5;
     margin-bottom: 22px;
-    max-width: 32rem;
+    max-width: 40rem;
     margin-left: auto;
     margin-right: auto;
 }
@@ -202,23 +203,24 @@ a:hover { text-decoration: underline; }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(16px, 2.2vw, 24px);
+    margin-bottom: 28px;
+    width: 100%;
 }
 
 .card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 20px 18px 18px;
+    padding: 22px 22px 20px;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
     transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
     display: flex;
     flex-direction: column;
-    min-height: 220px;
+    min-height: 200px;
 }
 .card::before {
     content: '';
@@ -317,20 +319,23 @@ a:hover { text-decoration: underline; }
     font-size: 0.78rem;
     color: var(--text-muted);
     line-height: 1.5;
-    max-width: 34rem;
+    max-width: 42rem;
     margin: 0 auto;
 }
 
-/* Panel derecho (igual filosofía que login) */
+/* Franja inferior (marca + tips; antes era panel lateral) */
 .panel-right {
-    flex: 1;
+    flex: 0 0 auto;
+    width: 100%;
     background: var(--brand-gradient-panel);
     color: #fff;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    padding: 48px 36px;
+    gap: clamp(20px, 4vw, 40px);
+    padding: clamp(24px, 4vw, 36px) clamp(20px, 4vw, 48px) max(28px, env(safe-area-inset-bottom, 0px));
     position: relative;
     overflow: hidden;
 }
@@ -347,47 +352,49 @@ a:hover { text-decoration: underline; }
     pointer-events: none;
 }
 
+.hero-copy {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 28rem;
+}
+
 .hero-illustration {
     position: relative;
     z-index: 1;
-    width: min(100%, 280px);
-    margin-bottom: 32px;
+    width: min(100%, 200px);
+    flex-shrink: 0;
     opacity: 0.95;
 }
 
 .hero-illustration svg { width: 100%; height: auto; display: block; }
 
 .hero-title {
-    position: relative;
-    z-index: 1;
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 3vw, 1.55rem);
+    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
     font-weight: 700;
     text-align: center;
     color: var(--panel-right-text);
-    max-width: 300px;
     line-height: 1.35;
     letter-spacing: -0.02em;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .hero-sub {
-    position: relative;
-    z-index: 1;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     text-align: center;
     color: var(--panel-right-muted);
-    max-width: 280px;
     line-height: 1.55;
     font-weight: 400;
 }
 
 .dots {
-    position: relative;
-    z-index: 1;
     display: flex;
     gap: 8px;
-    margin-top: 28px;
+    margin-top: 16px;
     align-items: center;
     justify-content: center;
 }
@@ -415,24 +422,11 @@ a:hover { text-decoration: underline; }
 @media (max-width: 960px) {
     html, body { font-size: 16px; }
 
-    .page {
-        flex-direction: column;
-        min-height: 100dvh;
-        min-height: 100svh;
-    }
-
     .panel-left {
-        max-width: none;
-        width: 100%;
-        margin: 0;
         justify-content: flex-start;
         min-height: 0;
-        flex: 1 1 auto;
         padding-top: max(5.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
-        padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
-        padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
-        padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
-        order: 1;
+        padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
     }
 
     .back-link {
@@ -455,24 +449,21 @@ a:hover { text-decoration: underline; }
     }
 
     .panel-right {
-        order: 2;
-        flex: 0 0 auto;
-        padding: 1.75rem max(1.25rem, env(safe-area-inset-right, 0px))
-            max(2rem, env(safe-area-inset-bottom, 0px)) max(1.25rem, env(safe-area-inset-left, 0px));
+        flex-direction: column;
+        padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+        padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
     }
 
     .hero-illustration {
-        width: min(100%, 220px);
-        margin-bottom: 1.15rem;
+        width: min(100%, 180px);
     }
+}
 
-    .hero-title { font-size: clamp(1.08rem, 4vw, 1.32rem); max-width: 20rem; }
-    .hero-sub { font-size: 0.875rem; max-width: 18rem; }
-    .dots { margin-top: 1.1rem; }
+@media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
-    .grid { grid-template-columns: 1fr; }
     .card { min-height: 0; }
     .brand-logo img {
         max-height: min(26vw, 104px);
@@ -528,12 +519,14 @@ a:hover { text-decoration: underline; }
                 <path d="M92 88 L175 95" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
             </svg>
         </div>
-        <h2 class="hero-title" id="hero-title">Un solo acceso, varios tableros.</h2>
-        <p class="hero-sub" id="heroSub">Todo el equipo alineado en los mismos paneles de trabajo.</p>
-        <div class="dots" role="tablist" aria-label="Consejos del flujo">
-            <button type="button" aria-current="true" aria-label="Paso 1"></button>
-            <button type="button" aria-current="false" aria-label="Paso 2"></button>
-            <button type="button" aria-current="false" aria-label="Paso 3"></button>
+        <div class="hero-copy">
+            <h2 class="hero-title" id="hero-title">Un solo acceso, varios tableros.</h2>
+            <p class="hero-sub" id="heroSub">Todo el equipo alineado en los mismos paneles de trabajo.</p>
+            <div class="dots" role="tablist" aria-label="Consejos del flujo">
+                <button type="button" aria-current="true" aria-label="Paso 1"></button>
+                <button type="button" aria-current="false" aria-label="Paso 2"></button>
+                <button type="button" aria-current="false" aria-label="Paso 3"></button>
+            </div>
         </div>
     </aside>
 </div>
@@ -661,14 +654,23 @@ dots.forEach(function (d, i) {
 });
 
 (async function init() {
+    var supabase;
     try {
-        var supabase = await getSupabaseClient();
-        var session = (await supabase.auth.getSession()).data.session;
-        if (!session) {
-            window.location.replace('/login');
-            return;
-        }
+        supabase = await getSupabaseClient();
     } catch (_) {
+        window.location.replace('/login');
+        return;
+    }
+    var h = window.location.hash || '';
+    if (h && (h.indexOf('access_token') >= 0 || h.indexOf('refresh_token') >= 0 || h.indexOf('type=') >= 0)) {
+        await supabase.auth.getSession();
+        var sAfterHash = (await supabase.auth.getSession()).data.session;
+        if (sAfterHash) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+    }
+    var session = (await supabase.auth.getSession()).data.session;
+    if (!session) {
         window.location.replace('/login');
         return;
     }

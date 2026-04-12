@@ -13,7 +13,9 @@
 --   Añade hecom SIN quitar marketingconholistic, wazapp, localhost, etc.
 --
 
---   Magic link (Edge Function redirect_to suele ser /login):
+--   Magic link desde Hecom (Edge Function redirect_to = /destinos):
+--     https://www.hecom.club/destinos
+--   Página de login (formulario, sesión existente):
 --     https://www.hecom.club/login
 --   Tras sesión, hub de destinos (mismo origen hecom.club):
 --     https://www.hecom.club/destinos
