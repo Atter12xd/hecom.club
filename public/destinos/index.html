@@ -508,7 +508,7 @@ a:hover { text-decoration: underline; }
 
             <div class="grid" id="destinosGrid" role="list"></div>
 
-            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> para dejarte en Hecom con la sesión activa. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club).</p>
+            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> para dejarte en Hecom con la sesión activa. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club). <strong>Diagnóstico:</strong> en esta página abrí <strong>F12</strong> → <strong>Consola</strong> y buscá líneas <code>[hecom/destinos]</code>; lo mismo queda en <strong>Vercel → Functions → /api/handoff-log</strong> (sin datos sensibles).</p>
         </div>
     </section>
 
@@ -647,28 +647,85 @@ async function resolveHandoffUrl(targetUrl) {
     return targetUrl;
 }
 
+/** Metadatos seguros (nunca tokens ni URL con hash). Consola + POST /api/handoff-log → logs Vercel. */
+function handoffDebug(payload) {
+    var row = Object.assign({ ts: new Date().toISOString() }, payload);
+    try {
+        console.info('[hecom/destinos]', row);
+    } catch (_) {}
+    try {
+        var body = JSON.stringify(row);
+        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+            var ok = navigator.sendBeacon('/api/handoff-log', new Blob([body], { type: 'application/json' }));
+            if (!ok) {
+                fetch('/api/handoff-log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body,
+                    keepalive: true,
+                    credentials: 'same-origin',
+                }).catch(function () {});
+            }
+        } else {
+            fetch('/api/handoff-log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: body,
+                keepalive: true,
+                credentials: 'same-origin',
+            }).catch(function () {});
+        }
+    } catch (_) {}
+}
+
 /**
  * Pestaña nueva con URL final en el mismo tick del clic (evita about:blank → assign, que en Crédito
  * podía montar la app dos veces y romper tipografías / imágenes).
  * Si popup bloqueado, fallback async con about:blank.
  */
 function openHolisticPanel(targetUrl, panelName) {
+    var meta = { step: 'open-click', panel: panelName || '' };
+    try {
+        var pu = new URL(targetUrl);
+        meta.targetHost = pu.hostname;
+        meta.targetPath = pu.pathname;
+    } catch (_) {
+        meta.targetHost = '';
+        meta.targetPath = '';
+    }
     try {
         localStorage.setItem(STORAGE_KEY, targetUrl || '');
         if (panelName) localStorage.setItem(STORAGE_NAME, panelName);
     } catch (_) {}
     var s = sessionSnapshot;
+    meta.hasSnapshot = !!s;
+    meta.hasAccess = !!(s && s.access_token);
+    meta.hasRefresh = !!(s && s.refresh_token);
     var urlToOpen = targetUrl;
+    var usedHandoff = false;
     if (s && s.access_token && s.refresh_token && globalSupabase && isHolisticPanelUrl(targetUrl)) {
         urlToOpen = buildSessionHandoffUrl(targetUrl, s);
+        usedHandoff = true;
     }
+    meta.usedHandoff = usedHandoff;
+    meta.finalUrlLen = urlToOpen.length;
+    var hashIdx = urlToOpen.indexOf('#');
+    meta.hashLen = hashIdx >= 0 ? urlToOpen.length - hashIdx : 0;
+
     var w = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
+    meta.syncPopupOpened = !!w;
+    handoffDebug(meta);
     if (w) {
         try {
             w.opener = null;
         } catch (_) {}
         return;
     }
+    handoffDebug(
+        Object.assign({}, meta, {
+            step: 'popup-blocked-fallback',
+        })
+    );
     void (async function () {
         var pending = window.open('about:blank', '_blank', 'noopener,noreferrer');
         if (pending) {
@@ -676,11 +733,38 @@ function openHolisticPanel(targetUrl, panelName) {
                 pending.opener = null;
             } catch (_) {}
         }
-        var u = await resolveHandoffUrl(targetUrl);
+        var u = targetUrl;
+        try {
+            u = await resolveHandoffUrl(targetUrl);
+        } catch (ex) {
+            handoffDebug({
+                step: 'fallback-error',
+                panel: panelName || '',
+                targetHost: meta.targetHost,
+                targetPath: meta.targetPath,
+                err: ex && ex.message ? ex.message : String(ex),
+            });
+            u = targetUrl;
+        }
+        var hashI = u.indexOf('#');
+        handoffDebug({
+            step: 'fallback-resolved',
+            panel: panelName || '',
+            targetHost: meta.targetHost,
+            targetPath: meta.targetPath,
+            usedHandoff: hashI >= 0 && u.length - hashI > 20,
+            finalUrlLen: u.length,
+            hashLen: hashI >= 0 ? u.length - hashI : 0,
+        });
         if (pending) {
             try {
                 pending.location.href = u;
-            } catch (_) {
+            } catch (ex) {
+                handoffDebug({
+                    step: 'fallback-assign-failed',
+                    panel: panelName || '',
+                    err: ex && ex.message ? ex.message : String(ex),
+                });
                 try {
                     pending.close();
                 } catch (_) {}
