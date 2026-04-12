@@ -1,0 +1,16 @@
+-- =============================================================================
+-- Magic link (Edge Function magic-link-login) + hecom.club
+-- =============================================================================
+--
+-- El correo debe existir en public.gerentes O public.clientes_acceso (mismo criterio que tu función).
+-- Para un cliente de Hecom Club, insertá su email en clientes_acceso (o la tabla que uses).
+--
+-- Ejemplo (ajustá columnas a tu esquema real):
+--   insert into public.clientes_acceso (email) values ('cliente@ejemplo.com')
+--   on conflict do nothing;
+--
+-- En Supabase → Authentication → Redirect URLs debe figurar, por ejemplo:
+--   https://www.hecom.club/login
+--   https://www.hecom.club/**
+--
+-- =============================================================================

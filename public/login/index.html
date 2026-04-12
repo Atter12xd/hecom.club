@@ -155,53 +155,14 @@ a:hover { text-decoration: underline; }
     box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
-.input-wrap.has-toggle input { padding-right: 48px; }
-
-.toggle-pass {
-    position: absolute;
-    right: 4px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    border: none;
-    background: transparent;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #9ca3af;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s, background 0.2s;
-}
-.toggle-pass:hover { color: var(--text); background: #f3f4f6; }
-
 .form-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 22px;
+    margin-bottom: 8px;
     margin-top: 4px;
-}
-
-.remember {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    cursor: pointer;
-    user-select: none;
-}
-.remember input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--brand-start);
-    cursor: pointer;
 }
 
 .forgot-link {
@@ -211,6 +172,13 @@ a:hover { text-decoration: underline; }
     text-decoration: none;
 }
 .forgot-link:hover { text-decoration: underline; }
+
+.hint-line {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
 
 .submit-btn {
     width: 100%;
@@ -446,27 +414,14 @@ a:hover { text-decoration: underline; }
         padding-left: 46px;
     }
 
-    .input-wrap.has-toggle input { padding-right: 50px; }
-
     .form-row {
         flex-direction: column;
-        align-items: stretch;
-        gap: 0.65rem;
-        margin-bottom: 1.1rem;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
     }
 
-    .forgot-link { align-self: flex-start; padding: 4px 0; }
-
-    .remember {
-        min-height: 44px;
-        padding: 4px 0;
-        font-size: 0.9375rem;
-    }
-
-    .remember input {
-        width: 18px;
-        height: 18px;
-    }
+    .forgot-link { padding: 6px 0; }
 
     .brand-logo img {
         max-height: min(26vw, 104px);
@@ -485,8 +440,8 @@ a:hover { text-decoration: underline; }
                 <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="640" height="186">
             </a>
 
-            <h1 class="form-title" id="login-heading">Inicia sesión en tu cuenta</h1>
-            <p class="form-sub">¡Te damos la bienvenida de nuevo! Introduce tu correo y contraseña para entrar.</p>
+            <h1 class="form-title" id="login-heading">Iniciar sesión</h1>
+            <p class="form-sub">Te enviamos un enlace mágico al correo (válido por tiempo limitado). Mismo acceso que en tus otros paneles Holistic.</p>
 
             <form id="loginForm" novalidate>
                 <div class="field-group">
@@ -496,27 +451,13 @@ a:hover { text-decoration: underline; }
                         <input type="email" id="email" name="email" autocomplete="email" placeholder="correo@ejemplo.com" required>
                     </div>
                 </div>
-                <div class="field-group">
-                    <label class="field-label" for="password">Contraseña</label>
-                    <div class="input-wrap has-toggle">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Contraseña" required minlength="6">
-                        <button type="button" class="toggle-pass" id="togglePass" aria-label="Mostrar u ocultar contraseña" title="Mostrar contraseña">
-                            <svg id="iconEyeOff" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                            <svg id="iconEye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                        </button>
-                    </div>
-                </div>
+                <p class="hint-line">Solo correos dados de alta como gerente o con acceso en <strong>clientes_acceso</strong>.</p>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Enviar enlace mágico</button>
 
                 <div class="form-row">
-                    <label class="remember">
-                        <input type="checkbox" name="remember" id="remember">
-                        Recordarme
-                    </label>
                     <a class="forgot-link" href="/forgot-password">¿Olvidaste tu contraseña?</a>
                 </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">Entrar</button>
 
                 <p class="status-msg info" id="statusInfo" role="status"></p>
                 <p class="status-msg error" id="statusError" role="alert"></p>
@@ -565,16 +506,12 @@ a:hover { text-decoration: underline; }
 </div>
 
 <script type="module">
-import { getSupabaseClient } from '/js/supabase-auth.js';
+import { getSupabaseClient, invokeMagicLinkLogin } from '/js/supabase-auth.js';
 
 var form = document.getElementById('loginForm');
 var btn = document.getElementById('submitBtn');
 var info = document.getElementById('statusInfo');
 var err = document.getElementById('statusError');
-var pass = document.getElementById('password');
-var toggle = document.getElementById('togglePass');
-var iconOff = document.getElementById('iconEyeOff');
-var iconOn = document.getElementById('iconEye');
 
 function hideMsgs() {
     info.classList.remove('visible');
@@ -583,28 +520,25 @@ function hideMsgs() {
     err.textContent = '';
 }
 
-function mapAuthError(e) {
-    if (!e || !e.message) return 'No se pudo iniciar sesión. Intenta de nuevo.';
-    var m = e.message.toLowerCase();
-    if (m.includes('invalid login') || m.includes('invalid credentials')) {
-        return 'Correo o contraseña incorrectos.';
+async function tryConsumeMagicLinkHash() {
+    var h = window.location.hash || '';
+    if (!h || (h.indexOf('access_token') < 0 && h.indexOf('refresh_token') < 0 && h.indexOf('type=') < 0)) {
+        return;
     }
-    if (m.includes('email not confirmed')) {
-        return 'Confirma tu correo antes de entrar (revisa la bandeja de entrada).';
+    try {
+        var supabase = await getSupabaseClient();
+        await supabase.auth.getSession();
+        var session = (await supabase.auth.getSession()).data.session;
+        if (session) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+            window.location.replace('/');
+        }
+    } catch (_) {
+        /* ignorar */
     }
-    if (m.includes('too many requests')) {
-        return 'Demasiados intentos. Espera un momento e inténtalo de nuevo.';
-    }
-    return e.message;
 }
 
-toggle.addEventListener('click', function () {
-    var show = pass.type === 'password';
-    pass.type = show ? 'text' : 'password';
-    iconOff.style.display = show ? 'none' : 'block';
-    iconOn.style.display = show ? 'block' : 'none';
-    toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
-});
+tryConsumeMagicLinkHash();
 
 var dots = document.querySelectorAll('.dots button');
 var slides = [
@@ -626,29 +560,19 @@ form.addEventListener('submit', async function (e) {
     e.preventDefault();
     hideMsgs();
     var email = document.getElementById('email').value.trim();
-    var pw = pass.value;
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         err.textContent = 'Introduce un correo electrónico válido.';
         err.classList.add('visible');
         return;
     }
-    if (pw.length < 6) {
-        err.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-        err.classList.add('visible');
-        return;
-    }
     btn.disabled = true;
     try {
-        var supabase = await getSupabaseClient();
-        var result = await supabase.auth.signInWithPassword({ email: email, password: pw });
-        if (result.error) {
-            err.textContent = mapAuthError(result.error);
-            err.classList.add('visible');
-            return;
-        }
-        window.location.href = '/';
+        var redirectTo = window.location.origin + '/login';
+        var data = await invokeMagicLinkLogin(email, redirectTo);
+        info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
+        info.classList.add('visible');
     } catch (ex) {
-        err.textContent = ex.message || 'Error de conexión. Revisa la configuración en Vercel.';
+        err.textContent = ex.message || 'No se pudo enviar el enlace.';
         err.classList.add('visible');
     } finally {
         btn.disabled = false;

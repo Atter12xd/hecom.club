@@ -4,6 +4,52 @@
  */
 var _clientPromise = null;
 
+export async function getPublicSupabaseConfig() {
+    var res = await fetch('/api/supabase-config', { credentials: 'same-origin' });
+    if (!res.ok) {
+        var errBody = await res.text();
+        throw new Error(errBody || 'No se pudo cargar la configuración de Supabase');
+    }
+    var cfg = await res.json();
+    if (!cfg.url || !cfg.anonKey) {
+        throw new Error('Respuesta de configuración incompleta');
+    }
+    return {
+        url: cfg.url.replace(/\/$/, ''),
+        anonKey: cfg.anonKey,
+        magicLinkFunctionUrl: (cfg.magicLinkFunctionUrl || '').trim(),
+    };
+}
+
+/**
+ * Llama al Edge Function magic-link-login (mismo proyecto que PUBLIC_SUPABASE_URL).
+ * Opcional en Vercel (y en /api/supabase-config): PUBLIC_MAGIC_LINK_LOGIN_URL = URL completa.
+ */
+export async function invokeMagicLinkLogin(email, redirectTo) {
+    var cfg = await getPublicSupabaseConfig();
+    var fnUrl = cfg.magicLinkFunctionUrl || cfg.url + '/functions/v1/magic-link-login';
+    var res = await fetch(fnUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + cfg.anonKey,
+            apikey: cfg.anonKey,
+        },
+        body: JSON.stringify({
+            email: email,
+            method: 'link',
+            redirect_to: redirectTo,
+        }),
+    });
+    var data = await res.json().catch(function () {
+        return {};
+    });
+    if (!res.ok) {
+        throw new Error(data.error || data.message || 'Error ' + res.status);
+    }
+    return data;
+}
+
 export function getSupabaseClient() {
     if (_clientPromise) return _clientPromise;
     _clientPromise = (async function () {

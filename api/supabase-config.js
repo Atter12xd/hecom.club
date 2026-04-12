@@ -14,6 +14,7 @@ module.exports = function handler(req, res) {
 
     var url = process.env.PUBLIC_SUPABASE_URL || '';
     var anonKey = process.env.PUBLIC_SUPABASE_ANON_KEY || '';
+    var magicLinkFunctionUrl = process.env.PUBLIC_MAGIC_LINK_LOGIN_URL || '';
 
     if (!url || !anonKey) {
         return res.status(503).json({
@@ -23,5 +24,9 @@ module.exports = function handler(req, res) {
 
     res.setHeader('Cache-Control', 'no-store, max-age=0');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    return res.status(200).json({ url: url, anonKey: anonKey });
+    return res.status(200).json({
+        url: url,
+        anonKey: anonKey,
+        magicLinkFunctionUrl: magicLinkFunctionUrl,
+    });
 };

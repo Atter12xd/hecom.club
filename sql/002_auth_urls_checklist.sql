@@ -12,10 +12,11 @@
 -- Redirect URLs (lista de permitidos; wildcards OK)
 --   Añade hecom SIN quitar marketingconholistic, wazapp, localhost, etc.
 --
---   Mínimo para recuperación de contraseña desde hecom.club:
+--   Magic link (Edge Function redirect_to suele ser /login):
+--     https://www.hecom.club/login
+--   Recuperación de contraseña:
 --     https://www.hecom.club/auth/reset-password
---   O, más cómodo para login / futuros flujos:
---     https://www.hecom.club/**
+--   Atajo: https://www.hecom.club/** (cubre login, reset y más)
 --
 --   Si también sirves sin www:
 --     https://hecom.club/**
