@@ -530,7 +530,7 @@ a:hover { text-decoration: underline; }
             <div class="section-label"><span>Área de equipo</span></div>
             <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
             <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Páginas de trabajo</strong> — con tu sesión de Hecom abrimos las entradas <strong>acceso-*</strong> (donde el sitio aplica el login del hash) y luego pasás al panel. <strong>Crédito</strong> usa <strong>/credito</strong> (React). Si alguna pantalla pide login otra vez, avisá al equipo técnico.</p>
+            <p class="hint-line"><strong>Páginas de trabajo</strong> — en <strong>acceso-*</strong> llevamos la sesión en el enlace. <strong>Crédito</strong> (<code>/credito</code>, React) se abre <strong>sin hash de sesión</strong> para que el diseño cargue igual que si entrás directo; si hace falta sesión ahí, usá magic link en ese dominio.</p>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -543,10 +543,21 @@ a:hover { text-decoration: underline; }
 
             <div class="handoff-debug-wrap" id="handoffDebugWrap">
                 <p class="handoff-debug-title">Registro de diagnóstico (sin datos sensibles)</p>
-                <pre class="handoff-debug-pre" id="handoffDebugBody">Cargando…</pre>
+                <pre class="handoff-debug-pre" id="handoffDebugBody"></pre>
             </div>
         </div>
     </section>
+
+    <script>
+    (function () {
+        var el = document.getElementById('handoffDebugBody');
+        if (!el) return;
+        el.textContent =
+            '[1] Script inline OK — ' +
+            new Date().toISOString() +
+            '\n[2] Si no aparece línea [módulo] abajo, falló el import de /js/supabase-auth.js (mirá Consola y Red).';
+    })();
+    </script>
 
     <aside class="panel-right" aria-labelledby="hero-title">
         <div class="hero-illustration" aria-hidden="true">
@@ -646,6 +657,19 @@ function isHolisticPanelUrl(urlStr) {
     }
 }
 
+/** El panel React /credito rompe layout con un hash enorme de tokens; las páginas acceso-* sí lo consumen bien. */
+function needsSessionHandoff(urlStr) {
+    try {
+        if (!isHolisticPanelUrl(urlStr)) return false;
+        var u = new URL(urlStr);
+        var path = (u.pathname || '/').replace(/\/+$/, '') || '/';
+        if (path === '/credito') return false;
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
 /**
  * Misma sesión en otro dominio: el hash es el formato "implicit grant" que usa auth-js con detectSessionInUrl.
  * Requiere que crédito/pendientes/etc. usen el mismo proyecto Supabase y acepten implicit en URL (no PKCE estricto sin leer hash).
@@ -673,7 +697,7 @@ function buildSessionHandoffUrl(baseUrl, session) {
 }
 
 async function resolveHandoffUrl(targetUrl) {
-    if (!globalSupabase || !isHolisticPanelUrl(targetUrl)) return targetUrl;
+    if (!globalSupabase || !isHolisticPanelUrl(targetUrl) || !needsSessionHandoff(targetUrl)) return targetUrl;
     try {
         var session = (await globalSupabase.auth.getSession()).data.session;
         if (session && session.access_token && session.refresh_token) {
@@ -755,11 +779,14 @@ function openHolisticPanel(targetUrl, panelName) {
     meta.hasRefresh = !!(s && s.refresh_token);
     var urlToOpen = targetUrl;
     var usedHandoff = false;
-    if (s && s.access_token && s.refresh_token && globalSupabase && isHolisticPanelUrl(targetUrl)) {
+    var wantHandoff =
+        !!(s && s.access_token && s.refresh_token && globalSupabase && isHolisticPanelUrl(targetUrl) && needsSessionHandoff(targetUrl));
+    if (wantHandoff) {
         urlToOpen = buildSessionHandoffUrl(targetUrl, s);
         usedHandoff = true;
     }
     meta.usedHandoff = usedHandoff;
+    meta.skipHandoffCredito = isHolisticPanelUrl(targetUrl) && !needsSessionHandoff(targetUrl);
     meta.finalUrlLen = urlToOpen.length;
     var hashIdx = urlToOpen.indexOf('#');
     meta.hashLen = hashIdx >= 0 ? urlToOpen.length - hashIdx : 0;
@@ -935,13 +962,19 @@ dots.forEach(function (d, i) {
     supabase.auth.onAuthStateChange(function (_evt, sess) {
         sessionSnapshot = sess;
     });
+    try {
+        var pre0 = document.getElementById('handoffDebugBody');
+        if (pre0 && pre0.textContent.indexOf('[módulo]') < 0) {
+            pre0.textContent += '\n\n[módulo] Sesión lista. Crédito abre sin hash de handoff; resto con hash si aplica.';
+        }
+    } catch (_) {}
     handoffDebug({
         step: 'pagina-lista',
         panel: '',
         hasSnapshot: !!sessionSnapshot,
         hasAccess: !!(sessionSnapshot && sessionSnapshot.access_token),
         hasRefresh: !!(sessionSnapshot && sessionSnapshot.refresh_token),
-        msg: 'Hacé clic en Abrir panel; acá y en consola (F12) deberías ver más líneas.',
+        msg: 'Crédito=/credito sin hash; acceso-* con handoff.',
     });
     renderCards();
     showLastAccess();
