@@ -332,6 +332,37 @@ a:hover { text-decoration: underline; }
     margin: 0 auto;
 }
 
+.handoff-debug-wrap {
+    margin-top: 1.25rem;
+    max-width: 42rem;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+.handoff-debug-wrap .handoff-debug-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.handoff-debug-pre {
+    margin: 0;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1px dashed rgba(100, 116, 139, 0.45);
+    background: rgba(15, 23, 42, 0.04);
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    color: #475569;
+    max-height: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 /* Franja inferior (marca + tips; antes era panel lateral) */
 .panel-right {
     flex: 0 0 auto;
@@ -508,7 +539,12 @@ a:hover { text-decoration: underline; }
 
             <div class="grid" id="destinosGrid" role="list"></div>
 
-            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> para dejarte en Hecom con la sesión activa. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club). <strong>Diagnóstico:</strong> en esta página abrí <strong>F12</strong> → <strong>Consola</strong> y buscá líneas <code>[hecom/destinos]</code>; lo mismo queda en <strong>Vercel → Functions → /api/handoff-log</strong> (sin datos sensibles).</p>
+            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> para dejarte en Hecom con la sesión activa. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club). Si no ves el cuadro gris de abajo, probá <strong>recarga forzada</strong> (Ctrl+F5) por caché del navegador.</p>
+
+            <div class="handoff-debug-wrap" id="handoffDebugWrap">
+                <p class="handoff-debug-title">Registro de diagnóstico (sin datos sensibles)</p>
+                <pre class="handoff-debug-pre" id="handoffDebugBody">Cargando…</pre>
+            </div>
         </div>
     </section>
 
@@ -647,11 +683,27 @@ async function resolveHandoffUrl(targetUrl) {
     return targetUrl;
 }
 
-/** Metadatos seguros (nunca tokens ni URL con hash). Consola + POST /api/handoff-log → logs Vercel. */
+var _handoffLines = [];
+
+/** Metadatos seguros (nunca tokens ni URL con hash). Panel en página + consola + POST /api/handoff-log. */
 function handoffDebug(payload) {
     var row = Object.assign({ ts: new Date().toISOString() }, payload);
+    var line = JSON.stringify(row);
+    _handoffLines.push(line);
+    if (_handoffLines.length > 10) {
+        _handoffLines.shift();
+    }
     try {
-        console.info('[hecom/destinos]', row);
+        var pre = document.getElementById('handoffDebugBody');
+        if (pre) {
+            pre.textContent = _handoffLines.join('\n\n');
+        }
+    } catch (_) {}
+    try {
+        console.warn('[hecom/destinos]', row);
+    } catch (_) {}
+    try {
+        console.log('[hecom/destinos]', line);
     } catch (_) {}
     try {
         var body = JSON.stringify(row);
@@ -804,6 +856,11 @@ function renderCards() {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             if (e.button !== 0) return;
             e.preventDefault();
+            handoffDebug({
+                step: 'click-detectado',
+                panel: link.getAttribute('data-name') || '',
+                hrefLen: (link.getAttribute('data-url') || '').length,
+            });
             openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
         });
     });
@@ -826,6 +883,7 @@ function showLastAccess() {
     label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
     wrap.classList.add('visible');
     btn.onclick = function () {
+        handoffDebug({ step: 'click-ultimo-panel', panel: name || '', hrefLen: (url || '').length });
         openHolisticPanel(url, name);
     };
 }
@@ -876,6 +934,14 @@ dots.forEach(function (d, i) {
     sessionSnapshot = session;
     supabase.auth.onAuthStateChange(function (_evt, sess) {
         sessionSnapshot = sess;
+    });
+    handoffDebug({
+        step: 'pagina-lista',
+        panel: '',
+        hasSnapshot: !!sessionSnapshot,
+        hasAccess: !!(sessionSnapshot && sessionSnapshot.access_token),
+        hasRefresh: !!(sessionSnapshot && sessionSnapshot.refresh_token),
+        msg: 'Hacé clic en Abrir panel; acá y en consola (F12) deberías ver más líneas.',
     });
     renderCards();
     showLastAccess();
