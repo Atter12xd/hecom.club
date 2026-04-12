@@ -499,7 +499,7 @@ a:hover { text-decoration: underline; }
             <div class="section-label"><span>Área de equipo</span></div>
             <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
             <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Mismo navegador</strong> (donde ya tenés sesión en Hecom): <strong>Pendientes, Creativos y Finanzas</strong> reciben la sesión en el enlace hacia <code>acceso-*</code>. <strong>Crédito</strong> (<code>/credito</code>) se abre sin tokens en la URL por estabilidad del panel React; si pide login, usá magic link allí con el mismo correo. <strong>Otro navegador, incógnito o perfil</strong>: no comparte cookies con el primero — es normal que pida iniciar sesión en cada sitio.</p>
+            <p class="hint-line"><strong>Mismo navegador</strong> (sesión Hecom ya activa): los cuatro enlaces llevan la sesión en el fragmento de la URL hacia marketing (<code>/credito</code> y <code>acceso-*</code>). <strong>Otro navegador / incógnito / perfil</strong> no comparte esa sesión: hace falta magic link otra vez o un IdP central. En infra: ningún redirect 302 ni meta refresh puede “strippear” el <code>#</code> antes de que el JS de marketing consuma el hash.</p>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -552,13 +552,15 @@ var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
 
 /**
- * Pegar sesión en el hash solo hacia rutas /acceso-* (no /credito). true = entrás directo a esos tres
- * desde el mismo navegador donde ya hay sesión Hecom. false = siempre URL limpia (más login en marketing).
+ * Pegar sesión en el hash hacia marketing (implicit). Mismo navegador + marketing con bootstrap/AuthGate OK.
+ * false = URLs limpias (más login en marketing).
  */
 var USE_URL_SESSION_HANDOFF = true;
 
-/* Pendientes / creativos / finanzas: entradas acceso-* (setSession desde el hash antes del panel).
-   Crédito sigue en /credito (React); si más adelante hay acceso-credito, cambiá la URL acá. */
+/* Rutas de panel en marketing (setSession desde hash en cliente). Añadir aquí paths que NUNCA deban llevar tokens. */
+var MARKETING_HANDOFF_DENYLIST = [];
+
+/* Pendientes / creativos / finanzas: acceso-*. Crédito: /credito (React). */
 var DESTINOS = [
     {
         order: 1,
@@ -616,20 +618,33 @@ function isHolisticPanelUrl(urlStr) {
     }
 }
 
-/** Solo páginas acceso-* (HTML con setSession desde hash). Nunca /credito (React + diseño estable). */
+/**
+ * ¿Incluir #access_token=… en la URL? Sí en /credito y /acceso-* (alineado con holistic: main bootstrap + AuthGate).
+ * Denylist: paths normalizados sin barra final, p. ej. '/promo'.
+ */
 function needsSessionHandoff(urlStr) {
     try {
         if (!isHolisticPanelUrl(urlStr)) return false;
-        var path = (new URL(urlStr).pathname || '/').toLowerCase();
-        return path.indexOf('/acceso-') >= 0;
+        var raw = (new URL(urlStr).pathname || '/').toLowerCase();
+        var path = raw.replace(/\/+$/, '') || '/';
+        for (var i = 0; i < MARKETING_HANDOFF_DENYLIST.length; i++) {
+            var d = String(MARKETING_HANDOFF_DENYLIST[i] || '')
+                .toLowerCase()
+                .replace(/\/+$/, '') || '/';
+            if (path === d || path.indexOf(d + '/') === 0) return false;
+        }
+        if (path === '/credito') return true;
+        if (path.indexOf('/acceso-') >= 0) return true;
+        return false;
     } catch (_) {
         return false;
     }
 }
 
 /**
- * Misma sesión en otro dominio: el hash es el formato "implicit grant" que usa auth-js con detectSessionInUrl.
- * Requiere que crédito/pendientes/etc. usen el mismo proyecto Supabase y acepten implicit en URL (no PKCE estricto sin leer hash).
+ * Misma sesión en otro dominio: hash implicit (access_token, refresh_token, expires_in, token_type).
+ * Los 302/301 del servidor no envían el fragmento al destino: el cliente debe abrir ya la URL final con #…;
+ * si un proxy o HTML hace salto sin preservar hash, el handoff falla (no se arregla solo en marketing).
  */
 function buildSessionHandoffUrl(baseUrl, session) {
     var u = new URL(baseUrl);
