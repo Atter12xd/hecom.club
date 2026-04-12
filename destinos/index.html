@@ -332,37 +332,6 @@ a:hover { text-decoration: underline; }
     margin: 0 auto;
 }
 
-.handoff-debug-wrap {
-    margin-top: 1.25rem;
-    max-width: 42rem;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-}
-.handoff-debug-wrap .handoff-debug-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-}
-.handoff-debug-pre {
-    margin: 0;
-    padding: 12px 14px;
-    border-radius: var(--radius-md);
-    border: 1px dashed rgba(100, 116, 139, 0.45);
-    background: rgba(15, 23, 42, 0.04);
-    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
-    font-size: 11px;
-    line-height: 1.45;
-    color: #475569;
-    max-height: 200px;
-    overflow: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
 /* Franja inferior (marca + tips; antes era panel lateral) */
 .panel-right {
     flex: 0 0 auto;
@@ -530,7 +499,7 @@ a:hover { text-decoration: underline; }
             <div class="section-label"><span>Área de equipo</span></div>
             <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
             <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Páginas de trabajo</strong> — en <strong>acceso-*</strong> llevamos la sesión en el enlace. <strong>Crédito</strong> (<code>/credito</code>, React) se abre <strong>sin hash de sesión</strong> para que el diseño cargue igual que si entrás directo; si hace falta sesión ahí, usá magic link en ese dominio.</p>
+            <p class="hint-line"><strong>Páginas de trabajo</strong> — los enlaces abren la <strong>misma URL</strong> que si entrás directo a marketing (sin pegar sesión en la dirección), para que el diseño sea estable. En <strong>marketingconholistic.com</strong> usá magic link con el mismo correo cuando el panel pida iniciar sesión.</p>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -539,25 +508,9 @@ a:hover { text-decoration: underline; }
 
             <div class="grid" id="destinosGrid" role="list"></div>
 
-            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> para dejarte en Hecom con la sesión activa. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club). Si no ves el cuadro gris de abajo, probá <strong>recarga forzada</strong> (Ctrl+F5) por caché del navegador.</p>
-
-            <div class="handoff-debug-wrap" id="handoffDebugWrap">
-                <p class="handoff-debug-title">Registro de diagnóstico (sin datos sensibles)</p>
-                <pre class="handoff-debug-pre" id="handoffDebugBody"></pre>
-            </div>
+            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> y deja Hecom abierto con tu sesión. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club).</p>
         </div>
     </section>
-
-    <script>
-    (function () {
-        var el = document.getElementById('handoffDebugBody');
-        if (!el) return;
-        el.textContent =
-            '[1] Script inline OK — ' +
-            new Date().toISOString() +
-            '\n[2] Si no aparece línea [módulo] abajo, falló el import de /js/supabase-auth.js (mirá Consola y Red).';
-    })();
-    </script>
 
     <aside class="panel-right" aria-labelledby="hero-title">
         <div class="hero-illustration" aria-hidden="true">
@@ -597,6 +550,12 @@ var sessionSnapshot = null;
 
 var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
+
+/**
+ * Pegar sesión en el hash de la URL hacia marketing (SSO). Por defecto false: misma URL que entrar
+ * directo → sin saltos de diseño. Pasar a true solo cuando las apps consuman el hash sin romper UI.
+ */
+var USE_URL_SESSION_HANDOFF = false;
 
 /* Pendientes / creativos / finanzas: entradas acceso-* (setSession desde el hash antes del panel).
    Crédito sigue en /credito (React); si más adelante hay acceso-credito, cambiá la URL acá. */
@@ -697,7 +656,9 @@ function buildSessionHandoffUrl(baseUrl, session) {
 }
 
 async function resolveHandoffUrl(targetUrl) {
-    if (!globalSupabase || !isHolisticPanelUrl(targetUrl) || !needsSessionHandoff(targetUrl)) return targetUrl;
+    if (!USE_URL_SESSION_HANDOFF || !globalSupabase || !isHolisticPanelUrl(targetUrl) || !needsSessionHandoff(targetUrl)) {
+        return targetUrl;
+    }
     try {
         var session = (await globalSupabase.auth.getSession()).data.session;
         if (session && session.access_token && session.refresh_token) {
@@ -707,104 +668,27 @@ async function resolveHandoffUrl(targetUrl) {
     return targetUrl;
 }
 
-var _handoffLines = [];
-
-/** Metadatos seguros (nunca tokens ni URL con hash). Panel en página + consola + POST /api/handoff-log. */
-function handoffDebug(payload) {
-    var row = Object.assign({ ts: new Date().toISOString() }, payload);
-    var line = JSON.stringify(row);
-    _handoffLines.push(line);
-    if (_handoffLines.length > 10) {
-        _handoffLines.shift();
-    }
-    try {
-        var pre = document.getElementById('handoffDebugBody');
-        if (pre) {
-            pre.textContent = _handoffLines.join('\n\n');
-        }
-    } catch (_) {}
-    try {
-        console.warn('[hecom/destinos]', row);
-    } catch (_) {}
-    try {
-        console.log('[hecom/destinos]', line);
-    } catch (_) {}
-    try {
-        var body = JSON.stringify(row);
-        if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-            var ok = navigator.sendBeacon('/api/handoff-log', new Blob([body], { type: 'application/json' }));
-            if (!ok) {
-                fetch('/api/handoff-log', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: body,
-                    keepalive: true,
-                    credentials: 'same-origin',
-                }).catch(function () {});
-            }
-        } else {
-            fetch('/api/handoff-log', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: body,
-                keepalive: true,
-                credentials: 'same-origin',
-            }).catch(function () {});
-        }
-    } catch (_) {}
-}
-
-/**
- * Pestaña nueva con URL final en el mismo tick del clic (evita about:blank → assign, que en Crédito
- * podía montar la app dos veces y romper tipografías / imágenes).
- * Si popup bloqueado, fallback async con about:blank.
- */
+/** Pestaña nueva; URL limpia salvo que USE_URL_SESSION_HANDOFF sea true. */
 function openHolisticPanel(targetUrl, panelName) {
-    var meta = { step: 'open-click', panel: panelName || '' };
-    try {
-        var pu = new URL(targetUrl);
-        meta.targetHost = pu.hostname;
-        meta.targetPath = pu.pathname;
-    } catch (_) {
-        meta.targetHost = '';
-        meta.targetPath = '';
-    }
     try {
         localStorage.setItem(STORAGE_KEY, targetUrl || '');
         if (panelName) localStorage.setItem(STORAGE_NAME, panelName);
     } catch (_) {}
     var s = sessionSnapshot;
-    meta.hasSnapshot = !!s;
-    meta.hasAccess = !!(s && s.access_token);
-    meta.hasRefresh = !!(s && s.refresh_token);
     var urlToOpen = targetUrl;
-    var usedHandoff = false;
     var wantHandoff =
+        USE_URL_SESSION_HANDOFF &&
         !!(s && s.access_token && s.refresh_token && globalSupabase && isHolisticPanelUrl(targetUrl) && needsSessionHandoff(targetUrl));
     if (wantHandoff) {
         urlToOpen = buildSessionHandoffUrl(targetUrl, s);
-        usedHandoff = true;
     }
-    meta.usedHandoff = usedHandoff;
-    meta.skipHandoffCredito = isHolisticPanelUrl(targetUrl) && !needsSessionHandoff(targetUrl);
-    meta.finalUrlLen = urlToOpen.length;
-    var hashIdx = urlToOpen.indexOf('#');
-    meta.hashLen = hashIdx >= 0 ? urlToOpen.length - hashIdx : 0;
-
     var w = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
-    meta.syncPopupOpened = !!w;
-    handoffDebug(meta);
     if (w) {
         try {
             w.opener = null;
         } catch (_) {}
         return;
     }
-    handoffDebug(
-        Object.assign({}, meta, {
-            step: 'popup-blocked-fallback',
-        })
-    );
     void (async function () {
         var pending = window.open('about:blank', '_blank', 'noopener,noreferrer');
         if (pending) {
@@ -815,35 +699,13 @@ function openHolisticPanel(targetUrl, panelName) {
         var u = targetUrl;
         try {
             u = await resolveHandoffUrl(targetUrl);
-        } catch (ex) {
-            handoffDebug({
-                step: 'fallback-error',
-                panel: panelName || '',
-                targetHost: meta.targetHost,
-                targetPath: meta.targetPath,
-                err: ex && ex.message ? ex.message : String(ex),
-            });
+        } catch (_) {
             u = targetUrl;
         }
-        var hashI = u.indexOf('#');
-        handoffDebug({
-            step: 'fallback-resolved',
-            panel: panelName || '',
-            targetHost: meta.targetHost,
-            targetPath: meta.targetPath,
-            usedHandoff: hashI >= 0 && u.length - hashI > 20,
-            finalUrlLen: u.length,
-            hashLen: hashI >= 0 ? u.length - hashI : 0,
-        });
         if (pending) {
             try {
                 pending.location.href = u;
-            } catch (ex) {
-                handoffDebug({
-                    step: 'fallback-assign-failed',
-                    panel: panelName || '',
-                    err: ex && ex.message ? ex.message : String(ex),
-                });
+            } catch (_) {
                 try {
                     pending.close();
                 } catch (_) {}
@@ -883,11 +745,6 @@ function renderCards() {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             if (e.button !== 0) return;
             e.preventDefault();
-            handoffDebug({
-                step: 'click-detectado',
-                panel: link.getAttribute('data-name') || '',
-                hrefLen: (link.getAttribute('data-url') || '').length,
-            });
             openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
         });
     });
@@ -910,7 +767,6 @@ function showLastAccess() {
     label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
     wrap.classList.add('visible');
     btn.onclick = function () {
-        handoffDebug({ step: 'click-ultimo-panel', panel: name || '', hrefLen: (url || '').length });
         openHolisticPanel(url, name);
     };
 }
@@ -961,20 +817,6 @@ dots.forEach(function (d, i) {
     sessionSnapshot = session;
     supabase.auth.onAuthStateChange(function (_evt, sess) {
         sessionSnapshot = sess;
-    });
-    try {
-        var pre0 = document.getElementById('handoffDebugBody');
-        if (pre0 && pre0.textContent.indexOf('[módulo]') < 0) {
-            pre0.textContent += '\n\n[módulo] Sesión lista. Crédito abre sin hash de handoff; resto con hash si aplica.';
-        }
-    } catch (_) {}
-    handoffDebug({
-        step: 'pagina-lista',
-        panel: '',
-        hasSnapshot: !!sessionSnapshot,
-        hasAccess: !!(sessionSnapshot && sessionSnapshot.access_token),
-        hasRefresh: !!(sessionSnapshot && sessionSnapshot.refresh_token),
-        msg: 'Crédito=/credito sin hash; acceso-* con handoff.',
     });
     renderCards();
     showLastAccess();
