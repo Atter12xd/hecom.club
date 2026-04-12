@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Acceder | Hecom Club</title>
 <link rel="icon" type="image/png" href="/imagenes/favicon.png?v=2">
 <link rel="apple-touch-icon" href="/imagenes/favicon.png?v=2">
@@ -40,6 +40,7 @@ html, body {
     color: var(--text);
     background: #fff;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 a { color: var(--primary); text-decoration: none; }
@@ -137,6 +138,7 @@ a:hover { text-decoration: underline; }
     justify-content: center;
     gap: 10px;
     padding: 12px 16px;
+    min-height: 44px;
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 600;
@@ -145,6 +147,8 @@ a:hover { text-decoration: underline; }
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
 }
 .social-btn:hover {
@@ -220,8 +224,8 @@ a:hover { text-decoration: underline; }
     right: 4px;
     top: 50%;
     transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border: none;
     background: transparent;
     border-radius: var(--radius-sm);
@@ -230,6 +234,8 @@ a:hover { text-decoration: underline; }
     align-items: center;
     justify-content: center;
     color: #9ca3af;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: color 0.2s, background 0.2s;
 }
 .toggle-pass:hover { color: var(--text); background: #f3f4f6; }
@@ -271,6 +277,7 @@ a:hover { text-decoration: underline; }
 .submit-btn {
     width: 100%;
     padding: 14px 20px;
+    min-height: 48px;
     font-family: var(--font-display);
     font-size: 0.9375rem;
     font-weight: 700;
@@ -279,6 +286,8 @@ a:hover { text-decoration: underline; }
     border: none;
     border-radius: var(--radius-sm);
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: filter 0.2s, transform 0.15s, box-shadow 0.2s;
     box-shadow: 0 4px 16px rgba(255, 87, 51, 0.35);
 }
@@ -389,11 +398,15 @@ a:hover { text-decoration: underline; }
 .dots button {
     width: 8px;
     height: 8px;
+    min-width: 10px;
+    min-height: 10px;
     border-radius: 50%;
     border: none;
     padding: 0;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.35);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: background 0.25s, transform 0.2s;
 }
 .dots button[aria-current="true"] {
@@ -401,26 +414,146 @@ a:hover { text-decoration: underline; }
     transform: scale(1.15);
 }
 
+/* Móvil / tablet: lectura cómoda, sin zoom iOS en inputs, áreas seguras */
 @media (max-width: 960px) {
-    .page { flex-direction: column; }
+    html, body { font-size: 16px; }
+
+    .page {
+        flex-direction: column;
+        min-height: 100dvh;
+        min-height: 100svh;
+    }
+
     .panel-left {
         max-width: none;
-        padding: 72px 24px 40px;
+        width: 100%;
+        margin: 0;
+        justify-content: flex-start;
+        min-height: 0;
+        flex: 1 1 auto;
+        padding-top: max(5.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+        padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+        padding-bottom: max(1.75rem, env(safe-area-inset-bottom, 0px));
+        padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
         order: 1;
     }
-    .brand-logo { margin-bottom: 26px; }
-    .brand-logo img { max-height: 150px; max-width: min(96%, 520px); }
-    .back-link { left: 20px; top: 20px; }
+
+    .back-link {
+        top: max(0.75rem, env(safe-area-inset-top, 0px));
+        left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding: 0.5rem 0.65rem;
+        min-height: 44px;
+        min-width: 44px;
+        align-items: center;
+        font-size: 0.9375rem;
+    }
+
+    .brand-logo {
+        margin-top: 0.25rem;
+        margin-bottom: 1.35rem;
+    }
+
+    /* Logo visible pero sin aplastar el formulario */
+    .brand-logo img {
+        max-height: min(28vw, 118px);
+        max-width: min(88vw, 300px);
+    }
+
+    .form-title {
+        font-size: clamp(1.35rem, 5vw, 1.6rem);
+        line-height: 1.25;
+    }
+
+    .form-sub {
+        font-size: 0.9375rem;
+        margin-bottom: 1.35rem;
+        line-height: 1.55;
+    }
+
+    .field-group { margin-bottom: 1rem; }
+
     .panel-right {
         order: 2;
-        min-height: 320px;
-        padding: 40px 24px 48px;
+        flex: 0 0 auto;
+        min-height: 0;
+        padding: 1.75rem max(1.25rem, env(safe-area-inset-right, 0px))
+            max(2rem, env(safe-area-inset-bottom, 0px)) max(1.25rem, env(safe-area-inset-left, 0px));
     }
-    .hero-illustration { max-width: 280px; margin-bottom: 28px; }
+
+    .hero-illustration {
+        width: min(100%, 240px);
+        max-width: 240px;
+        margin-bottom: 1.15rem;
+    }
+
+    .hero-title {
+        font-size: clamp(1.1rem, 4.2vw, 1.35rem);
+        max-width: 20rem;
+        padding: 0 0.25rem;
+    }
+
+    .hero-sub {
+        font-size: 0.875rem;
+        max-width: 18rem;
+        line-height: 1.5;
+    }
+
+    .dots { margin-top: 1.15rem; }
 }
 
 @media (max-width: 480px) {
-    .social-row { grid-template-columns: 1fr; }
+    .social-row { grid-template-columns: 1fr; gap: 10px; }
+
+    .social-btn,
+    .submit-btn,
+    .input-wrap input {
+        font-size: 16px;
+    }
+
+    .social-btn { min-height: 48px; padding: 14px 18px; }
+
+    .submit-btn { min-height: 50px; padding: 15px 20px; }
+
+    .input-wrap input {
+        padding-top: 14px;
+        padding-bottom: 14px;
+        padding-left: 46px;
+    }
+
+    .input-wrap.has-toggle input { padding-right: 50px; }
+
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.65rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .forgot-link { align-self: flex-start; padding: 4px 0; }
+
+    .remember {
+        min-height: 44px;
+        padding: 4px 0;
+        font-size: 0.9375rem;
+    }
+
+    .remember input {
+        width: 18px;
+        height: 18px;
+    }
+
+    .divider {
+        font-size: 0.78rem;
+        gap: 10px;
+        margin-bottom: 1.1rem;
+    }
+
+    .form-footer { margin-top: 1.35rem; font-size: 0.9375rem; }
+
+    .brand-logo img {
+        max-height: min(26vw, 104px);
+        max-width: min(86vw, 280px);
+    }
 }
 </style>
 </head>
