@@ -4,32 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<title>Tus paneles de trabajo | Hecom Club</title>
+<title>Tus paneles | Hecom Club</title>
 <link rel="icon" type="image/png" href="/imagenes/favicon.png?v=2">
 <link rel="apple-touch-icon" href="/imagenes/favicon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-    --brand-start: #ff5733;
-    --brand-mid: #ff8c42;
-    --brand-end: #ffb347;
-    --brand-gradient: linear-gradient(90deg, var(--brand-start) 0%, var(--brand-mid) 52%, var(--brand-end) 100%);
-    --brand-gradient-panel: linear-gradient(145deg, #ff4f2e 0%, #ff7a35 38%, #ffa62e 72%, #ffc966 100%);
-    --primary: #e85a24;
-    --primary-soft: rgba(255, 87, 51, 0.12);
-    --text: #334155;
+    --primary: #c2410c;
+    --primary-hover: #9a3412;
+    --text: #0f172a;
     --text-muted: #64748b;
-    --border: #e8e4e1;
-    --card: #fffcfa;
-    --radius-sm: 8px;
-    --radius-md: 14px;
-    --panel-right-text: rgba(255, 255, 255, 0.96);
-    --panel-right-muted: rgba(255, 255, 255, 0.82);
-    --font-display: 'Varela Round', 'Inter', system-ui, sans-serif;
-    --shadow-sm: 0 1px 3px rgba(15, 17, 20, 0.04), 0 1px 2px rgba(15, 17, 20, 0.06);
-    --shadow-md: 0 4px 20px rgba(15, 17, 20, 0.06), 0 1px 4px rgba(15, 17, 20, 0.04);
+    --border: #e2e8f0;
+    --card: #ffffff;
+    --bg: #fafafa;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --font-display: 'Inter', system-ui, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,11 +35,7 @@ html, body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-size: 15px;
     color: var(--text);
-    background-color: #f6f0eb;
-    background-image:
-        radial-gradient(ellipse 100% 80% at 50% -30%, rgba(255, 138, 90, 0.14), transparent 55%),
-        linear-gradient(180deg, #fff9f5 0%, #faf6f2 45%, #f0f3f8 100%);
-    background-attachment: fixed;
+    background: var(--bg);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
@@ -67,8 +55,8 @@ a:hover { text-decoration: underline; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 48px clamp(20px, 4vw, 40px) 36px;
-    max-width: 1080px;
+    padding: 40px clamp(18px, 3.5vw, 32px) 28px;
+    max-width: 920px;
     margin: 0 auto;
     width: 100%;
     position: relative;
@@ -101,120 +89,117 @@ a:hover { text-decoration: underline; }
 .btn-ghost {
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--text-muted);
-    background: rgba(255, 252, 250, 0.92);
+    background: var(--card);
     border: 1px solid var(--border);
-    padding: 8px 14px;
-    border-radius: 999px;
+    padding: 7px 12px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    transition: border-color 0.2s, color 0.2s;
+    transition: border-color 0.15s, color 0.15s;
 }
-.btn-ghost:hover { border-color: rgba(255, 87, 51, 0.35); color: var(--primary); }
+.btn-ghost:hover { border-color: #cbd5e1; color: var(--text); }
 
 .brand-logo {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin: 0 auto 28px;
+    margin: 0 auto 20px;
     line-height: 0;
 }
 .brand-logo img {
     height: auto;
-    max-height: 200px;
+    max-height: 100px;
     width: auto;
-    max-width: min(98%, 640px);
+    max-width: min(92%, 320px);
     object-fit: contain;
     object-position: center center;
 }
 
-.section-label {
-    text-align: center;
-    margin-bottom: 10px;
-}
-.section-label span {
-    display: inline-block;
-    font-size: 0.73rem;
-    font-weight: 800;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    background: var(--brand-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
 .form-title {
     font-family: var(--font-display);
-    font-size: clamp(1.5rem, 4vw, 1.85rem);
-    font-weight: 800;
+    font-size: clamp(1.25rem, 3.2vw, 1.5rem);
+    font-weight: 600;
     letter-spacing: -0.02em;
     color: var(--text);
-    margin-bottom: 8px;
-    line-height: 1.2;
+    margin-bottom: 6px;
+    line-height: 1.25;
     text-align: center;
 }
 
 .form-sub {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
-    margin-bottom: 10px;
-    line-height: 1.55;
+    margin-bottom: 16px;
+    line-height: 1.45;
     text-align: center;
-    max-width: 42rem;
+    max-width: 28rem;
     margin-left: auto;
     margin-right: auto;
 }
 
-.hint-line {
+.hint-details {
+    max-width: 32rem;
+    margin: 0 auto 20px;
     font-size: 0.8125rem;
     color: var(--text-muted);
+}
+.hint-details summary {
+    cursor: pointer;
     text-align: center;
+    list-style: none;
+    user-select: none;
+}
+.hint-details summary::-webkit-details-marker { display: none; }
+.hint-details .hint-body {
+    margin-top: 10px;
     line-height: 1.5;
-    margin-bottom: 22px;
-    max-width: 40rem;
-    margin-left: auto;
-    margin-right: auto;
+    text-align: left;
+}
+.hint-details .hint-body code {
+    font-size: 0.78em;
+    background: #f1f5f9;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
 }
 
 .last-wrap {
     display: none;
-    margin-bottom: 20px;
-    padding: 14px 18px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
     border-radius: var(--radius-md);
-    background: rgba(255, 179, 71, 0.12);
-    border: 1px solid rgba(255, 87, 51, 0.2);
+    background: var(--card);
+    border: 1px solid var(--border);
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
 }
 .last-wrap.visible { display: flex; }
-.last-wrap span { font-size: 0.9rem; color: var(--text); }
+.last-wrap span { font-size: 0.875rem; color: var(--text); }
 .btn-last {
     font-family: var(--font-display);
-    font-size: 0.875rem;
-    font-weight: 700;
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: #fff;
-    background: var(--brand-gradient);
+    background: var(--primary);
     border: none;
-    padding: 10px 18px;
+    padding: 8px 14px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     touch-action: manipulation;
-    box-shadow: 0 4px 14px rgba(255, 87, 51, 0.28);
     white-space: nowrap;
 }
-.btn-last:hover { filter: brightness(0.96); }
+.btn-last:hover { background: var(--primary-hover); }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(16px, 2.2vw, 24px);
-    margin-bottom: 28px;
+    gap: clamp(12px, 1.8vw, 18px);
+    margin-bottom: 22px;
     width: 100%;
 }
 
@@ -222,82 +207,34 @@ a:hover { text-decoration: underline; }
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: 22px 22px 20px;
+    padding: 16px 16px 14px;
     position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    transition: border-color 0.15s;
     display: flex;
     flex-direction: column;
-    min-height: 200px;
+    min-height: 0;
 }
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--brand-gradient);
-}
-.card:hover {
-    border-color: rgba(255, 87, 51, 0.28);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.work-badge {
-    display: inline-flex;
-    align-items: center;
-    width: fit-content;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: var(--primary);
-    background: var(--primary-soft);
-    border: 1px solid rgba(255, 87, 51, 0.2);
-    padding: 4px 10px;
-    border-radius: 999px;
-    margin-bottom: 10px;
-}
-
-.card-num {
-    font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    background: var(--brand-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 6px;
-}
+.card:hover { border-color: #cbd5e1; }
 
 .card h2 {
     font-family: var(--font-display);
-    font-size: 1.12rem;
-    font-weight: 800;
-    margin-bottom: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
     letter-spacing: -0.02em;
     color: var(--text);
 }
 
-.card .subtitle {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--text);
-    opacity: 0.88;
-    margin-bottom: 8px;
-    line-height: 1.35;
-}
-
 .card p.desc {
-    font-size: 0.84rem;
+    font-size: 0.8125rem;
     color: var(--text-muted);
-    line-height: 1.55;
+    line-height: 1.45;
     flex: 1;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .card .go {
@@ -305,127 +242,49 @@ a:hover { text-decoration: underline; }
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 46px;
-    padding: 12px 16px;
+    min-height: 40px;
+    padding: 10px 14px;
     font-family: var(--font-display);
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 0.8125rem;
+    font-weight: 600;
     color: #fff;
-    background: var(--brand-gradient);
+    background: var(--primary);
     border-radius: var(--radius-sm);
     border: none;
     cursor: pointer;
     text-decoration: none;
     touch-action: manipulation;
-    box-shadow: 0 4px 16px rgba(255, 87, 51, 0.3);
-    transition: filter 0.2s, transform 0.15s;
+    transition: background 0.15s;
 }
-.card .go:hover { filter: brightness(0.97); text-decoration: none; }
-.card .go:active { transform: scale(0.99); }
+.card .go:hover { background: var(--primary-hover); text-decoration: none; }
 
 .foot-note {
     text-align: center;
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    line-height: 1.5;
-    max-width: 42rem;
+    line-height: 1.45;
+    max-width: 34rem;
     margin: 0 auto;
 }
 
-/* Franja inferior (marca + tips; antes era panel lateral) */
 .panel-right {
     flex: 0 0 auto;
     width: 100%;
-    background: var(--brand-gradient-panel);
-    color: #fff;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: clamp(20px, 4vw, 40px);
-    padding: clamp(24px, 4vw, 36px) clamp(20px, 4vw, 48px) max(28px, env(safe-area-inset-bottom, 0px));
-    position: relative;
-    overflow: hidden;
+    padding: 16px clamp(18px, 3vw, 32px) max(20px, env(safe-area-inset-bottom, 0px));
 }
 
-.panel-right::before {
-    content: '';
-    position: absolute;
-    width: 120%;
-    height: 120%;
-    left: 50%;
-    top: 45%;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 55%);
-    pointer-events: none;
-}
-
-.hero-copy {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.panel-right-copy {
+    font-size: 0.8125rem;
+    line-height: 1.45;
     text-align: center;
-    max-width: 28rem;
-}
-
-.hero-illustration {
-    position: relative;
-    z-index: 1;
-    width: min(100%, 200px);
-    flex-shrink: 0;
-    opacity: 0.95;
-}
-
-.hero-illustration svg { width: 100%; height: auto; display: block; }
-
-.hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
-    font-weight: 700;
-    text-align: center;
-    color: var(--panel-right-text);
-    line-height: 1.35;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-}
-
-.hero-sub {
-    font-size: 0.875rem;
-    text-align: center;
-    color: var(--panel-right-muted);
-    line-height: 1.55;
-    font-weight: 400;
-}
-
-.dots {
-    display: flex;
-    gap: 8px;
-    margin-top: 16px;
-    align-items: center;
-    justify-content: center;
-}
-
-.dots button {
-    width: 8px;
-    height: 8px;
-    min-width: 10px;
-    min-height: 10px;
-    border-radius: 50%;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.35);
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: background 0.25s, transform 0.2s;
-}
-
-.dots button[aria-current="true"] {
-    background: #fff;
-    transform: scale(1.15);
+    max-width: 26rem;
+    margin: 0;
 }
 
 @media (max-width: 960px) {
@@ -451,20 +310,15 @@ a:hover { text-decoration: underline; }
         right: max(0.75rem, env(safe-area-inset-right, 0px));
     }
 
-    .brand-logo { margin-top: 0.25rem; margin-bottom: 1.25rem; }
+    .brand-logo { margin-top: 0.25rem; margin-bottom: 1rem; }
     .brand-logo img {
-        max-height: min(28vw, 118px);
-        max-width: min(88vw, 300px);
+        max-height: min(22vw, 88px);
+        max-width: min(88vw, 260px);
     }
 
     .panel-right {
-        flex-direction: column;
         padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
         padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
-    }
-
-    .hero-illustration {
-        width: min(100%, 180px);
     }
 }
 
@@ -473,12 +327,11 @@ a:hover { text-decoration: underline; }
 }
 
 @media (max-width: 640px) {
-    .card { min-height: 0; }
     .brand-logo img {
-        max-height: min(26vw, 104px);
-        max-width: min(86vw, 280px);
+        max-height: min(20vw, 80px);
+        max-width: min(86vw, 240px);
     }
-    .card .go { min-height: 48px; font-size: 16px; }
+    .card .go { min-height: 44px; font-size: 0.875rem; }
 }
 </style>
 </head>
@@ -496,10 +349,12 @@ a:hover { text-decoration: underline; }
                 <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="640" height="186">
             </a>
 
-            <div class="section-label"><span>Área de equipo</span></div>
-            <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
-            <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Mismo navegador</strong> (sesión Hecom ya activa): los cuatro enlaces llevan la sesión en el fragmento de la URL hacia marketing (<code>/credito</code> y <code>acceso-*</code>). <strong>Otro navegador / incógnito / perfil</strong> no comparte esa sesión: hace falta magic link otra vez o un IdP central. En infra: ningún redirect 302 ni meta refresh puede “strippear” el <code>#</code> antes de que el JS de marketing consuma el hash.</p>
+            <h1 class="form-title" id="hub-heading">Tus paneles</h1>
+            <p class="form-sub">Elegí un espacio interno: crédito, operación, creativos o finanzas.</p>
+            <details class="hint-details">
+                <summary>Sesión entre sitios (mismo navegador)</summary>
+                <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los enlaces pueden llevar tokens en el fragmento hacia marketing (<code>/credito</code> y rutas <code>acceso-*</code>). Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar (magic link u otro flujo). Ningún redirect ni meta refresh debe consumir el <code>#</code> antes de que el cliente de marketing lea el hash.</p>
+            </details>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -508,35 +363,12 @@ a:hover { text-decoration: underline; }
 
             <div class="grid" id="destinosGrid" role="list"></div>
 
-            <p class="foot-note">Cada <strong>Abrir panel</strong> abre una <strong>pestaña nueva</strong> y <strong>dejás /destinos abierto acá</strong>. Si el navegador bloquea ventanas emergentes, permitilas para hecom.club. La sesión de Hecom <strong>no existe en otro navegador</strong>: magic link ahí también. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo y navegador (hecom.club).</p>
+            <p class="foot-note"><strong>Abrir panel</strong> usa una pestaña nueva y deja /destinos acá. Si bloquea popups, permití ventanas para hecom.club. La última elección se guarda solo en este navegador.</p>
         </div>
     </section>
 
-    <aside class="panel-right" aria-labelledby="hero-title">
-        <div class="hero-illustration" aria-hidden="true">
-            <svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="160" cy="100" r="88" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-                <circle cx="160" cy="100" r="68" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <rect x="175" y="58" width="130" height="100" rx="10" fill="white" fill-opacity="0.92"/>
-                <rect x="188" y="72" width="48" height="6" rx="3" fill="#E5E7EB"/>
-                <rect x="188" y="86" width="104" height="4" rx="2" fill="#F3F4F6"/>
-                <rect x="188" y="98" width="90" height="4" rx="2" fill="#F3F4F6"/>
-                <circle cx="194" cy="118" r="8" fill="#E5E7EB"/>
-                <rect x="208" y="112" width="70" height="5" rx="2" fill="#E5E7EB"/>
-                <circle cx="72" cy="88" r="20" fill="white" fill-opacity="0.9"/>
-                <text x="72" y="95" text-anchor="middle" font-size="18" fill="#1b2559">👥</text>
-                <path d="M92 88 L175 95" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
-        </div>
-        <div class="hero-copy">
-            <h2 class="hero-title" id="hero-title">Un solo acceso, varios tableros.</h2>
-            <p class="hero-sub" id="heroSub">Todo el equipo alineado en los mismos paneles de trabajo.</p>
-            <div class="dots" role="tablist" aria-label="Consejos del flujo">
-                <button type="button" aria-current="true" aria-label="Paso 1"></button>
-                <button type="button" aria-current="false" aria-label="Paso 2"></button>
-                <button type="button" aria-current="false" aria-label="Paso 3"></button>
-            </div>
-        </div>
+    <aside class="panel-right" aria-label="Contexto">
+        <p class="panel-right-copy">Mismo correo y magic link en Hecom y en marketing.</p>
     </aside>
 </div>
 
@@ -563,39 +395,25 @@ var MARKETING_HANDOFF_DENYLIST = [];
 /* Pendientes / creativos / finanzas: acceso-*. Crédito: /credito (React). */
 var DESTINOS = [
     {
-        order: 1,
         name: 'Crédito',
-        subtitle: 'Línea de crédito y cuentas de agencia',
-        desc: 'Página de trabajo para revisar crédito, cuentas TikTok y seguimiento comercial con clientes.',
+        desc: 'Línea de crédito, cuentas TikTok y seguimiento con clientes.',
         url: 'https://www.marketingconholistic.com/credito',
     },
     {
-        order: 2,
         name: 'Pendientes Holistic',
-        subtitle: 'Operación y coordinación del equipo',
-        desc: 'Dashboard interno: clientes, entregables, tickets, calendario y asistencia — el día a día del equipo.',
+        desc: 'Operación: clientes, entregables, tickets y calendario.',
         url: 'https://www.marketingconholistic.com/acceso-pendientes',
     },
     {
-        order: 3,
         name: 'Creativos Holistic',
-        subtitle: 'Pipeline y producción creativa',
-        desc: 'Página de trabajo para pipeline, proyectos, clientes creativos y entregables de diseño / contenido.',
+        desc: 'Pipeline creativo, proyectos y entregables de diseño.',
         url: 'https://www.marketingconholistic.com/acceso-creativos',
     },
     {
-        order: 4,
         name: 'Finanzas Holistic',
-        subtitle: 'Panel financiero de la organización',
-        desc: 'Espacio de trabajo para finanzas, control y vista general económica del equipo y la agencia.',
+        desc: 'Panel financiero y vista económica de la agencia.',
         url: 'https://www.marketingconholistic.com/acceso-finanzas',
     },
-];
-
-var slides = [
-    { title: 'Un solo acceso, varios tableros.', sub: 'Todo el equipo alineado en los mismos paneles de trabajo.' },
-    { title: 'Mismo login Holistic.', sub: 'Gerentes y clientes con acceso usan el mismo correo y magic link en todos los productos.' },
-    { title: 'Hecom Club + operación interna.', sub: 'Desde acá saltás a las páginas donde el equipo ejecuta: crédito, ops, creativos y números.' },
 ];
 
 function escapeHtml(s) {
@@ -764,10 +582,7 @@ function renderCards() {
         article.className = 'card';
         article.setAttribute('role', 'listitem');
         article.innerHTML =
-            '<span class="work-badge">Página de trabajo</span>' +
-            '<p class="card-num">Paso 0' + d.order + '</p>' +
             '<h2>' + escapeHtml(d.name) + '</h2>' +
-            '<p class="subtitle">' + escapeHtml(d.subtitle) + '</p>' +
             '<p class="desc">' + escapeHtml(d.desc) + '</p>' +
             '<a class="go" href="' +
             escapeAttr(d.url) +
@@ -817,19 +632,6 @@ document.getElementById('btnLogout').addEventListener('click', async function ()
         await supabase.auth.signOut();
     } catch (_) {}
     window.location.href = '/login';
-});
-
-var dots = document.querySelectorAll('.dots button');
-var heroTitle = document.getElementById('hero-title');
-var heroSub = document.getElementById('heroSub');
-dots.forEach(function (d, i) {
-    d.addEventListener('click', function () {
-        dots.forEach(function (x, j) {
-            x.setAttribute('aria-current', j === i ? 'true' : 'false');
-        });
-        heroTitle.textContent = slides[i].title;
-        heroSub.textContent = slides[i].sub;
-    });
 });
 
 (async function init() {
