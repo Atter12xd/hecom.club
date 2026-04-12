@@ -523,7 +523,7 @@ function hideMsgs() {
 async function tryConsumeMagicLinkHash() {
     var h = window.location.hash || '';
     if (!h || (h.indexOf('access_token') < 0 && h.indexOf('refresh_token') < 0 && h.indexOf('type=') < 0)) {
-        return;
+        return false;
     }
     try {
         var supabase = await getSupabaseClient();
@@ -531,53 +531,70 @@ async function tryConsumeMagicLinkHash() {
         var session = (await supabase.auth.getSession()).data.session;
         if (session) {
             history.replaceState(null, '', window.location.pathname + window.location.search);
-            window.location.replace('/');
+            window.location.replace('/destinos');
+            return true;
         }
     } catch (_) {
         /* ignorar */
     }
+    return false;
 }
 
-tryConsumeMagicLinkHash();
+async function init() {
+    if (await tryConsumeMagicLinkHash()) return;
 
-var dots = document.querySelectorAll('.dots button');
-var slides = [
-    { title: 'Conecta con cada aplicación.', sub: 'Todo lo que necesitas en un panel fácil de personalizar.' },
-    { title: 'Escala con cuentas de agencia.', sub: 'CPM, crédito y soporte al nivel que tu negocio merece.' },
-    { title: 'Hecom Club a tu lado.', sub: 'TikTok Marketing Partner — respaldo real, no promesas vacías.' }
-];
-var heroTitle = document.getElementById('hero-title');
-var heroSub = document.querySelector('.hero-sub');
-dots.forEach(function (d, i) {
-    d.addEventListener('click', function () {
-        dots.forEach(function (x, j) { x.setAttribute('aria-current', j === i ? 'true' : 'false'); });
-        heroTitle.textContent = slides[i].title;
-        heroSub.textContent = slides[i].sub;
-    });
-});
-
-form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    hideMsgs();
-    var email = document.getElementById('email').value.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        err.textContent = 'Introduce un correo electrónico válido.';
-        err.classList.add('visible');
-        return;
-    }
-    btn.disabled = true;
     try {
-        var redirectTo = window.location.origin + '/login';
-        var data = await invokeMagicLinkLogin(email, redirectTo);
-        info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
-        info.classList.add('visible');
-    } catch (ex) {
-        err.textContent = ex.message || 'No se pudo enviar el enlace.';
-        err.classList.add('visible');
-    } finally {
-        btn.disabled = false;
+        var supabase = await getSupabaseClient();
+        var session = (await supabase.auth.getSession()).data.session;
+        if (session) {
+            window.location.replace('/destinos');
+            return;
+        }
+    } catch (_) {
+        /* seguir: mostrar formulario de magic link */
     }
-});
+
+    var dots = document.querySelectorAll('.dots button');
+    var slides = [
+        { title: 'Conecta con cada aplicación.', sub: 'Todo lo que necesitas en un panel fácil de personalizar.' },
+        { title: 'Escala con cuentas de agencia.', sub: 'CPM, crédito y soporte al nivel que tu negocio merece.' },
+        { title: 'Hecom Club a tu lado.', sub: 'TikTok Marketing Partner — respaldo real, no promesas vacías.' }
+    ];
+    var heroTitle = document.getElementById('hero-title');
+    var heroSub = document.querySelector('.hero-sub');
+    dots.forEach(function (d, i) {
+        d.addEventListener('click', function () {
+            dots.forEach(function (x, j) { x.setAttribute('aria-current', j === i ? 'true' : 'false'); });
+            heroTitle.textContent = slides[i].title;
+            heroSub.textContent = slides[i].sub;
+        });
+    });
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        hideMsgs();
+        var email = document.getElementById('email').value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            err.textContent = 'Introduce un correo electrónico válido.';
+            err.classList.add('visible');
+            return;
+        }
+        btn.disabled = true;
+        try {
+            var redirectTo = window.location.origin + '/login';
+            var data = await invokeMagicLinkLogin(email, redirectTo);
+            info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
+            info.classList.add('visible');
+        } catch (ex) {
+            err.textContent = ex.message || 'No se pudo enviar el enlace.';
+            err.classList.add('visible');
+        } finally {
+            btn.disabled = false;
+        }
+    });
+}
+
+init();
 </script>
 </body>
 </html>

@@ -12,8 +12,11 @@
 -- Redirect URLs (lista de permitidos; wildcards OK)
 --   Añade hecom SIN quitar marketingconholistic, wazapp, localhost, etc.
 --
+
 --   Magic link (Edge Function redirect_to suele ser /login):
 --     https://www.hecom.club/login
+--   Tras sesión, hub de destinos (mismo origen hecom.club):
+--     https://www.hecom.club/destinos
 --   Recuperación de contraseña:
 --     https://www.hecom.club/auth/reset-password
 --   Atajo: https://www.hecom.club/** (cubre login, reset y más)

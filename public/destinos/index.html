@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tus paneles de trabajo | Hecom Club</title>
+<link rel="icon" type="image/png" href="/imagenes/favicon.png?v=2">
+<link rel="apple-touch-icon" href="/imagenes/favicon.png?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+<style>
+:root {
+    --brand-start: #ff5733;
+    --brand-mid: #ff8c42;
+    --brand-end: #ffb347;
+    --brand-gradient: linear-gradient(90deg, var(--brand-start) 0%, var(--brand-mid) 52%, var(--brand-end) 100%);
+    --brand-gradient-panel: linear-gradient(145deg, #ff4f2e 0%, #ff7a35 38%, #ffa62e 72%, #ffc966 100%);
+    --primary: #e85a24;
+    --primary-soft: rgba(255, 87, 51, 0.12);
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --card: #ffffff;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --panel-right-text: rgba(255, 255, 255, 0.96);
+    --panel-right-muted: rgba(255, 255, 255, 0.82);
+    --font-display: 'Varela Round', 'Inter', system-ui, sans-serif;
+    --shadow-sm: 0 1px 3px rgba(15, 17, 20, 0.04), 0 1px 2px rgba(15, 17, 20, 0.06);
+    --shadow-md: 0 4px 20px rgba(15, 17, 20, 0.06), 0 1px 4px rgba(15, 17, 20, 0.04);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: #fafbfd;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.page {
+    display: flex;
+    min-height: 100dvh;
+    width: 100%;
+}
+
+.panel-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 48px 48px;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+}
+
+.back-link {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.back-link:hover { color: var(--primary); text-decoration: none; }
+
+.top-actions {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn-ghost {
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s, color 0.2s;
+}
+.btn-ghost:hover { border-color: rgba(255, 87, 51, 0.35); color: var(--primary); }
+
+.brand-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto 28px;
+    line-height: 0;
+}
+.brand-logo img {
+    height: auto;
+    max-height: 200px;
+    width: auto;
+    max-width: min(98%, 640px);
+    object-fit: contain;
+    object-position: center center;
+}
+
+.section-label {
+    text-align: center;
+    margin-bottom: 10px;
+}
+.section-label span {
+    display: inline-block;
+    font-size: 0.73rem;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.form-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 4vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.form-sub {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    line-height: 1.55;
+    text-align: center;
+    max-width: 34rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hint-line {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 22px;
+    max-width: 32rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.last-wrap {
+    display: none;
+    margin-bottom: 20px;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 179, 71, 0.12);
+    border: 1px solid rgba(255, 87, 51, 0.2);
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.last-wrap.visible { display: flex; }
+.last-wrap span { font-size: 0.9rem; color: var(--text); }
+.btn-last {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--brand-gradient);
+    border: none;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    touch-action: manipulation;
+    box-shadow: 0 4px 14px rgba(255, 87, 51, 0.28);
+    white-space: nowrap;
+}
+.btn-last:hover { filter: brightness(0.96); }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px 18px 18px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+}
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--brand-gradient);
+}
+.card:hover {
+    border-color: rgba(255, 87, 51, 0.28);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.work-badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border: 1px solid rgba(255, 87, 51, 0.2);
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+}
+
+.card-num {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+}
+
+.card h2 {
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+.card .subtitle {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text);
+    opacity: 0.88;
+    margin-bottom: 8px;
+    line-height: 1.35;
+}
+
+.card p.desc {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    flex: 1;
+    margin-bottom: 14px;
+}
+
+.card .go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 16px;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--brand-gradient);
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    touch-action: manipulation;
+    box-shadow: 0 4px 16px rgba(255, 87, 51, 0.3);
+    transition: filter 0.2s, transform 0.15s;
+}
+.card .go:hover { filter: brightness(0.97); text-decoration: none; }
+.card .go:active { transform: scale(0.99); }
+
+.foot-note {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 34rem;
+    margin: 0 auto;
+}
+
+/* Panel derecho (igual filosofía que login) */
+.panel-right {
+    flex: 1;
+    background: var(--brand-gradient-panel);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 36px;
+    position: relative;
+    overflow: hidden;
+}
+
+.panel-right::before {
+    content: '';
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 55%);
+    pointer-events: none;
+}
+
+.hero-illustration {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 280px);
+    margin-bottom: 32px;
+    opacity: 0.95;
+}
+
+.hero-illustration svg { width: 100%; height: auto; display: block; }
+
+.hero-title {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 3vw, 1.55rem);
+    font-weight: 700;
+    text-align: center;
+    color: var(--panel-right-text);
+    max-width: 300px;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+}
+
+.hero-sub {
+    position: relative;
+    z-index: 1;
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--panel-right-muted);
+    max-width: 280px;
+    line-height: 1.55;
+    font-weight: 400;
+}
+
+.dots {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 8px;
+    margin-top: 28px;
+    align-items: center;
+    justify-content: center;
+}
+
+.dots button {
+    width: 8px;
+    height: 8px;
+    min-width: 10px;
+    min-height: 10px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.35);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.25s, transform 0.2s;
+}
+
+.dots button[aria-current="true"] {
+    background: #fff;
+    transform: scale(1.15);
+}
+
+@media (max-width: 960px) {
+    html, body { font-size: 16px; }
+
+    .page {
+        flex-direction: column;
+        min-height: 100dvh;
+        min-height: 100svh;
+    }
+
+    .panel-left {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        justify-content: flex-start;
+        min-height: 0;
+        flex: 1 1 auto;
+        padding-top: max(5.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
+        padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+        padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+        order: 1;
+    }
+
+    .back-link {
+        top: max(0.75rem, env(safe-area-inset-top, 0px));
+        left: max(0.75rem, env(safe-area-inset-left, 0px));
+        padding: 0.5rem 0.65rem;
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .top-actions {
+        top: max(0.75rem, env(safe-area-inset-top, 0px));
+        right: max(0.75rem, env(safe-area-inset-right, 0px));
+    }
+
+    .brand-logo { margin-top: 0.25rem; margin-bottom: 1.25rem; }
+    .brand-logo img {
+        max-height: min(28vw, 118px);
+        max-width: min(88vw, 300px);
+    }
+
+    .panel-right {
+        order: 2;
+        flex: 0 0 auto;
+        padding: 1.75rem max(1.25rem, env(safe-area-inset-right, 0px))
+            max(2rem, env(safe-area-inset-bottom, 0px)) max(1.25rem, env(safe-area-inset-left, 0px));
+    }
+
+    .hero-illustration {
+        width: min(100%, 220px);
+        margin-bottom: 1.15rem;
+    }
+
+    .hero-title { font-size: clamp(1.08rem, 4vw, 1.32rem); max-width: 20rem; }
+    .hero-sub { font-size: 0.875rem; max-width: 18rem; }
+    .dots { margin-top: 1.1rem; }
+}
+
+@media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .card { min-height: 0; }
+    .brand-logo img {
+        max-height: min(26vw, 104px);
+        max-width: min(86vw, 280px);
+    }
+    .card .go { min-height: 48px; font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+    <section class="panel-left" aria-labelledby="hub-heading">
+        <a class="back-link" href="/">← Volver al inicio</a>
+        <div class="top-actions">
+            <a class="btn-ghost" href="/login" style="text-decoration:none;color:inherit">Cambiar correo</a>
+            <button type="button" class="btn-ghost" id="btnLogout">Cerrar sesión</button>
+        </div>
+
+        <div>
+            <a class="brand-logo" href="/" aria-label="holistic marketing — inicio">
+                <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="640" height="186">
+            </a>
+
+            <div class="section-label"><span>Área de equipo</span></div>
+            <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
+            <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
+            <p class="hint-line"><strong>Páginas de trabajo</strong> — cada enlace abre el producto en <strong>marketingconholistic.com</strong>. Si el navegador aún no tiene sesión en ese dominio, usá el mismo correo con magic link allí.</p>
+
+            <div class="last-wrap" id="lastWrap" aria-live="polite">
+                <span id="lastLabel"></span>
+                <button type="button" class="btn-last" id="btnLast">Ir al último panel</button>
+            </div>
+
+            <div class="grid" id="destinosGrid" role="list"></div>
+
+            <p class="foot-note">Orden recomendado para el flujo del equipo: Crédito → Pendientes (operación) → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club).</p>
+        </div>
+    </section>
+
+    <aside class="panel-right" aria-labelledby="hero-title">
+        <div class="hero-illustration" aria-hidden="true">
+            <svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="160" cy="100" r="88" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+                <circle cx="160" cy="100" r="68" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <rect x="175" y="58" width="130" height="100" rx="10" fill="white" fill-opacity="0.92"/>
+                <rect x="188" y="72" width="48" height="6" rx="3" fill="#E5E7EB"/>
+                <rect x="188" y="86" width="104" height="4" rx="2" fill="#F3F4F6"/>
+                <rect x="188" y="98" width="90" height="4" rx="2" fill="#F3F4F6"/>
+                <circle cx="194" cy="118" r="8" fill="#E5E7EB"/>
+                <rect x="208" y="112" width="70" height="5" rx="2" fill="#E5E7EB"/>
+                <circle cx="72" cy="88" r="20" fill="white" fill-opacity="0.9"/>
+                <text x="72" y="95" text-anchor="middle" font-size="18" fill="#1b2559">👥</text>
+                <path d="M92 88 L175 95" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <h2 class="hero-title" id="hero-title">Un solo acceso, varios tableros.</h2>
+        <p class="hero-sub" id="heroSub">Todo el equipo alineado en los mismos paneles de trabajo.</p>
+        <div class="dots" role="tablist" aria-label="Consejos del flujo">
+            <button type="button" aria-current="true" aria-label="Paso 1"></button>
+            <button type="button" aria-current="false" aria-label="Paso 2"></button>
+            <button type="button" aria-current="false" aria-label="Paso 3"></button>
+        </div>
+    </aside>
+</div>
+
+<script type="module">
+import { getSupabaseClient } from '/js/supabase-auth.js';
+
+var STORAGE_KEY = 'holistic_hub_destino_preferido';
+var STORAGE_NAME = 'holistic_hub_destino_nombre';
+
+var DESTINOS = [
+    {
+        order: 1,
+        name: 'Crédito',
+        subtitle: 'Línea de crédito y cuentas de agencia',
+        desc: 'Página de trabajo para revisar crédito, cuentas TikTok y seguimiento comercial con clientes.',
+        url: 'https://www.marketingconholistic.com/credito',
+    },
+    {
+        order: 2,
+        name: 'Pendientes Holistic',
+        subtitle: 'Operación y coordinación del equipo',
+        desc: 'Dashboard interno: clientes, entregables, tickets, calendario y asistencia — el día a día del equipo.',
+        url: 'https://www.marketingconholistic.com/pendientes',
+    },
+    {
+        order: 3,
+        name: 'Creativos Holistic',
+        subtitle: 'Pipeline y producción creativa',
+        desc: 'Página de trabajo para pipeline, proyectos, clientes creativos y entregables de diseño / contenido.',
+        url: 'https://www.marketingconholistic.com/creativos',
+    },
+    {
+        order: 4,
+        name: 'Finanzas Holistic',
+        subtitle: 'Panel financiero de la organización',
+        desc: 'Espacio de trabajo para finanzas, control y vista general económica del equipo y la agencia.',
+        url: 'https://www.marketingconholistic.com/finanzas',
+    },
+];
+
+var slides = [
+    { title: 'Un solo acceso, varios tableros.', sub: 'Todo el equipo alineado en los mismos paneles de trabajo.' },
+    { title: 'Mismo login Holistic.', sub: 'Gerentes y clientes con acceso usan el mismo correo y magic link en todos los productos.' },
+    { title: 'Hecom Club + operación interna.', sub: 'Desde acá saltás a las páginas donde el equipo ejecuta: crédito, ops, creativos y números.' },
+];
+
+function escapeHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+
+function escapeAttr(s) {
+    return String(s).replace(/"/g, '&quot;');
+}
+
+function renderCards() {
+    var grid = document.getElementById('destinosGrid');
+    grid.innerHTML = '';
+    DESTINOS.forEach(function (d) {
+        var article = document.createElement('article');
+        article.className = 'card';
+        article.setAttribute('role', 'listitem');
+        article.innerHTML =
+            '<span class="work-badge">Página de trabajo</span>' +
+            '<p class="card-num">Paso 0' + d.order + '</p>' +
+            '<h2>' + escapeHtml(d.name) + '</h2>' +
+            '<p class="subtitle">' + escapeHtml(d.subtitle) + '</p>' +
+            '<p class="desc">' + escapeHtml(d.desc) + '</p>' +
+            '<a class="go" href="' + escapeAttr(d.url) + '" data-url="' + escapeAttr(d.url) + '" data-name="' + escapeAttr(d.name) + '" rel="noopener noreferrer">Abrir panel</a>';
+        grid.appendChild(article);
+    });
+
+    grid.querySelectorAll('a.go').forEach(function (link) {
+        link.addEventListener('click', function () {
+            try {
+                localStorage.setItem(STORAGE_KEY, link.getAttribute('data-url') || '');
+                localStorage.setItem(STORAGE_NAME, link.getAttribute('data-name') || '');
+            } catch (_) {}
+        });
+    });
+}
+
+function showLastAccess() {
+    var url = '';
+    var name = '';
+    try {
+        url = localStorage.getItem(STORAGE_KEY) || '';
+        name = localStorage.getItem(STORAGE_NAME) || '';
+    } catch (_) {}
+    var wrap = document.getElementById('lastWrap');
+    var label = document.getElementById('lastLabel');
+    var btn = document.getElementById('btnLast');
+    if (!url || !DESTINOS.some(function (x) { return x.url === url; })) {
+        wrap.classList.remove('visible');
+        return;
+    }
+    label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
+    wrap.classList.add('visible');
+    btn.onclick = function () {
+        window.location.href = url;
+    };
+}
+
+document.getElementById('btnLogout').addEventListener('click', async function () {
+    try {
+        var supabase = await getSupabaseClient();
+        await supabase.auth.signOut();
+    } catch (_) {}
+    window.location.href = '/login';
+});
+
+var dots = document.querySelectorAll('.dots button');
+var heroTitle = document.getElementById('hero-title');
+var heroSub = document.getElementById('heroSub');
+dots.forEach(function (d, i) {
+    d.addEventListener('click', function () {
+        dots.forEach(function (x, j) {
+            x.setAttribute('aria-current', j === i ? 'true' : 'false');
+        });
+        heroTitle.textContent = slides[i].title;
+        heroSub.textContent = slides[i].sub;
+    });
+});
+
+(async function init() {
+    try {
+        var supabase = await getSupabaseClient();
+        var session = (await supabase.auth.getSession()).data.session;
+        if (!session) {
+            window.location.replace('/login');
+            return;
+        }
+    } catch (_) {
+        window.location.replace('/login');
+        return;
+    }
+    renderCards();
+    showLastAccess();
+})();
+</script>
+</body>
+</html>
