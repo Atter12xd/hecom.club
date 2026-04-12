@@ -91,17 +91,20 @@ a:hover { text-decoration: underline; }
 .back-link:hover { color: var(--primary); text-decoration: none; }
 
 .brand-logo {
-    display: block;
-    margin-bottom: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto 30px;
     line-height: 0;
 }
 .brand-logo img {
     height: auto;
-    max-height: 76px;
+    max-height: 58px;
     width: auto;
-    max-width: min(100%, 280px);
+    max-width: min(90%, 200px);
     object-fit: contain;
-    object-position: left center;
+    object-position: center center;
 }
 
 .form-title {
@@ -405,6 +408,8 @@ a:hover { text-decoration: underline; }
         padding: 72px 24px 40px;
         order: 1;
     }
+    .brand-logo { margin-bottom: 26px; }
+    .brand-logo img { max-height: 52px; max-width: min(88%, 188px); }
     .back-link { left: 20px; top: 20px; }
     .panel-right {
         order: 2;
@@ -426,7 +431,7 @@ a:hover { text-decoration: underline; }
 
         <div>
             <a class="brand-logo" href="/" aria-label="holistic marketing — inicio">
-                <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="280" height="76">
+                <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="200" height="58">
             </a>
 
             <h1 class="form-title" id="login-heading">Inicia sesión en tu cuenta</h1>
