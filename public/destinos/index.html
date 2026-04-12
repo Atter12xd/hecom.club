@@ -508,7 +508,7 @@ a:hover { text-decoration: underline; }
 
             <div class="grid" id="destinosGrid" role="list"></div>
 
-            <p class="foot-note">Cada <strong>Abrir panel</strong> abre una <strong>pestaña nueva</strong>. La sesión de Hecom <strong>no existe en otro navegador</strong>: entrá a Hecom con magic link ahí también, o iniciá sesión en marketing. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo y este navegador (hecom.club).</p>
+            <p class="foot-note">Cada <strong>Abrir panel</strong> abre una <strong>pestaña nueva</strong> y <strong>dejás /destinos abierto acá</strong>. Si el navegador bloquea ventanas emergentes, permitilas para hecom.club. La sesión de Hecom <strong>no existe en otro navegador</strong>: magic link ahí también. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo y navegador (hecom.club).</p>
         </div>
     </section>
 
@@ -681,7 +681,30 @@ async function resolveHandoffUrl(targetUrl) {
     return targetUrl;
 }
 
-/** Pestaña nueva; URL limpia salvo que USE_URL_SESSION_HANDOFF sea true. */
+/** Siempre intenta otra pestaña; esta ventana sigue en /destinos (nunca location.assign en self). */
+function openUrlInNewTabPreservingThisPage(urlToOpen) {
+    var w = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
+    if (w) {
+        try {
+            w.opener = null;
+        } catch (_) {}
+        return true;
+    }
+    try {
+        var a = document.createElement('a');
+        a.href = urlToOpen;
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+        a.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        return true;
+    } catch (_) {}
+    return false;
+}
+
+/** Pestaña nueva; URL con hash si USE_URL_SESSION_HANDOFF y ruta lo permiten. */
 function openHolisticPanel(targetUrl, panelName) {
     try {
         localStorage.setItem(STORAGE_KEY, targetUrl || '');
@@ -695,11 +718,7 @@ function openHolisticPanel(targetUrl, panelName) {
     if (wantHandoff) {
         urlToOpen = buildSessionHandoffUrl(targetUrl, s);
     }
-    var w = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
-    if (w) {
-        try {
-            w.opener = null;
-        } catch (_) {}
+    if (openUrlInNewTabPreservingThisPage(urlToOpen)) {
         return;
     }
     void (async function () {
@@ -715,17 +734,24 @@ function openHolisticPanel(targetUrl, panelName) {
         } catch (_) {
             u = targetUrl;
         }
+        var ok = false;
         if (pending) {
             try {
                 pending.location.href = u;
+                ok = true;
             } catch (_) {
                 try {
                     pending.close();
                 } catch (_) {}
-                if (!window.open(u, '_blank', 'noopener,noreferrer')) window.location.assign(u);
             }
-        } else {
-            window.location.assign(u);
+        }
+        if (!ok) {
+            ok = openUrlInNewTabPreservingThisPage(u);
+        }
+        if (!ok) {
+            window.alert(
+                'No se pudo abrir el panel en otra pestaña (bloqueo de ventanas emergentes). Permití popups para www.hecom.club y volvé a intentar. Esta página se queda en /destinos.'
+            );
         }
     })();
 }
@@ -758,6 +784,7 @@ function renderCards() {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             if (e.button !== 0) return;
             e.preventDefault();
+            e.stopPropagation();
             openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
         });
     });
