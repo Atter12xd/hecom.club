@@ -422,37 +422,49 @@ a:hover { text-decoration: underline; }
     </aside>
 </div>
 
-<script>
-(function () {
-    var form = document.getElementById('forgotForm');
-    var btn = document.getElementById('submitBtn');
-    var info = document.getElementById('statusInfo');
-    var err = document.getElementById('statusError');
+<script type="module">
+import { getSupabaseClient } from '/js/supabase-auth.js';
 
-    function hideMsgs() {
-        info.classList.remove('visible');
-        err.classList.remove('visible');
-        info.textContent = '';
-        err.textContent = '';
+var form = document.getElementById('forgotForm');
+var btn = document.getElementById('submitBtn');
+var info = document.getElementById('statusInfo');
+var err = document.getElementById('statusError');
+
+function hideMsgs() {
+    info.classList.remove('visible');
+    err.classList.remove('visible');
+    info.textContent = '';
+    err.textContent = '';
+}
+
+form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    hideMsgs();
+    var email = document.getElementById('email').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        err.textContent = 'Introduce un correo electrónico válido.';
+        err.classList.add('visible');
+        return;
     }
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        hideMsgs();
-        var email = document.getElementById('email').value.trim();
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            err.textContent = 'Introduce un correo electrónico válido.';
+    btn.disabled = true;
+    try {
+        var supabase = await getSupabaseClient();
+        var redirectTo = window.location.origin + '/auth/reset-password';
+        var result = await supabase.auth.resetPasswordForEmail(email, { redirectTo: redirectTo });
+        if (result.error) {
+            err.textContent = result.error.message || 'No se pudo enviar el correo.';
             err.classList.add('visible');
             return;
         }
-        btn.disabled = true;
-        setTimeout(function () {
-            btn.disabled = false;
-            info.textContent = 'Cuando activemos el envío automático, recibirás el enlace en tu bandeja. Mientras tanto, usa WhatsApp y te ayudamos en minutos.';
-            info.classList.add('visible');
-        }, 550);
-    });
-})();
+        info.textContent = 'Si ese correo está registrado, recibirás un enlace para restablecer la contraseña. Revisa también spam.';
+        info.classList.add('visible');
+    } catch (ex) {
+        err.textContent = ex.message || 'Error de conexión. Revisa la configuración en Vercel.';
+        err.classList.add('visible');
+    } finally {
+        btn.disabled = false;
+    }
+});
 </script>
 </body>
 </html>

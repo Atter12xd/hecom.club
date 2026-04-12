@@ -564,73 +564,96 @@ a:hover { text-decoration: underline; }
     </aside>
 </div>
 
-<script>
-(function () {
-    var form = document.getElementById('loginForm');
-    var btn = document.getElementById('submitBtn');
-    var info = document.getElementById('statusInfo');
-    var err = document.getElementById('statusError');
-    var pass = document.getElementById('password');
-    var toggle = document.getElementById('togglePass');
-    var iconOff = document.getElementById('iconEyeOff');
-    var iconOn = document.getElementById('iconEye');
+<script type="module">
+import { getSupabaseClient } from '/js/supabase-auth.js';
 
-    toggle.addEventListener('click', function () {
-        var show = pass.type === 'password';
-        pass.type = show ? 'text' : 'password';
-        iconOff.style.display = show ? 'none' : 'block';
-        iconOn.style.display = show ? 'block' : 'none';
-        toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
-    });
+var form = document.getElementById('loginForm');
+var btn = document.getElementById('submitBtn');
+var info = document.getElementById('statusInfo');
+var err = document.getElementById('statusError');
+var pass = document.getElementById('password');
+var toggle = document.getElementById('togglePass');
+var iconOff = document.getElementById('iconEyeOff');
+var iconOn = document.getElementById('iconEye');
 
-    var dots = document.querySelectorAll('.dots button');
-    var slides = [
-        { title: 'Conecta con cada aplicación.', sub: 'Todo lo que necesitas en un panel fácil de personalizar.' },
-        { title: 'Escala con cuentas de agencia.', sub: 'CPM, crédito y soporte al nivel que tu negocio merece.' },
-        { title: 'Hecom Club a tu lado.', sub: 'TikTok Marketing Partner — respaldo real, no promesas vacías.' }
-    ];
-    var heroTitle = document.getElementById('hero-title');
-    var heroSub = document.querySelector('.hero-sub');
-    var si = 0;
-    dots.forEach(function (d, i) {
-        d.addEventListener('click', function () {
-            si = i;
-            dots.forEach(function (x, j) { x.setAttribute('aria-current', j === i ? 'true' : 'false'); });
-            heroTitle.textContent = slides[i].title;
-            heroSub.textContent = slides[i].sub;
-        });
-    });
+function hideMsgs() {
+    info.classList.remove('visible');
+    err.classList.remove('visible');
+    info.textContent = '';
+    err.textContent = '';
+}
 
-    function hideMsgs() {
-        info.classList.remove('visible');
-        err.classList.remove('visible');
-        info.textContent = '';
-        err.textContent = '';
+function mapAuthError(e) {
+    if (!e || !e.message) return 'No se pudo iniciar sesión. Intenta de nuevo.';
+    var m = e.message.toLowerCase();
+    if (m.includes('invalid login') || m.includes('invalid credentials')) {
+        return 'Correo o contraseña incorrectos.';
     }
+    if (m.includes('email not confirmed')) {
+        return 'Confirma tu correo antes de entrar (revisa la bandeja de entrada).';
+    }
+    if (m.includes('too many requests')) {
+        return 'Demasiados intentos. Espera un momento e inténtalo de nuevo.';
+    }
+    return e.message;
+}
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        hideMsgs();
-        var email = document.getElementById('email').value.trim();
-        var pw = pass.value;
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            err.textContent = 'Introduce un correo electrónico válido.';
-            err.classList.add('visible');
-            return;
-        }
-        if (pw.length < 6) {
-            err.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-            err.classList.add('visible');
-            return;
-        }
-        btn.disabled = true;
-        setTimeout(function () {
-            btn.disabled = false;
-            info.textContent = 'El acceso seguro para clientes se activará en breve. Mientras tanto, escríbenos por WhatsApp desde la página principal.';
-            info.classList.add('visible');
-        }, 550);
+toggle.addEventListener('click', function () {
+    var show = pass.type === 'password';
+    pass.type = show ? 'text' : 'password';
+    iconOff.style.display = show ? 'none' : 'block';
+    iconOn.style.display = show ? 'block' : 'none';
+    toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+});
+
+var dots = document.querySelectorAll('.dots button');
+var slides = [
+    { title: 'Conecta con cada aplicación.', sub: 'Todo lo que necesitas en un panel fácil de personalizar.' },
+    { title: 'Escala con cuentas de agencia.', sub: 'CPM, crédito y soporte al nivel que tu negocio merece.' },
+    { title: 'Hecom Club a tu lado.', sub: 'TikTok Marketing Partner — respaldo real, no promesas vacías.' }
+];
+var heroTitle = document.getElementById('hero-title');
+var heroSub = document.querySelector('.hero-sub');
+dots.forEach(function (d, i) {
+    d.addEventListener('click', function () {
+        dots.forEach(function (x, j) { x.setAttribute('aria-current', j === i ? 'true' : 'false'); });
+        heroTitle.textContent = slides[i].title;
+        heroSub.textContent = slides[i].sub;
     });
-})();
+});
+
+form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    hideMsgs();
+    var email = document.getElementById('email').value.trim();
+    var pw = pass.value;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        err.textContent = 'Introduce un correo electrónico válido.';
+        err.classList.add('visible');
+        return;
+    }
+    if (pw.length < 6) {
+        err.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        err.classList.add('visible');
+        return;
+    }
+    btn.disabled = true;
+    try {
+        var supabase = await getSupabaseClient();
+        var result = await supabase.auth.signInWithPassword({ email: email, password: pw });
+        if (result.error) {
+            err.textContent = mapAuthError(result.error);
+            err.classList.add('visible');
+            return;
+        }
+        window.location.href = '/';
+    } catch (ex) {
+        err.textContent = ex.message || 'Error de conexión. Revisa la configuración en Vercel.';
+        err.classList.add('visible');
+    } finally {
+        btn.disabled = false;
+    }
+});
 </script>
 </body>
 </html>

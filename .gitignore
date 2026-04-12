@@ -1,6 +1,11 @@
 # Vercel
 .vercel
 
+# Variables locales (usa .env.example como plantilla)
+.env
+.env.local
+.env.*.local
+
 # Sistema
 .DS_Store
 Thumbs.db

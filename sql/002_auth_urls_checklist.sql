@@ -1,0 +1,33 @@
+-- =============================================================================
+-- Supabase → Authentication → URL configuration (mismo proyecto, varias apps)
+-- =============================================================================
+--
+-- Site URL (un solo valor “por defecto”)
+--   Lo usan plantillas de email (variable tipo Site URL) y cuando no mandas
+--   redirectTo explícito. NO tiene que ser hecom.club si tu proyecto principal
+--   sigue siendo otro (ej. cmr-chatbot-two.vercel.app).
+--   Solo cámbialo a https://www.hecom.club si quieres que los emails “genéricos”
+--   apunten siempre a Hecom.
+--
+-- Redirect URLs (lista de permitidos; wildcards OK)
+--   Añade hecom SIN quitar marketingconholistic, wazapp, localhost, etc.
+--
+--   Mínimo para recuperación de contraseña desde hecom.club:
+--     https://www.hecom.club/auth/reset-password
+--   O, más cómodo para login / futuros flujos:
+--     https://www.hecom.club/**
+--
+--   Si también sirves sin www:
+--     https://hecom.club/**
+--
+--   Local al probar hecom en tu máquina (ajusta puerto si no es 4321):
+--     http://localhost:4321/**
+--
+-- El cliente ya usa: redirectTo = origin + '/auth/reset-password'
+-- Esa URL debe coincidir con alguna entrada de la lista (o un wildcard que la cubra).
+--
+-- Si Hecom va en un Supabase NUEVO (proyecto aparte): ahí sí pon
+--   Site URL = https://www.hecom.club
+--   y Redirect URLs solo las de hecom (+ localhost si desarrollas).
+--
+-- =============================================================================
