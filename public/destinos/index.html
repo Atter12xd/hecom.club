@@ -545,6 +545,8 @@ import { getSupabaseClient } from '/js/supabase-auth.js';
 
 /** Cliente ya inicializado; sirve para reenviar la sesión al abrir paneles en marketing. */
 var globalSupabase = null;
+/** Copia síncrona de la sesión (mismo clic → window.open sin about:blank intermedio). */
+var sessionSnapshot = null;
 
 var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
@@ -646,34 +648,48 @@ async function resolveHandoffUrl(targetUrl) {
 }
 
 /**
- * Abre en pestaña nueva (about:blank en el clic evita bloqueo de popups tras await).
- * Si el navegador bloquea igual, cae a misma pestaña.
+ * Pestaña nueva con URL final en el mismo tick del clic (evita about:blank → assign, que en Crédito
+ * podía montar la app dos veces y romper tipografías / imágenes).
+ * Si popup bloqueado, fallback async con about:blank.
  */
-async function openHolisticPanel(targetUrl, panelName) {
-    var pending = window.open('about:blank', '_blank', 'noopener,noreferrer');
-    if (pending) {
-        try {
-            pending.opener = null;
-        } catch (_) {}
-    }
+function openHolisticPanel(targetUrl, panelName) {
     try {
         localStorage.setItem(STORAGE_KEY, targetUrl || '');
         if (panelName) localStorage.setItem(STORAGE_NAME, panelName);
     } catch (_) {}
-    var urlToOpen = await resolveHandoffUrl(targetUrl);
-    if (pending) {
-        try {
-            pending.location.href = urlToOpen;
-        } catch (_) {
-            try {
-                pending.close();
-            } catch (_) {}
-            var w2 = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
-            if (!w2) window.location.assign(urlToOpen);
-        }
-    } else {
-        window.location.assign(urlToOpen);
+    var s = sessionSnapshot;
+    var urlToOpen = targetUrl;
+    if (s && s.access_token && s.refresh_token && globalSupabase && isHolisticPanelUrl(targetUrl)) {
+        urlToOpen = buildSessionHandoffUrl(targetUrl, s);
     }
+    var w = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
+    if (w) {
+        try {
+            w.opener = null;
+        } catch (_) {}
+        return;
+    }
+    void (async function () {
+        var pending = window.open('about:blank', '_blank', 'noopener,noreferrer');
+        if (pending) {
+            try {
+                pending.opener = null;
+            } catch (_) {}
+        }
+        var u = await resolveHandoffUrl(targetUrl);
+        if (pending) {
+            try {
+                pending.location.href = u;
+            } catch (_) {
+                try {
+                    pending.close();
+                } catch (_) {}
+                if (!window.open(u, '_blank', 'noopener,noreferrer')) window.location.assign(u);
+            }
+        } else {
+            window.location.assign(u);
+        }
+    })();
 }
 
 function renderCards() {
@@ -704,7 +720,7 @@ function renderCards() {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             if (e.button !== 0) return;
             e.preventDefault();
-            void openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
+            openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
         });
     });
 }
@@ -726,7 +742,7 @@ function showLastAccess() {
     label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
     wrap.classList.add('visible');
     btn.onclick = function () {
-        void openHolisticPanel(url, name);
+        openHolisticPanel(url, name);
     };
 }
 
@@ -773,6 +789,10 @@ dots.forEach(function (d, i) {
         return;
     }
     globalSupabase = supabase;
+    sessionSnapshot = session;
+    supabase.auth.onAuthStateChange(function (_evt, sess) {
+        sessionSnapshot = sess;
+    });
     renderCards();
     showLastAccess();
 })();
