@@ -10,7 +10,12 @@
 --   on conflict do nothing;
 --
 -- En Supabase → Authentication → Redirect URLs debe figurar, por ejemplo:
+--   https://www.hecom.club/destinos
 --   https://www.hecom.club/login
 --   https://www.hecom.club/**
+--
+-- Paneles en marketingconholistic.com: deben usar el MISMO proyecto Supabase.
+-- Desde /destinos se reenvía la sesión en el hash (implicit); si una app fuerza solo PKCE
+-- sin leer el hash, hay que ajustar esa app (p. ej. setSession al cargar o detectSessionInUrl compatible).
 --
 -- =============================================================================

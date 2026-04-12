@@ -483,14 +483,14 @@ a:hover { text-decoration: underline; }
         </div>
 
         <div>
-            <a class="brand-logo" href="/" aria-label="holistic marketing — inicio">
+            <a class="brand-logo" href="https://www.marketingconholistic.com/" rel="noopener noreferrer" aria-label="Holistic Marketing — sitio web">
                 <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="640" height="186">
             </a>
 
             <div class="section-label"><span>Área de equipo</span></div>
             <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
             <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Páginas de trabajo</strong> — cada enlace abre el producto en <strong>marketingconholistic.com</strong>. Si el navegador aún no tiene sesión en ese dominio, usá el mismo correo con magic link allí.</p>
+            <p class="hint-line"><strong>Páginas de trabajo</strong> — con tu sesión de Hecom intentamos abrirte ya autenticado en <strong>marketingconholistic.com</strong> (mismo sistema de usuarios). Si alguna pantalla pide login otra vez, suele ser la configuración de esa app: avisá al equipo técnico.</p>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -533,6 +533,9 @@ a:hover { text-decoration: underline; }
 
 <script type="module">
 import { getSupabaseClient } from '/js/supabase-auth.js';
+
+/** Cliente ya inicializado; sirve para reenviar la sesión al abrir paneles en marketing. */
+var globalSupabase = null;
 
 var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
@@ -584,6 +587,61 @@ function escapeAttr(s) {
     return String(s).replace(/"/g, '&quot;');
 }
 
+function isHolisticPanelUrl(urlStr) {
+    try {
+        var u = new URL(urlStr);
+        var h = u.hostname.toLowerCase();
+        return h === 'www.marketingconholistic.com' || h === 'marketingconholistic.com';
+    } catch (_) {
+        return false;
+    }
+}
+
+/**
+ * Misma sesión en otro dominio: el hash es el formato "implicit grant" que usa auth-js con detectSessionInUrl.
+ * Requiere que crédito/pendientes/etc. usen el mismo proyecto Supabase y acepten implicit en URL (no PKCE estricto sin leer hash).
+ */
+function buildSessionHandoffUrl(baseUrl, session) {
+    var u = new URL(baseUrl);
+    var expiresIn =
+        session.expires_in != null
+            ? String(session.expires_in)
+            : session.expires_at != null
+              ? String(Math.max(60, parseInt(String(session.expires_at), 10) - Math.round(Date.now() / 1000)))
+              : '3600';
+    var tokenType = session.token_type || 'bearer';
+    var parts = [
+        'access_token=' + encodeURIComponent(session.access_token),
+        'expires_in=' + encodeURIComponent(expiresIn),
+        'refresh_token=' + encodeURIComponent(session.refresh_token),
+        'token_type=' + encodeURIComponent(tokenType),
+    ];
+    if (session.expires_at != null) {
+        parts.push('expires_at=' + encodeURIComponent(String(session.expires_at)));
+    }
+    u.hash = parts.join('&');
+    return u.href;
+}
+
+async function openHolisticPanel(targetUrl, panelName) {
+    try {
+        localStorage.setItem(STORAGE_KEY, targetUrl || '');
+        if (panelName) localStorage.setItem(STORAGE_NAME, panelName);
+    } catch (_) {}
+    if (!globalSupabase || !isHolisticPanelUrl(targetUrl)) {
+        window.location.assign(targetUrl);
+        return;
+    }
+    try {
+        var session = (await globalSupabase.auth.getSession()).data.session;
+        if (session && session.access_token && session.refresh_token) {
+            window.location.assign(buildSessionHandoffUrl(targetUrl, session));
+            return;
+        }
+    } catch (_) {}
+    window.location.assign(targetUrl);
+}
+
 function renderCards() {
     var grid = document.getElementById('destinosGrid');
     grid.innerHTML = '';
@@ -602,11 +660,11 @@ function renderCards() {
     });
 
     grid.querySelectorAll('a.go').forEach(function (link) {
-        link.addEventListener('click', function () {
-            try {
-                localStorage.setItem(STORAGE_KEY, link.getAttribute('data-url') || '');
-                localStorage.setItem(STORAGE_NAME, link.getAttribute('data-name') || '');
-            } catch (_) {}
+        link.addEventListener('click', function (e) {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+            if (e.button !== 0) return;
+            e.preventDefault();
+            void openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
         });
     });
 }
@@ -628,7 +686,7 @@ function showLastAccess() {
     label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
     wrap.classList.add('visible');
     btn.onclick = function () {
-        window.location.href = url;
+        void openHolisticPanel(url, name);
     };
 }
 
@@ -674,6 +732,7 @@ dots.forEach(function (d, i) {
         window.location.replace('/login');
         return;
     }
+    globalSupabase = supabase;
     renderCards();
     showLastAccess();
 })();
