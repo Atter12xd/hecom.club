@@ -490,7 +490,7 @@ a:hover { text-decoration: underline; }
             <div class="section-label"><span>Área de equipo</span></div>
             <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
             <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Páginas de trabajo</strong> — con tu sesión de Hecom intentamos abrirte ya autenticado en <strong>marketingconholistic.com</strong> (mismo sistema de usuarios). Si alguna pantalla pide login otra vez, suele ser la configuración de esa app: avisá al equipo técnico.</p>
+            <p class="hint-line"><strong>Páginas de trabajo</strong> — con tu sesión de Hecom abrimos las entradas <strong>acceso-*</strong> (donde el sitio aplica el login del hash) y luego pasás al panel. <strong>Crédito</strong> usa <strong>/credito</strong> (React). Si alguna pantalla pide login otra vez, avisá al equipo técnico.</p>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -540,6 +540,8 @@ var globalSupabase = null;
 var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
 
+/* Pendientes / creativos / finanzas: entradas acceso-* (setSession desde el hash antes del panel).
+   Crédito sigue en /credito (React); si más adelante hay acceso-credito, cambiá la URL acá. */
 var DESTINOS = [
     {
         order: 1,
@@ -553,21 +555,21 @@ var DESTINOS = [
         name: 'Pendientes Holistic',
         subtitle: 'Operación y coordinación del equipo',
         desc: 'Dashboard interno: clientes, entregables, tickets, calendario y asistencia — el día a día del equipo.',
-        url: 'https://www.marketingconholistic.com/pendientes',
+        url: 'https://www.marketingconholistic.com/acceso-pendientes',
     },
     {
         order: 3,
         name: 'Creativos Holistic',
         subtitle: 'Pipeline y producción creativa',
         desc: 'Página de trabajo para pipeline, proyectos, clientes creativos y entregables de diseño / contenido.',
-        url: 'https://www.marketingconholistic.com/creativos',
+        url: 'https://www.marketingconholistic.com/acceso-creativos',
     },
     {
         order: 4,
         name: 'Finanzas Holistic',
         subtitle: 'Panel financiero de la organización',
         desc: 'Espacio de trabajo para finanzas, control y vista general económica del equipo y la agencia.',
-        url: 'https://www.marketingconholistic.com/finanzas',
+        url: 'https://www.marketingconholistic.com/acceso-finanzas',
     },
 ];
 
