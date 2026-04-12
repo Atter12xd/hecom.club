@@ -499,7 +499,7 @@ a:hover { text-decoration: underline; }
             <div class="section-label"><span>Área de equipo</span></div>
             <h1 class="form-title" id="hub-heading">Tus paneles de trabajo</h1>
             <p class="form-sub">Elegí a qué espacio interno entrás. Son las mismas herramientas que usa el equipo Holistic día a día: crédito, operación, creativos y finanzas.</p>
-            <p class="hint-line"><strong>Páginas de trabajo</strong> — los enlaces abren la <strong>misma URL</strong> que si entrás directo a marketing (sin pegar sesión en la dirección), para que el diseño sea estable. En <strong>marketingconholistic.com</strong> usá magic link con el mismo correo cuando el panel pida iniciar sesión.</p>
+            <p class="hint-line"><strong>Mismo navegador</strong> (donde ya tenés sesión en Hecom): <strong>Pendientes, Creativos y Finanzas</strong> reciben la sesión en el enlace hacia <code>acceso-*</code>. <strong>Crédito</strong> (<code>/credito</code>) se abre sin tokens en la URL por estabilidad del panel React; si pide login, usá magic link allí con el mismo correo. <strong>Otro navegador, incógnito o perfil</strong>: no comparte cookies con el primero — es normal que pida iniciar sesión en cada sitio.</p>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
                 <span id="lastLabel"></span>
@@ -508,7 +508,7 @@ a:hover { text-decoration: underline; }
 
             <div class="grid" id="destinosGrid" role="list"></div>
 
-            <p class="foot-note">Cada <strong>Abrir panel</strong> se abre en una <strong>pestaña nueva</strong> y deja Hecom abierto con tu sesión. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo (hecom.club).</p>
+            <p class="foot-note">Cada <strong>Abrir panel</strong> abre una <strong>pestaña nueva</strong>. La sesión de Hecom <strong>no existe en otro navegador</strong>: entrá a Hecom con magic link ahí también, o iniciá sesión en marketing. Orden sugerido: Crédito → Pendientes → Creativos → Finanzas. La última elección se guarda solo en este dispositivo y este navegador (hecom.club).</p>
         </div>
     </section>
 
@@ -552,10 +552,10 @@ var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
 
 /**
- * Pegar sesión en el hash de la URL hacia marketing (SSO). Por defecto false: misma URL que entrar
- * directo → sin saltos de diseño. Pasar a true solo cuando las apps consuman el hash sin romper UI.
+ * Pegar sesión en el hash solo hacia rutas /acceso-* (no /credito). true = entrás directo a esos tres
+ * desde el mismo navegador donde ya hay sesión Hecom. false = siempre URL limpia (más login en marketing).
  */
-var USE_URL_SESSION_HANDOFF = false;
+var USE_URL_SESSION_HANDOFF = true;
 
 /* Pendientes / creativos / finanzas: entradas acceso-* (setSession desde el hash antes del panel).
    Crédito sigue en /credito (React); si más adelante hay acceso-credito, cambiá la URL acá. */
@@ -616,14 +616,12 @@ function isHolisticPanelUrl(urlStr) {
     }
 }
 
-/** El panel React /credito rompe layout con un hash enorme de tokens; las páginas acceso-* sí lo consumen bien. */
+/** Solo páginas acceso-* (HTML con setSession desde hash). Nunca /credito (React + diseño estable). */
 function needsSessionHandoff(urlStr) {
     try {
         if (!isHolisticPanelUrl(urlStr)) return false;
-        var u = new URL(urlStr);
-        var path = (u.pathname || '/').replace(/\/+$/, '') || '/';
-        if (path === '/credito') return false;
-        return true;
+        var path = (new URL(urlStr).pathname || '/').toLowerCase();
+        return path.indexOf('/acceso-') >= 0;
     } catch (_) {
         return false;
     }
