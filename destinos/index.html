@@ -353,7 +353,7 @@ a:hover { text-decoration: underline; }
             <p class="form-sub">Elegí un espacio interno: crédito, operación, creativos o finanzas.</p>
             <details class="hint-details">
                 <summary>Sesión entre sitios (mismo navegador)</summary>
-                <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los enlaces pueden llevar tokens en el fragmento hacia marketing (<code>/credito</code> y rutas <code>acceso-*</code>). Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar (magic link u otro flujo). Ningún redirect ni meta refresh debe consumir el <code>#</code> antes de que el cliente de marketing lea el hash.</p>
+                <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los enlaces pueden llevar tokens en el fragmento hacia marketing (<code>/credito</code> y rutas <code>acceso-*</code>). Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar (magic link u otro flujo). Ningún redirect ni meta refresh debe consumir el <code>#</code> antes de que el cliente de marketing lea el hash. <strong>Importante (marketing):</strong> el handoff usa flujo implícito en el hash; el cliente de Supabase en marketing debe tener <code>auth.flowType: 'implicit'</code> (o detectar el hash y llamar <code>setSession</code>). Si está en <code>pkce</code> por defecto, Auth puede borrar la sesión al cargar y verás pantalla vacía o sin tema.</p>
             </details>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
@@ -466,13 +466,17 @@ function needsSessionHandoff(urlStr) {
  */
 function buildSessionHandoffUrl(baseUrl, session) {
     var u = new URL(baseUrl);
-    var expiresIn =
-        session.expires_in != null
-            ? String(session.expires_in)
-            : session.expires_at != null
-              ? String(Math.max(60, parseInt(String(session.expires_at), 10) - Math.round(Date.now() / 1000)))
-              : '3600';
-    var tokenType = session.token_type || 'bearer';
+    var now = Math.round(Date.now() / 1000);
+    var expAt = session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN;
+    var expiresIn;
+    if (!isNaN(expAt)) {
+        expiresIn = String(Math.max(30, expAt - now));
+    } else if (session.expires_in != null && !isNaN(Number(session.expires_in))) {
+        expiresIn = String(Math.max(30, Math.floor(Number(session.expires_in))));
+    } else {
+        expiresIn = '3600';
+    }
+    var tokenType = (session.token_type || 'bearer').toLowerCase();
     var parts = [
         'access_token=' + encodeURIComponent(session.access_token),
         'expires_in=' + encodeURIComponent(expiresIn),
@@ -501,9 +505,12 @@ async function resolveHandoffUrl(targetUrl) {
     return targetUrl;
 }
 
-/** Siempre intenta otra pestaña; esta ventana sigue en /destinos (nunca location.assign en self). */
+/**
+ * Abre URL en pestaña nueva sin navegar esta ventana.
+ * Sin el tercer argumento de window.open: algunos navegadores/extensiones fallan con URLs largas (#tokens) + "noopener,noreferrer".
+ */
 function openUrlInNewTabPreservingThisPage(urlToOpen) {
-    var w = window.open(urlToOpen, '_blank', 'noopener,noreferrer');
+    var w = window.open(urlToOpen, '_blank');
     if (w) {
         try {
             w.opener = null;
@@ -514,7 +521,7 @@ function openUrlInNewTabPreservingThisPage(urlToOpen) {
         var a = document.createElement('a');
         a.href = urlToOpen;
         a.setAttribute('target', '_blank');
-        a.setAttribute('rel', 'noopener noreferrer');
+        a.setAttribute('rel', 'noreferrer');
         a.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none';
         document.body.appendChild(a);
         a.click();
@@ -524,56 +531,75 @@ function openUrlInNewTabPreservingThisPage(urlToOpen) {
     return false;
 }
 
+/** Sesión reciente para el hash (evita snapshot desactualizado tras login / refresh). */
+async function getSessionForHandoff() {
+    if (!globalSupabase) return null;
+    try {
+        var session = (await globalSupabase.auth.getSession()).data.session;
+        if (!session || !session.access_token || !session.refresh_token) return null;
+        var now = Math.round(Date.now() / 1000);
+        var expAt = session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN;
+        if (!isNaN(expAt) && expAt - now < 120) {
+            var ref = await globalSupabase.auth.refreshSession();
+            if (ref.data && ref.data.session) session = ref.data.session;
+        }
+        return session;
+    } catch (_) {
+        return null;
+    }
+}
+
 /** Pestaña nueva; URL con hash si USE_URL_SESSION_HANDOFF y ruta lo permiten. */
-function openHolisticPanel(targetUrl, panelName) {
+async function openHolisticPanel(targetUrl, panelName) {
     try {
         localStorage.setItem(STORAGE_KEY, targetUrl || '');
         if (panelName) localStorage.setItem(STORAGE_NAME, panelName);
     } catch (_) {}
-    var s = sessionSnapshot;
     var urlToOpen = targetUrl;
-    var wantHandoff =
+    var needHandoff =
         USE_URL_SESSION_HANDOFF &&
-        !!(s && s.access_token && s.refresh_token && globalSupabase && isHolisticPanelUrl(targetUrl) && needsSessionHandoff(targetUrl));
-    if (wantHandoff) {
-        urlToOpen = buildSessionHandoffUrl(targetUrl, s);
+        !!(globalSupabase && isHolisticPanelUrl(targetUrl) && needsSessionHandoff(targetUrl));
+    if (needHandoff) {
+        var fresh = await getSessionForHandoff();
+        if (fresh && fresh.access_token && fresh.refresh_token) {
+            sessionSnapshot = fresh;
+            urlToOpen = buildSessionHandoffUrl(targetUrl, fresh);
+        }
     }
     if (openUrlInNewTabPreservingThisPage(urlToOpen)) {
         return;
     }
-    void (async function () {
-        var pending = window.open('about:blank', '_blank', 'noopener,noreferrer');
-        if (pending) {
+    var pending = window.open('about:blank', '_blank');
+    if (pending) {
+        try {
+            pending.opener = null;
+        } catch (_) {}
+    }
+    var u = targetUrl;
+    try {
+        u = await resolveHandoffUrl(targetUrl);
+    } catch (_) {
+        u = targetUrl;
+    }
+    var ok = false;
+    if (pending) {
+        try {
+            pending.location.replace(u);
+            ok = true;
+        } catch (_) {
             try {
-                pending.opener = null;
+                pending.close();
             } catch (_) {}
         }
-        var u = targetUrl;
-        try {
-            u = await resolveHandoffUrl(targetUrl);
-        } catch (_) {
-            u = targetUrl;
-        }
-        var ok = false;
-        if (pending) {
-            try {
-                pending.location.href = u;
-                ok = true;
-            } catch (_) {
-                try {
-                    pending.close();
-                } catch (_) {}
-            }
-        }
-        if (!ok) {
-            ok = openUrlInNewTabPreservingThisPage(u);
-        }
-        if (!ok) {
-            window.alert(
-                'No se pudo abrir el panel en otra pestaña (bloqueo de ventanas emergentes). Permití popups para www.hecom.club y volvé a intentar. Esta página se queda en /destinos.'
-            );
-        }
-    })();
+    }
+    if (!ok) {
+        ok = openUrlInNewTabPreservingThisPage(u);
+    }
+    if (!ok) {
+        window.alert(
+            'No se pudo abrir el panel en otra pestaña (bloqueo de ventanas emergentes). Permití popups para www.hecom.club y volvé a intentar. Esta página se queda en /destinos.'
+        );
+    }
 }
 
 function renderCards() {
@@ -597,12 +623,12 @@ function renderCards() {
     });
 
     grid.querySelectorAll('a.go').forEach(function (link) {
-        link.addEventListener('click', function (e) {
+        link.addEventListener('click', async function (e) {
             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
             if (e.button !== 0) return;
             e.preventDefault();
             e.stopPropagation();
-            openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
+            await openHolisticPanel(link.getAttribute('data-url') || '', link.getAttribute('data-name') || '');
         });
     });
 }
@@ -623,8 +649,8 @@ function showLastAccess() {
     }
     label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
     wrap.classList.add('visible');
-    btn.onclick = function () {
-        openHolisticPanel(url, name);
+    btn.onclick = async function () {
+        await openHolisticPanel(url, name);
     };
 }
 
