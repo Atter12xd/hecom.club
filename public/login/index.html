@@ -180,6 +180,107 @@ a:hover { text-decoration: underline; }
     margin-bottom: 20px;
 }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.method-switch {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 5px;
+    background: #f9fafb;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+}
+.method-switch label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    text-align: center;
+    gap: 8px;
+}
+.method-switch label:has(input:checked) {
+    background: #fff;
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(17, 24, 39, 0.08);
+}
+.method-switch input {
+    accent-color: var(--primary);
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+.otp-step {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+.otp-step[hidden] {
+    display: none !important;
+}
+.otp-step .field-label {
+    margin-bottom: 10px;
+}
+.otp-code-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-family: ui-monospace, monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-align: center;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.otp-code-input:focus {
+    border-color: var(--brand-start);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.otp-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-top: 14px;
+}
+.linkish {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 8px 0;
+    font-family: inherit;
+    text-align: center;
+}
+.linkish:hover {
+    color: var(--primary-dark);
+}
+
 .submit-btn {
     width: 100%;
     padding: 14px 20px;
@@ -441,7 +542,7 @@ a:hover { text-decoration: underline; }
             </a>
 
             <h1 class="form-title" id="login-heading">Iniciar sesión</h1>
-            <p class="form-sub">Te enviamos un enlace mágico al correo (válido por tiempo limitado). Mismo acceso que en tus otros paneles Holistic.</p>
+            <p class="form-sub" id="formSub">Elegí enlace mágico o código por correo (ambos por tiempo limitado). Mismo acceso que en tus otros paneles Holistic.</p>
 
             <form id="loginForm" novalidate>
                 <div class="field-group">
@@ -451,9 +552,27 @@ a:hover { text-decoration: underline; }
                         <input type="email" id="email" name="email" autocomplete="email" placeholder="correo@ejemplo.com" required>
                     </div>
                 </div>
+
+                <div class="method-switch" role="radiogroup" aria-labelledby="methodLegend">
+                    <span id="methodLegend" class="sr-only">Forma de entrar</span>
+                    <label><input type="radio" name="loginMethod" value="link" checked> Enlace mágico</label>
+                    <label><input type="radio" name="loginMethod" value="code"> Código por correo</label>
+                </div>
+
                 <p class="hint-line">Solo correos dados de alta como gerente o con acceso en <strong>clientes_acceso</strong>.</p>
 
                 <button type="submit" class="submit-btn" id="submitBtn">Enviar enlace mágico</button>
+
+                <div id="otpStep" class="otp-step" hidden>
+                    <label class="field-label" for="otpCode">Código que te enviamos</label>
+                    <input type="text" class="otp-code-input" id="otpCode" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="000000" aria-describedby="otpHint">
+                    <p id="otpHint" class="hint-line" style="margin-top:10px;margin-bottom:0">Ingresá el código del correo (suele ser 6 dígitos).</p>
+                    <button type="button" class="submit-btn" id="verifyOtpBtn" style="margin-top:16px">Entrar con el código</button>
+                    <div class="otp-actions">
+                        <button type="button" class="linkish" id="resendCodeBtn">Reenviar código</button>
+                        <button type="button" class="linkish" id="backMethodBtn">Cambiar método</button>
+                    </div>
+                </div>
 
                 <div class="form-row">
                     <a class="forgot-link" href="/forgot-password">¿Olvidaste tu contraseña?</a>
@@ -512,12 +631,45 @@ var form = document.getElementById('loginForm');
 var btn = document.getElementById('submitBtn');
 var info = document.getElementById('statusInfo');
 var err = document.getElementById('statusError');
+var otpStep = document.getElementById('otpStep');
+var otpInput = document.getElementById('otpCode');
+var verifyOtpBtn = document.getElementById('verifyOtpBtn');
+var resendCodeBtn = document.getElementById('resendCodeBtn');
+var backMethodBtn = document.getElementById('backMethodBtn');
+var emailInput = document.getElementById('email');
+var formSub = document.getElementById('formSub');
 
 function hideMsgs() {
     info.classList.remove('visible');
     err.classList.remove('visible');
     info.textContent = '';
     err.textContent = '';
+}
+
+function getMethod() {
+    var el = document.querySelector('input[name="loginMethod"]:checked');
+    return el && el.value === 'code' ? 'code' : 'link';
+}
+
+function syncSubmitLabel() {
+    btn.textContent = getMethod() === 'code' ? 'Enviar código' : 'Enviar enlace mágico';
+    if (formSub) {
+        formSub.textContent =
+            getMethod() === 'code'
+                ? 'Te mandamos un código al correo; lo ingresás acá abajo. Si preferís abrir un enlace, elegí «Enlace mágico». Mismo acceso que en tus otros paneles Holistic.'
+                : 'Te mandamos un enlace al correo; lo abrís y listo. Si preferís escribir un código, elegí «Código por correo». Mismo acceso que en tus otros paneles Holistic.';
+    }
+}
+
+function showOtpStep(on) {
+    if (on) {
+        otpStep.removeAttribute('hidden');
+        otpInput.value = '';
+        otpInput.focus();
+    } else {
+        otpStep.setAttribute('hidden', '');
+        otpInput.value = '';
+    }
 }
 
 async function tryConsumeMagicLinkHash() {
@@ -570,26 +722,109 @@ async function init() {
         });
     });
 
+    document.querySelectorAll('input[name="loginMethod"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+            syncSubmitLabel();
+            showOtpStep(false);
+            hideMsgs();
+        });
+    });
+    syncSubmitLabel();
+
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
         hideMsgs();
-        var email = document.getElementById('email').value.trim();
+        var email = emailInput.value.trim();
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             err.textContent = 'Introduce un correo electrónico válido.';
             err.classList.add('visible');
             return;
         }
+        var method = getMethod();
         btn.disabled = true;
         try {
             var redirectTo = window.location.origin + '/destinos';
-            var data = await invokeMagicLinkLogin(email, redirectTo);
-            info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
-            info.classList.add('visible');
+            var data = await invokeMagicLinkLogin(email, redirectTo, method);
+            if (method === 'code') {
+                info.textContent = data.message || 'Revisá tu correo e ingresá el código abajo.';
+                info.classList.add('visible');
+                showOtpStep(true);
+            } else {
+                showOtpStep(false);
+                info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
+                info.classList.add('visible');
+            }
         } catch (ex) {
-            err.textContent = ex.message || 'No se pudo enviar el enlace.';
+            err.textContent = ex.message || (method === 'code' ? 'No se pudo enviar el código.' : 'No se pudo enviar el enlace.');
             err.classList.add('visible');
         } finally {
             btn.disabled = false;
+        }
+    });
+
+    verifyOtpBtn.addEventListener('click', async function () {
+        hideMsgs();
+        var email = emailInput.value.trim();
+        var code = (otpInput.value || '').replace(/\D/g, '');
+        if (!email || code.length < 6) {
+            err.textContent = 'Ingresá el código completo que recibiste por correo.';
+            err.classList.add('visible');
+            return;
+        }
+        verifyOtpBtn.disabled = true;
+        try {
+            var supabase = await getSupabaseClient();
+            var res = await supabase.auth.verifyOtp({ email: email, token: code, type: 'email' });
+            if (res.error) {
+                err.textContent = res.error.message || 'Código incorrecto o vencido.';
+                err.classList.add('visible');
+                return;
+            }
+            if (res.data && res.data.session) {
+                window.location.replace('/destinos');
+                return;
+            }
+            err.textContent = 'No se pudo iniciar sesión. Probá de nuevo o pedí un código nuevo.';
+            err.classList.add('visible');
+        } catch (ex) {
+            err.textContent = ex.message || 'Error al verificar el código.';
+            err.classList.add('visible');
+        } finally {
+            verifyOtpBtn.disabled = false;
+        }
+    });
+
+    resendCodeBtn.addEventListener('click', async function () {
+        hideMsgs();
+        var email = emailInput.value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            err.textContent = 'Correo no válido.';
+            err.classList.add('visible');
+            return;
+        }
+        resendCodeBtn.disabled = true;
+        try {
+            var redirectTo = window.location.origin + '/destinos';
+            var data = await invokeMagicLinkLogin(email, redirectTo, 'code');
+            info.textContent = data.message || 'Te enviamos otro código.';
+            info.classList.add('visible');
+        } catch (ex) {
+            err.textContent = ex.message || 'No se pudo reenviar el código.';
+            err.classList.add('visible');
+        } finally {
+            resendCodeBtn.disabled = false;
+        }
+    });
+
+    backMethodBtn.addEventListener('click', function () {
+        showOtpStep(false);
+        hideMsgs();
+    });
+
+    otpInput.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter') {
+            ev.preventDefault();
+            verifyOtpBtn.click();
         }
     });
 }

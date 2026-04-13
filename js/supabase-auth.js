@@ -24,8 +24,10 @@ export async function getPublicSupabaseConfig() {
 /**
  * Llama al Edge Function magic-link-login (mismo proyecto que PUBLIC_SUPABASE_URL).
  * Opcional en Vercel (y en /api/supabase-config): PUBLIC_MAGIC_LINK_LOGIN_URL = URL completa.
+ * @param {'link'|'code'|undefined} method "link" = enlace por Resend; "code" = código por Resend si Auth devuelve email_otp en generate_link, si no correo plantilla Supabase.
  */
-export async function invokeMagicLinkLogin(email, redirectTo) {
+export async function invokeMagicLinkLogin(email, redirectTo, method) {
+    var m = method === 'code' ? 'code' : 'link';
     var cfg = await getPublicSupabaseConfig();
     var fnUrl = cfg.magicLinkFunctionUrl || cfg.url + '/functions/v1/magic-link-login';
     var res = await fetch(fnUrl, {
@@ -37,7 +39,7 @@ export async function invokeMagicLinkLogin(email, redirectTo) {
         },
         body: JSON.stringify({
             email: email,
-            method: 'link',
+            method: m,
             redirect_to: redirectTo,
         }),
     });
