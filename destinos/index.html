@@ -478,6 +478,8 @@ function buildSessionHandoffUrl(baseUrl, session) {
         'expires_in=' + encodeURIComponent(expiresIn),
         'refresh_token=' + encodeURIComponent(session.refresh_token),
         'token_type=' + encodeURIComponent(tokenType),
+        /* Sin esto, el bootstrap de marketing (getSessionFromUrl / AuthGate) a veces no hidrata y queda pantalla en negro o sin tema. */
+        'type=magiclink',
     ];
     if (session.expires_at != null) {
         parts.push('expires_at=' + encodeURIComponent(String(session.expires_at)));

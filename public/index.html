@@ -616,6 +616,16 @@ document.addEventListener('mousedown',()=>glass.classList.add('clicking'));
 document.addEventListener('mouseup',()=>glass.classList.remove('clicking'));
 document.addEventListener('mouseleave',()=>{glass.style.opacity='0';core.style.opacity='0'});
 document.addEventListener('mouseenter',()=>{glass.style.opacity='1';core.style.opacity='1'});
+function restoreCursorLayer(){
+    if(!glass||!core||glass.style.display==='none')return;
+    glass.style.opacity='1';core.style.opacity='1';
+    try{resizeC();}catch(_){}
+}
+document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')restoreCursorLayer();
+});
+window.addEventListener('pageshow',()=>restoreCursorLayer());
+window.addEventListener('focus',restoreCursorLayer);
 
 // ═══ 16. 3D MAGNETIC TILT ═══
 document.querySelectorAll('.tilt-card').forEach(c=>{
