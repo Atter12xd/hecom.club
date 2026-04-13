@@ -212,10 +212,6 @@ main,header,footer,.alert-bar{position:relative;z-index:1}
 
 /* ═══════════════ LAYOUT STYLES ═══════════════ */
 header{padding:28px 24px;display:flex;justify-content:center;align-items:center;position:relative;opacity:0;animation:luxFD 1s ease-out .2s forwards}
-.header-login-nav{position:absolute;right:24px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:min(200px,42vw)}
-.header-login-link{font-size:.88rem;font-weight:700;color:var(--cyan);text-decoration:none;padding:10px 18px;border-radius:999px;border:1px solid rgba(0,196,191,.28);background:rgba(255,255,255,.75);backdrop-filter:blur(8px);transition:all .25s ease}
-.header-login-link:hover{border-color:rgba(232,0,62,.25);color:var(--pink);box-shadow:var(--shadow-sm)}
-@media (max-width:640px){.header-login-nav{right:14px}.header-login-link{padding:8px 14px;font-size:.8rem}}
 .logo{display:flex;align-items:center;justify-content:center;gap:0}
 .logo a{display:inline-block;line-height:0;position:relative;transition:transform .4s ease}
 .logo a::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:60%;height:3px;background:linear-gradient(90deg,var(--cyan),var(--pink));border-radius:3px;opacity:0.6;transition:opacity .4s ease}
@@ -465,10 +461,6 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 </div>
 
 <header>
-    <nav class="header-login-nav" aria-label="Cuenta">
-        <a class="header-login-link" href="/destinos">Paneles</a>
-        <a class="header-login-link" href="/login">Acceder</a>
-    </nav>
     <div class="logo">
         <a href="/" aria-label="Hecom Club"><img class="logo-img" src="/imagenes/logoh.png?v=2" alt="Hecom Club"></a>
     </div>
