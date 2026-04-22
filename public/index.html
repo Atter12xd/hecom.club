@@ -393,18 +393,26 @@ footer a:hover{color:var(--cyan)}
     .problem-item{padding:16px 18px;flex-direction:column;gap:10px}
 }
 </style>
-<!-- Meta Pixel Code -->
+<!-- Meta Pixel Code: carga tras load + idle para no competir con el primer pintado -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '2145558262942462');
-fbq('track', 'PageView');
+window.addEventListener('load',function(){
+  function injectFb(){
+    if(window.fbq)return;
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2145558262942462');
+    fbq('track', 'PageView');
+    console.log('[hecom:perf] Meta Pixel: script inyectado (tras load + idle)');
+  }
+  if('requestIdleCallback'in window)requestIdleCallback(injectFb,{timeout:4000});
+  else setTimeout(injectFb,2200);
+},{once:true});
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
@@ -473,7 +481,7 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 
 <header>
     <div class="logo">
-        <a href="/" aria-label="Hecom Club"><img class="logo-img" src="/imagenes/logoh.png?v=2" alt="Hecom Club"></a>
+        <a href="/" aria-label="Hecom Club"><img class="logo-img" src="/imagenes/logoh.png?v=2" width="123" height="56" decoding="async" fetchpriority="high" alt="Hecom Club"></a>
     </div>
 </header>
 
@@ -606,103 +614,196 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 <div class="countdown-badge" id="countdownBadge"><div class="pulse-dot"></div><span>Contenido completo en <span class="time" id="countdown">30</span>s</span></div>
 
 <script>
-// ═══ 1-2. CURSOR SYSTEM — FAST ═══
-const glass=document.getElementById('cursorGlass'),core=document.getElementById('cursorCore'),tc=document.getElementById('cursorTrailCanvas'),ctx=tc.getContext('2d');
-function resizeC(){tc.width=window.innerWidth;tc.height=window.innerHeight}resizeC();window.addEventListener('resize',resizeC);
-let mx=-100,my=-100,gx=-100,gy=-100,ccx=-100,ccy=-100;const trail=[];const TL=8;
+(function initHecomPerf(){
+    const perfVerbose=/[?&]perf=1(?:&|$)/.test(location.search)||localStorage.getItem('hecomPerf')==='1';
+    const tScript=performance.now();
+    const log=function(){console.log('[hecom:perf]',...arguments);};
+    const warn=function(){console.warn('[hecom:perf]',...arguments);};
+    log('monitor ON · más detalle longtasks: ?perf=1 o localStorage.setItem("hecomPerf","1")');
+    if('PerformanceObserver'in window){
+        try{
+            let ltCount=0;
+            const poLt=new PerformanceObserver(function(list){
+                list.getEntries().forEach(function(e){
+                    if(e.entryType!=='longtask')return;
+                    const d=e.duration;
+                    if(d<90&&!perfVerbose)return;
+                    if(++ltCount>35)return;
+                    const a=e.attribution&&e.attribution[0];
+                    warn('LONGTASK '+Math.round(d)+'ms',a&&(a.name||a.containerName||a.containerType)||'sin atribución');
+                });
+            });
+            poLt.observe({type:'longtask',buffered:true});
+        }catch(_){if(perfVerbose)log('Long Task API no disponible en este navegador');}
+        try{
+            const poLcp=new PerformanceObserver(function(list){
+                list.getEntries().forEach(function(e){
+                    const el=e.element;
+                    const hint=(el&&(el.tagName+'.'+String(el.className||'').slice(0,52)))||(e.url||'').slice(0,72);
+                    log('LCP ~'+Math.round(e.startTime)+'ms ·',hint||'(sin elemento)');
+                });
+            });
+            poLcp.observe({type:'largest-contentful-paint',buffered:true});
+        }catch(_){}
+    }
+    window.addEventListener('load',function(){
+        const nav=performance.getEntriesByType('navigation')[0];
+        if(nav)log('NavigationTiming',{domInteractive:Math.round(nav.domInteractive),domComplete:Math.round(nav.domComplete),loadEventEnd:Math.round(nav.loadEventEnd),transferKB:Math.round((nav.transferSize||0)/1024)});
+        log('desde inicio de este <script> hasta window load:',Math.round(performance.now()-tScript)+'ms');
+    },{once:true});
+    window.__hecomPerf={verbose:perfVerbose,log:log,warn:warn};
+})();
+
+const __hecomScriptT0=performance.now();
+const isTouchDevice='ontouchstart'in window||navigator.maxTouchPoints>0;
+if(window.__hecomPerf)window.__hecomPerf.log('dispositivo:',isTouchDevice?'touch (sin canvas trail)':'desktop');
+
+const glass=document.getElementById('cursorGlass'),core=document.getElementById('cursorCore'),tc=document.getElementById('cursorTrailCanvas'),ctx=tc&&tc.getContext('2d');
+let resizeT=0;
+function resizeC(){
+    if(!tc||!ctx)return;
+    const w=window.innerWidth,h=window.innerHeight;
+    if(tc.width===w&&tc.height===h)return;
+    tc.width=w;tc.height=h;
+}
+function scheduleResize(){
+    clearTimeout(resizeT);
+    resizeT=setTimeout(function(){
+        resizeC();
+        if(window.__hecomPerf&&window.__hecomPerf.verbose)window.__hecomPerf.log('canvas resize aplicado');
+    },140);
+}
+let mx=-100,my=-100,gx=-100,gy=-100,ccx=-100,ccy=-100;
+const trail=[];const TL=8;
 const spot=document.getElementById('spotlight');
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;
-    spot.style.setProperty('--mx',e.clientX+'px');spot.style.setProperty('--my',e.clientY+'px')});
+if(!isTouchDevice&&spot){
+    document.addEventListener('mousemove',function(e){
+        mx=e.clientX;my=e.clientY;
+        spot.style.setProperty('--mx',e.clientX+'px');
+        spot.style.setProperty('--my',e.clientY+'px');
+    },{passive:true});
+}
 function animC(){
+    if(document.hidden||isTouchDevice||!glass||!core||!tc||!ctx)return;
     ccx+=(mx-ccx)*.85;ccy+=(my-ccy)*.85;core.style.left=ccx+'px';core.style.top=ccy+'px';
     gx+=(mx-gx)*.45;gy+=(my-gy)*.45;glass.style.left=gx+'px';glass.style.top=gy+'px';
     trail.unshift({x:mx,y:my});if(trail.length>TL)trail.pop();
     ctx.clearRect(0,0,tc.width,tc.height);
-    for(let i=1;i<trail.length;i++){const p=trail[i],pr=trail[i-1],pg=i/trail.length,a=(1-pg)*.12,w=(1-pg)*2;
+    for(let i=1;i<trail.length;i++){
+        const p=trail[i],pr=trail[i-1],pg=i/trail.length,a=(1-pg)*.12,w=(1-pg)*2;
         ctx.beginPath();ctx.moveTo(pr.x,pr.y);ctx.lineTo(p.x,p.y);
-        ctx.strokeStyle='rgba(0,196,191,'+a+')';ctx.lineWidth=w;ctx.lineCap='round';ctx.stroke()}
-    requestAnimationFrame(animC)}animC();
+        ctx.strokeStyle='rgba(0,196,191,'+a+')';ctx.lineWidth=w;ctx.lineCap='round';ctx.stroke();
+    }
+    requestAnimationFrame(animC);
+}
+if(!isTouchDevice){
+    resizeC();
+    window.addEventListener('resize',scheduleResize,{passive:true});
+    requestAnimationFrame(animC);
+}
 
-// Hover states
-document.querySelectorAll('a,button,.cta-button,.benefit-card,.testimonial-card,.hook,.credit-card,.problem-item,.pain-pill').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{glass.classList.add('hovering');core.classList.add('hovering')});
-    el.addEventListener('mouseleave',()=>{glass.classList.remove('hovering');core.classList.remove('hovering')})});
-document.addEventListener('mousedown',()=>glass.classList.add('clicking'));
-document.addEventListener('mouseup',()=>glass.classList.remove('clicking'));
-document.addEventListener('mouseleave',()=>{glass.style.opacity='0';core.style.opacity='0'});
-document.addEventListener('mouseenter',()=>{glass.style.opacity='1';core.style.opacity='1'});
+if(!isTouchDevice&&glass&&core){
+    document.querySelectorAll('a,button,.cta-button,.benefit-card,.testimonial-card,.hook,.credit-card,.problem-item,.pain-pill').forEach(function(el){
+        el.addEventListener('mouseenter',function(){glass.classList.add('hovering');core.classList.add('hovering');});
+        el.addEventListener('mouseleave',function(){glass.classList.remove('hovering');core.classList.remove('hovering');});
+    });
+    document.addEventListener('mousedown',function(){glass.classList.add('clicking');});
+    document.addEventListener('mouseup',function(){glass.classList.remove('clicking');});
+    document.addEventListener('mouseleave',function(){glass.style.opacity='0';core.style.opacity='0';});
+    document.addEventListener('mouseenter',function(){glass.style.opacity='1';core.style.opacity='1';});
+}
 function restoreCursorLayer(){
     if(!glass||!core||glass.style.display==='none')return;
     glass.style.opacity='1';core.style.opacity='1';
     try{resizeC();}catch(_){}
 }
-document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')restoreCursorLayer();
+document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState!=='visible')return;
+    restoreCursorLayer();
+    if(!isTouchDevice)requestAnimationFrame(animC);
 });
-window.addEventListener('pageshow',()=>restoreCursorLayer());
+window.addEventListener('pageshow',restoreCursorLayer);
 window.addEventListener('focus',restoreCursorLayer);
 
-// ═══ Loom: embed solo al clic (evita scripts y ~1.2 MB de Loom hasta que el usuario quiera ver el vídeo) ═══
 const loomBtn=document.getElementById('loomLoadBtn'),loomHost=document.getElementById('loomVideoHost');
 if(loomBtn&&loomHost){
     const loomSrc='https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64de?sid=auto&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true';
-    loomBtn.addEventListener('click',()=>{
+    loomBtn.addEventListener('click',function(){
+        const t0=performance.now();
+        console.log('[hecom:perf] Loom: insertando iframe (pesado; solo tras clic)');
         loomBtn.remove();
         const f=document.createElement('iframe');
         f.src=loomSrc;f.title='Cómo funciona la cuenta de agencia';
         f.setAttribute('frameborder','0');f.setAttribute('webkitallowfullscreen','');f.setAttribute('mozallowfullscreen','');f.setAttribute('allowfullscreen','');
         f.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
         loomHost.appendChild(f);
+        console.log('[hecom:perf] Loom: iframe en DOM en',Math.round(performance.now()-t0)+'ms (red Loom aparte)');
     });
 }
 
-// ═══ 16. 3D MAGNETIC TILT ═══
-document.querySelectorAll('.tilt-card').forEach(c=>{
-    c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,rx=((y-r.height/2)/(r.height/2))*-5,ry=((x-r.width/2)/(r.width/2))*5;
-        c.style.transform='perspective(800px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-6px) scale(1.01)'});
-    c.addEventListener('mouseleave',()=>{c.style.transform='perspective(800px) rotateX(0) rotateY(0) translateY(0) scale(1)'})});
+function initDecorativeInteractions(){
+    const t0=performance.now();
+    document.querySelectorAll('.tilt-card').forEach(function(c){
+        c.addEventListener('mousemove',function(e){const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,rx=((y-r.height/2)/(r.height/2))*-5,ry=((x-r.width/2)/(r.width/2))*5;
+            c.style.transform='perspective(800px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateY(-6px) scale(1.01)'});
+        c.addEventListener('mouseleave',function(){c.style.transform='perspective(800px) rotateX(0) rotateY(0) translateY(0) scale(1)'});
+    });
+    document.querySelectorAll('.ripple-hover').forEach(function(el){
+        el.addEventListener('mousemove',function(e){const r=el.getBoundingClientRect();
+            el.style.setProperty('--rx',(e.clientX-r.left)+'px');el.style.setProperty('--ry',(e.clientY-r.top)+'px')});
+    });
+    document.querySelectorAll('.magnetic-btn').forEach(function(btn){
+        btn.addEventListener('mousemove',function(e){const r=btn.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)*.15;const y=(e.clientY-r.top-r.height/2)*.15;
+            btn.style.transform='translate('+x+'px,'+y+'px) scale(1.02)'});
+        btn.addEventListener('mouseleave',function(){btn.style.transform='translate(0,0) scale(1)'});
+    });
+    if(window.__hecomPerf)window.__hecomPerf.log('tilt+ripple+magnetic registrados en',Math.round(performance.now()-t0)+'ms');
+}
+if('requestIdleCallback'in window)requestIdleCallback(function(){initDecorativeInteractions();},{timeout:1500});
+else setTimeout(initDecorativeInteractions,60);
 
-// ═══ 14. SCROLL REVEAL OBSERVER ═══
-const rObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+const rObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
     const cs=Array.from(e.target.parentElement.children),i=cs.indexOf(e.target);
     e.target.style.transitionDelay=i*.1+'s';e.target.classList.add('visible');rObs.unobserve(e.target)}})},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
 
-// ═══ 17. SCROLL PROGRESS BAR ═══
 const scrollBar=document.getElementById('scrollProgress');
-window.addEventListener('scroll',()=>{
-    const h=document.documentElement;const pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
-    scrollBar.style.width=pct+'%'},{passive:true});
+let scrollRaf=0;
+window.addEventListener('scroll',function(){
+    if(scrollRaf)return;
+    scrollRaf=requestAnimationFrame(function(){
+        scrollRaf=0;
+        const h=document.documentElement,den=h.scrollHeight-h.clientHeight,pct=den>0?(h.scrollTop/den)*100:0;
+        if(scrollBar)scrollBar.style.width=pct+'%';
+    });
+},{passive:true});
 
-// ═══ 25. RIPPLE HOVER TRACKING ═══
-document.querySelectorAll('.ripple-hover').forEach(el=>{
-    el.addEventListener('mousemove',e=>{const r=el.getBoundingClientRect();
-        el.style.setProperty('--rx',(e.clientX-r.left)+'px');el.style.setProperty('--ry',(e.clientY-r.top)+'px')})});
-
-// ═══ 27. MAGNETIC BUTTONS ═══
-document.querySelectorAll('.magnetic-btn').forEach(btn=>{
-    btn.addEventListener('mousemove',e=>{const r=btn.getBoundingClientRect();const x=(e.clientX-r.left-r.width/2)*.15;const y=(e.clientY-r.top-r.height/2)*.15;
-        btn.style.transform='translate('+x+'px,'+y+'px) scale(1.02)'});
-    btn.addEventListener('mouseleave',()=>{btn.style.transform='translate(0,0) scale(1)'})});
-
-// ═══ COUNTDOWN + REVEAL ═══
 let tl=30;const cdEl=document.getElementById('countdown'),cdB=document.getElementById('countdownBadge'),hc=document.getElementById('hiddenContent');
-const tmr=setInterval(()=>{tl--;cdEl.textContent=tl;if(tl<=0){clearInterval(tmr);cdB.classList.add('hidden');hc.classList.add('revealed');
-    setTimeout(()=>{document.querySelectorAll('.reveal-card').forEach(c=>rObs.observe(c))},400);
-    setTimeout(()=>cdB.style.display='none',600)}},1000);
+const tmr=setInterval(function(){
+    tl--;if(cdEl)cdEl.textContent=tl;
+    if(tl<=0){
+        clearInterval(tmr);
+        if(cdB)cdB.classList.add('hidden');
+        if(hc)hc.classList.add('revealed');
+        setTimeout(function(){document.querySelectorAll('.reveal-card').forEach(function(c){rObs.observe(c)});},400);
+        setTimeout(function(){if(cdB)cdB.style.display='none';if(window.__hecomPerf)window.__hecomPerf.log('countdown 0s: sección oculta revelada');},600);
+    }
+},1000);
 
-// ═══ PAIN PILL STAGGER ENTRANCE ═══
 const pills=document.querySelectorAll('.pain-pill');
-pills.forEach((p,i)=>{p.style.opacity='0';p.style.transform='translateY(12px) scale(.95)';p.style.transition='all .5s cubic-bezier(.22,1,.36,1) '+(0.6+i*.12)+'s'});
-setTimeout(()=>{pills.forEach(p=>{p.style.opacity='1';p.style.transform='translateY(0) scale(1)'})},300);
+pills.forEach(function(p,i){p.style.opacity='0';p.style.transform='translateY(12px) scale(.95)';p.style.transition='all .5s cubic-bezier(.22,1,.36,1) '+(0.6+i*.12)+'s'});
+setTimeout(function(){pills.forEach(function(p){p.style.opacity='1';p.style.transform='translateY(0) scale(1)'});},300);
 
-// ═══ COUNTER ANIMATION ON CREDIT ═══
-const counterObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('counted');counterObs.unobserve(e.target)}})},{threshold:.5});
-document.querySelectorAll('.counter-value').forEach(el=>counterObs.observe(el));
+const counterObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('counted');counterObs.unobserve(e.target)}})},{threshold:.5});
+document.querySelectorAll('.counter-value').forEach(function(el){counterObs.observe(el);});
 
-// ═══ TOUCH DEVICE CHECK ═══
-if('ontouchstart' in window||navigator.maxTouchPoints>0){
-    glass.style.display='none';core.style.display='none';tc.style.display='none';
-    document.documentElement.style.cursor='auto';document.body.style.cursor='auto'}
+if(isTouchDevice){
+    if(glass)glass.style.display='none';
+    if(core)core.style.display='none';
+    if(tc)tc.style.display='none';
+    document.documentElement.style.cursor='auto';
+    document.body.style.cursor='auto';
+}
+if(window.__hecomPerf)window.__hecomPerf.log('sync del <script> principal:',Math.round(performance.now()-__hecomScriptT0)+'ms (tilt/ripple/magnetic van en idle)');
 </script>
 </body>
 </html>
