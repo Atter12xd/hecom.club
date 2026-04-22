@@ -256,6 +256,17 @@ header{padding:28px 24px;display:flex;justify-content:center;align-items:center;
 .video-wrapper::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient);border-radius:20px 20px 0 0;z-index:1}
 .loom-video-container{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:0 0 18px 18px;background:var(--bg-warm)}
 .loom-video-container iframe{position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:0 0 18px 18px}
+.loom-lazy-trigger{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:24px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;border:none;border-radius:0 0 18px 18px;cursor:pointer;font-family:inherit;background:linear-gradient(165deg,rgba(250,251,253,.98) 0%,rgba(245,246,250,.96) 45%,rgba(0,196,191,.06) 100%);transition:background .35s ease,box-shadow .35s ease}
+.loom-lazy-trigger:hover{background:linear-gradient(165deg,#fff 0%,rgba(0,196,191,.09) 55%,rgba(232,0,62,.05) 100%);box-shadow:inset 0 0 0 1px rgba(0,196,191,.12)}
+.loom-lazy-trigger:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.loom-lazy-play{width:76px;height:76px;border-radius:50%;background:var(--gradient);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(0,196,191,.22),0 4px 16px rgba(232,0,62,.1);transition:transform .25s ease}
+.loom-lazy-play svg{width:36px;height:36px;margin-left:5px}
+.loom-lazy-trigger:hover .loom-lazy-play{transform:scale(1.06)}
+.loom-lazy-text{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.05rem,2.5vw,1.25rem);font-weight:800;color:var(--dark);letter-spacing:-.02em}
+.loom-lazy-hint{font-size:.78rem;color:var(--muted);font-weight:500;max-width:280px;line-height:1.45;text-align:center}
+@media(max-width:480px){
+    .loom-lazy-hint{font-size:.72rem;max-width:220px}
+}
 
 .cta-section{text-align:center;opacity:0;animation:luxFU 1s ease-out .9s forwards}
 .cta-button{display:inline-flex;align-items:center;gap:14px;background:linear-gradient(270deg,var(--cyan),var(--pink),var(--cyan),var(--pink));background-size:300% 300%;animation:ctaMorph 6s ease infinite,breathe 4s ease-in-out infinite;color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:1.02rem;font-weight:700;padding:20px 44px;border:none;border-radius:14px;text-decoration:none;transition:all .4s cubic-bezier(.175,.885,.32,1.275);text-transform:uppercase;letter-spacing:1.5px;position:relative;overflow:hidden}
@@ -497,8 +508,12 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 
     <div class="video-container">
         <div class="video-wrapper shimmer-line">
-            <div class="loom-video-container">
-                <iframe src="https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64de?sid=auto&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" title="Cómo funciona la cuenta de agencia"></iframe>
+            <div class="loom-video-container" id="loomVideoHost">
+                <button type="button" class="loom-lazy-trigger magnetic-btn" id="loomLoadBtn" aria-label="Reproducir vídeo: cómo funciona la cuenta de agencia">
+                    <span class="loom-lazy-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" opacity=".35"/><path d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg></span>
+                    <span class="loom-lazy-text">Ver vídeo</span>
+                    <span class="loom-lazy-hint">El reproductor se carga al pulsar; la página abre más rápido.</span>
+                </button>
             </div>
         </div>
     </div>
@@ -626,6 +641,20 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pageshow',()=>restoreCursorLayer());
 window.addEventListener('focus',restoreCursorLayer);
+
+// ═══ Loom: embed solo al clic (evita scripts y ~1.2 MB de Loom hasta que el usuario quiera ver el vídeo) ═══
+const loomBtn=document.getElementById('loomLoadBtn'),loomHost=document.getElementById('loomVideoHost');
+if(loomBtn&&loomHost){
+    const loomSrc='https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64de?sid=auto&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true';
+    loomBtn.addEventListener('click',()=>{
+        loomBtn.remove();
+        const f=document.createElement('iframe');
+        f.src=loomSrc;f.title='Cómo funciona la cuenta de agencia';
+        f.setAttribute('frameborder','0');f.setAttribute('webkitallowfullscreen','');f.setAttribute('mozallowfullscreen','');f.setAttribute('allowfullscreen','');
+        f.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        loomHost.appendChild(f);
+    });
+}
 
 // ═══ 16. 3D MAGNETIC TILT ═══
 document.querySelectorAll('.tilt-card').forEach(c=>{
