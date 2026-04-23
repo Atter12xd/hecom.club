@@ -264,6 +264,8 @@ header{padding:28px 24px;display:flex;justify-content:center;align-items:center;
 .video-wrapper::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--gradient);border-radius:20px 20px 0 0;z-index:1}
 .loom-video-container{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:0 0 18px 18px;background:var(--bg-warm)}
 .loom-video-container iframe{position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:0 0 18px 18px}
+.loom-lite-trigger{position:absolute;inset:0;width:100%;height:100%;min-height:180px;margin:0;padding:20px 16px;display:flex;align-items:center;justify-content:center;text-align:center;border:none;border-radius:0 0 18px 18px;cursor:pointer;font-family:inherit;font-size:.95rem;font-weight:700;line-height:1.45;color:var(--dark);background:linear-gradient(165deg,#f8fafc 0%,#eef2f7 50%,rgba(0,196,191,.06) 100%);box-shadow:inset 0 0 0 1px rgba(0,196,191,.1)}
+.loom-lite-trigger:active{opacity:.92}
 
 .cta-section{text-align:center;opacity:0;animation:luxFU 1s ease-out .9s forwards}
 .cta-button{display:inline-flex;align-items:center;gap:14px;background:linear-gradient(270deg,var(--cyan),var(--pink),var(--cyan),var(--pink));background-size:300% 300%;animation:ctaMorph 6s ease infinite,breathe 4s ease-in-out infinite;color:white;font-family:'Plus Jakarta Sans',sans-serif;font-size:1.02rem;font-weight:700;padding:20px 44px;border:none;border-radius:14px;text-decoration:none;transition:all .4s cubic-bezier(.175,.885,.32,1.275);text-transform:uppercase;letter-spacing:1.5px;position:relative;overflow:hidden}
@@ -362,6 +364,16 @@ footer a:hover{color:var(--cyan)}
 @media(max-width:768px){
     .cursor-glass,.cursor-core{display:none!important}#cursorTrailCanvas{display:none!important}.scroll-progress{display:none}.spotlight{display:none}
     *,*::before,*::after{cursor:auto!important}html,body{cursor:auto}
+    /* Móvil: menos capas animadas = menos GPU/CPU */
+    .particles,.noise-overlay,.float-icons{display:none!important}
+    .aurora-blob{animation:none!important;filter:blur(72px)!important;opacity:.42}
+    .fine-grid{animation:none!important;opacity:.02}
+    .marquee-track{animation-play-state:paused!important}
+    .shimmer-line::after,.alert-bar::before,.alert-bar::after{display:none!important}
+    .cta-button{animation:none!important}
+    .credit-amount{animation:none!important}
+    .partner-badge{animation:none!important}
+    .problem-section,.benefits,.credit-section,.testimonials,.final-cta{content-visibility:auto;contain-intrinsic-size:1px 520px}
     header{padding:18px 16px;justify-content:center}.logo-img{height:64px;max-width:260px}
     .hero{padding:32px 16px 52px}.hook{padding:10px 20px;font-size:.82rem}.partner-badge{font-size:.72rem;padding:8px 14px}
     .headline{font-size:clamp(1.6rem,6vw,2.1rem);letter-spacing:-1px}.subheadline{font-size:.95rem;margin-bottom:18px}
@@ -415,8 +427,9 @@ window.addEventListener('load',function(){
     fbq('track', 'PageView');
     console.log('[hecom:perf] Meta Pixel: script inyectado (tras load + idle)');
   }
-  if('requestIdleCallback'in window)requestIdleCallback(injectFb,{timeout:4000});
-  else setTimeout(injectFb,2200);
+  var mobileSlow=window.matchMedia('(max-width:768px)').matches||('ontouchstart'in window)||navigator.maxTouchPoints>0;
+  if('requestIdleCallback'in window)requestIdleCallback(injectFb,{timeout:mobileSlow?9000:4000});
+  else setTimeout(injectFb,mobileSlow?5500:2200);
 },{once:true});
 </script>
 <noscript><img height="1" width="1" style="display:none"
@@ -513,9 +526,7 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 
     <div class="video-container">
         <div class="video-wrapper shimmer-line">
-            <div class="loom-video-container">
-                <iframe src="https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64de?sid=auto&amp;hide_owner=true&amp;hide_share=true&amp;hide_title=true&amp;hideEmbedTopBar=true&amp;autoplay=1&amp;muted=1" title="Cómo funciona la cuenta de agencia" fetchpriority="low" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
-            </div>
+            <div class="loom-video-container" id="loomVideoHost"></div>
         </div>
     </div>
 
@@ -676,6 +687,46 @@ const __hecomScriptT0=performance.now();
 const isTouchDevice='ontouchstart'in window||navigator.maxTouchPoints>0;
 if(window.__hecomPerf)window.__hecomPerf.log('dispositivo:',isTouchDevice?'touch (sin canvas trail)':'desktop');
 
+const LOOM_EMBED_BASE='https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64de?sid=auto&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true';
+(function initLoomEmbed(){
+    var host=document.getElementById('loomVideoHost');
+    if(!host)return;
+    var save=navigator.connection&&navigator.connection.saveData;
+    var reduced=false;
+    try{reduced=window.matchMedia('(prefers-reduced-data: reduce)').matches;}catch(_){}
+    var narrow=window.matchMedia('(max-width:768px)').matches;
+    var lite=narrow||isTouchDevice||save||reduced;
+    function mkIframe(autoplay){
+        var f=document.createElement('iframe');
+        f.src=LOOM_EMBED_BASE+(autoplay?'&autoplay=1&muted=1':'');
+        f.title='Cómo funciona la cuenta de agencia';
+        f.setAttribute('fetchpriority','low');
+        f.setAttribute('frameborder','0');
+        f.setAttribute('webkitallowfullscreen','');
+        f.setAttribute('mozallowfullscreen','');
+        f.setAttribute('allowfullscreen','');
+        f.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:none;border-radius:0 0 18px 18px';
+        return f;
+    }
+    if(lite){
+        var btn=document.createElement('button');
+        btn.type='button';
+        btn.className='loom-lite-trigger';
+        btn.textContent='Toca para ver el vídeo';
+        btn.setAttribute('aria-label','Cargar vídeo: cómo funciona la cuenta de agencia');
+        host.appendChild(btn);
+        btn.addEventListener('click',function(){
+            btn.remove();
+            host.appendChild(mkIframe(true));
+        },{once:true});
+        if(window.__hecomPerf)window.__hecomPerf.log('Loom: modo móvil/ahorro — iframe solo al tocar');
+    }else{
+        host.appendChild(mkIframe(true));
+        if(window.__hecomPerf)window.__hecomPerf.log('Loom: escritorio — iframe con autoplay');
+    }
+})();
+
 const glass=document.getElementById('cursorGlass'),core=document.getElementById('cursorCore'),tc=document.getElementById('cursorTrailCanvas'),ctx=tc&&tc.getContext('2d');
 let resizeT=0;
 function resizeC(){
@@ -761,8 +812,10 @@ function initDecorativeInteractions(){
     });
     if(window.__hecomPerf)window.__hecomPerf.log('tilt+ripple+magnetic registrados en',Math.round(performance.now()-t0)+'ms');
 }
-if('requestIdleCallback'in window)requestIdleCallback(function(){initDecorativeInteractions();},{timeout:1500});
-else setTimeout(initDecorativeInteractions,60);
+if(!isTouchDevice){
+    if('requestIdleCallback'in window)requestIdleCallback(function(){initDecorativeInteractions();},{timeout:1500});
+    else setTimeout(initDecorativeInteractions,60);
+}
 
 const rObs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
     const cs=Array.from(e.target.parentElement.children),i=cs.indexOf(e.target);
@@ -779,7 +832,10 @@ window.addEventListener('scroll',function(){
     });
 },{passive:true});
 
-let tl=10;const cdEl=document.getElementById('countdown'),cdB=document.getElementById('countdownBadge'),hc=document.getElementById('hiddenContent');
+const CD_SEC=(window.matchMedia('(max-width:768px)').matches||isTouchDevice)?3:10;
+let tl=CD_SEC;
+const cdEl=document.getElementById('countdown'),cdB=document.getElementById('countdownBadge'),hc=document.getElementById('hiddenContent');
+if(cdEl)cdEl.textContent=String(CD_SEC);
 const tmr=setInterval(function(){
     tl--;if(cdEl)cdEl.textContent=tl;
     if(tl<=0){
