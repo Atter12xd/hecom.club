@@ -8,7 +8,9 @@
 <link rel="apple-touch-icon" href="/imagenes/favicon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 <style>
 @property --border-angle { syntax:'<angle>'; initial-value:0deg; inherits:false; }
 @property --glow-spread { syntax:'<length>'; initial-value:0px; inherits:false; }
@@ -232,7 +234,11 @@ header{padding:28px 24px;display:flex;justify-content:center;align-items:center;
 .partner-badge svg{width:18px;height:18px}
 
 .hero{max-width:960px;margin:0 auto;padding:48px 24px 72px;text-align:center;position:relative;z-index:1}
-.hero-content{opacity:0;animation:luxFU 1.2s ease-out .3s forwards}
+/* h1 + subtítulo visibles al inicio → LCP útil (antes todo .hero-content opacity:0 favorecía el marquee) */
+.hero-content{opacity:1}
+.hero-content .partner-badge{opacity:0;animation:luxFU .75s ease-out .12s forwards}
+.hero-content .hook{opacity:0;animation:luxFU .75s ease-out .18s forwards}
+.headline,.subheadline{opacity:1}
 
 .hook{background:var(--card);border:1px solid var(--card-border);border-radius:50px;padding:12px 26px;display:inline-block;margin-bottom:32px;font-size:.92rem;color:var(--pink);font-weight:600;box-shadow:var(--shadow-sm);transition:all .4s ease;position:relative;overflow:hidden}
 .hook:hover{border-color:rgba(232,0,62,.25);box-shadow:var(--shadow-md)}
@@ -317,7 +323,7 @@ header{padding:28px 24px;display:flex;justify-content:center;align-items:center;
 .credit-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,196,191,.12),transparent 60%);pointer-events:none}
 .credit-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,196,191,.15);border:1px solid rgba(0,196,191,.35);padding:12px 24px;border-radius:50px;font-size:.8rem;font-weight:800;margin-bottom:28px;color:var(--cyan-bright);letter-spacing:2.5px;position:relative;z-index:1;text-shadow:0 0 20px rgba(0,217,211,.25)}
 .credit-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(1.5rem,3.5vw,2.35rem);font-weight:800;margin-bottom:20px;color:rgba(255,255,255,.95);letter-spacing:-.5px;position:relative;z-index:1;line-height:1.2}
-.credit-amount{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(3.2rem,10vw,6rem);font-weight:900;margin-bottom:20px;letter-spacing:-4px;background:linear-gradient(135deg,#00d9d3 0%,#00c4bf 30%,#ff1a5c 70%,#e8003e 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 5s ease infinite,amountPulse 4s ease-in-out infinite;position:relative;z-index:1;filter:drop-shadow(0 0 30px rgba(0,196,191,.2))}
+.credit-amount{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(3.2rem,10vw,6rem);font-weight:800;margin-bottom:20px;letter-spacing:-4px;background:linear-gradient(135deg,#00d9d3 0%,#00c4bf 30%,#ff1a5c 70%,#e8003e 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 5s ease infinite,amountPulse 4s ease-in-out infinite;position:relative;z-index:1;filter:drop-shadow(0 0 30px rgba(0,196,191,.2))}
 .credit-description{color:rgba(255,255,255,.78);font-size:1.08rem;max-width:520px;margin:0 auto;line-height:1.8;font-weight:400;position:relative;z-index:1}
 
 .testimonials{max-width:1100px;margin:100px auto;padding:0 24px;position:relative;z-index:1}
@@ -392,6 +398,14 @@ footer a:hover{color:var(--cyan)}
     .countdown-badge{left:10px;right:72px;bottom:14px}
     .problem-item{padding:16px 18px;flex-direction:column;gap:10px}
 }
+@media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .marquee-track,.aurora-blob,.particle,.fine-grid,.shimmer-line::after,.alert-bar::before,.alert-bar::after,.glow-text{animation:none!important}
+    .partner-badge{animation:none!important;opacity:1}
+    .hook{animation:none!important;opacity:1}
+    .pain-points{animation:none!important;opacity:1}
+    .video-container,.cta-section{animation:none!important;opacity:1}
+}
 </style>
 <!-- Meta Pixel Code: carga tras load + idle para no competir con el primer pintado -->
 <script>
@@ -437,28 +451,20 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 <div class="noise-overlay"></div>
 
 <!-- Floating Particles -->
-<div class="particles">
-    <div class="particle gc" style="left:3%;--dur:20s;--delay:0s;--drift:25px;--d2:-15px;--peak:.2"></div>
-    <div class="particle gp" style="left:12%;--dur:26s;--delay:-5s;--drift:-20px;--d2:25px;--peak:.18"></div>
-    <div class="particle dot" style="left:22%;--dur:22s;--delay:-8s;--drift:15px;--d2:-25px;--peak:.22"></div>
-    <div class="particle gc" style="left:32%;--dur:19s;--delay:-11s;--drift:20px;--d2:-18px;--peak:.2"></div>
-    <div class="particle gp" style="left:42%;--dur:24s;--delay:-3s;--drift:-18px;--d2:22px;--peak:.18"></div>
-    <div class="particle dot" style="left:52%;--dur:21s;--delay:-14s;--drift:22px;--d2:-12px;--peak:.22"></div>
-    <div class="particle gc" style="left:62%;--dur:23s;--delay:-7s;--drift:12px;--d2:-22px;--peak:.2"></div>
-    <div class="particle gp" style="left:72%;--dur:25s;--delay:-16s;--drift:-15px;--d2:18px;--peak:.18"></div>
-    <div class="particle dot" style="left:82%;--dur:18s;--delay:-9s;--drift:20px;--d2:-20px;--peak:.22"></div>
-    <div class="particle gc" style="left:92%;--dur:27s;--delay:-12s;--drift:-12px;--d2:16px;--peak:.15"></div>
+<div class="particles" aria-hidden="true">
+    <div class="particle gc" style="left:8%;--dur:22s;--delay:0s;--drift:22px;--d2:-18px;--peak:.2"></div>
+    <div class="particle gp" style="left:28%;--dur:24s;--delay:-6s;--drift:-18px;--d2:20px;--peak:.18"></div>
+    <div class="particle dot" style="left:48%;--dur:20s;--delay:-10s;--drift:18px;--d2:-14px;--peak:.2"></div>
+    <div class="particle gc" style="left:68%;--dur:23s;--delay:-4s;--drift:-14px;--d2:16px;--peak:.18"></div>
+    <div class="particle gp" style="left:88%;--dur:26s;--delay:-12s;--drift:16px;--d2:-20px;--peak:.16"></div>
 </div>
 
 <!-- Floating Micro Icons -->
-<div class="float-icons">
-    <div class="float-icon" style="left:8%;--fi-dur:16s;--fi-delay:0s">💰</div>
-    <div class="float-icon" style="left:20%;--fi-dur:20s;--fi-delay:-4s">📈</div>
-    <div class="float-icon" style="left:35%;--fi-dur:18s;--fi-delay:-8s">🚀</div>
-    <div class="float-icon" style="left:50%;--fi-dur:22s;--fi-delay:-2s">⚡</div>
-    <div class="float-icon" style="left:65%;--fi-dur:19s;--fi-delay:-10s">💎</div>
-    <div class="float-icon" style="left:78%;--fi-dur:17s;--fi-delay:-6s">🔥</div>
-    <div class="float-icon" style="left:90%;--fi-dur:21s;--fi-delay:-13s">✨</div>
+<div class="float-icons" aria-hidden="true">
+    <div class="float-icon" style="left:12%;--fi-dur:18s;--fi-delay:0s">💰</div>
+    <div class="float-icon" style="left:38%;--fi-dur:20s;--fi-delay:-5s">📈</div>
+    <div class="float-icon" style="left:62%;--fi-dur:19s;--fi-delay:-8s">🚀</div>
+    <div class="float-icon" style="left:86%;--fi-dur:21s;--fi-delay:-3s">⚡</div>
 </div>
 
 <!-- Marquee Alert Banner -->
@@ -481,7 +487,7 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 
 <header>
     <div class="logo">
-        <a href="/" aria-label="Hecom Club"><img class="logo-img" src="/imagenes/logoh.png?v=2" width="123" height="56" decoding="async" fetchpriority="high" alt="Hecom Club"></a>
+        <a href="/" aria-label="Hecom Club"><picture><source type="image/webp" srcset="/imagenes/logoh.webp?v=3"><img class="logo-img" src="/imagenes/logoh.png?v=3" width="123" height="56" decoding="async" fetchpriority="high" alt="Hecom Club"></picture></a>
     </div>
 </header>
 
@@ -611,7 +617,7 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
 
 <div class="floating-whatsapp"><a href="http://wa.me/victorminas28" target="_blank"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg><span>Contáctanos</span></a></div>
 
-<div class="countdown-badge" id="countdownBadge"><div class="pulse-dot"></div><span>Contenido completo en <span class="time" id="countdown">30</span>s</span></div>
+<div class="countdown-badge" id="countdownBadge"><div class="pulse-dot"></div><span>Contenido completo en <span class="time" id="countdown">10</span>s</span></div>
 
 <script>
 (function initHecomPerf(){
@@ -636,20 +642,45 @@ src="https://www.facebook.com/tr?id=2145558262942462&ev=PageView&noscript=1"
             poLt.observe({type:'longtask',buffered:true});
         }catch(_){if(perfVerbose)log('Long Task API no disponible en este navegador');}
         try{
+            let lcpTimer=0;
+            let lcpLatest=null;
             const poLcp=new PerformanceObserver(function(list){
-                list.getEntries().forEach(function(e){
+                list.getEntries().forEach(function(e){lcpLatest=e;});
+                const flush=function(){
+                    lcpTimer=0;
+                    if(!lcpLatest)return;
+                    const e=lcpLatest;
                     const el=e.element;
                     const hint=(el&&(el.tagName+'.'+String(el.className||'').slice(0,52)))||(e.url||'').slice(0,72);
-                    log('LCP ~'+Math.round(e.startTime)+'ms ·',hint||'(sin elemento)');
-                });
+                    log('LCP ~'+Math.round(e.startTime)+'ms ·',hint||'(sin elemento)','· área',Math.round(e.size||0)+'px²');
+                };
+                if(perfVerbose){
+                    list.getEntries().forEach(function(e){
+                        const el=e.element;
+                        const hint=(el&&(el.tagName+'.'+String(el.className||'').slice(0,52)))||(e.url||'').slice(0,72);
+                        log('LCP (verbose) ~'+Math.round(e.startTime)+'ms ·',hint||'(sin elemento)');
+                    });
+                }else{
+                    clearTimeout(lcpTimer);
+                    lcpTimer=setTimeout(flush,450);
+                }
             });
             poLcp.observe({type:'largest-contentful-paint',buffered:true});
         }catch(_){}
     }
-    window.addEventListener('load',function(){
+    function logNavigationSummary(){
         const nav=performance.getEntriesByType('navigation')[0];
-        if(nav)log('NavigationTiming',{domInteractive:Math.round(nav.domInteractive),domComplete:Math.round(nav.domComplete),loadEventEnd:Math.round(nav.loadEventEnd),transferKB:Math.round((nav.transferSize||0)/1024)});
-        log('desde inicio de este <script> hasta window load:',Math.round(performance.now()-tScript)+'ms');
+        if(!nav)return;
+        const tLegacy=performance.timing;
+        const loadEnd=nav.loadEventEnd>0?Math.round(nav.loadEventEnd):(tLegacy&&tLegacy.loadEventEnd>0?Math.round(tLegacy.loadEventEnd-(tLegacy.navigationStart||0)):0);
+        const xfer=nav.transferSize>0?Math.round(nav.transferSize/1024):(nav.encodedBodySize>0?Math.round(nav.encodedBodySize/1024):0);
+        log('NavigationTiming',{type:nav.type,domInteractive:Math.round(nav.domInteractive),domComplete:Math.round(nav.domComplete),loadEventEndMs:loadEnd||'(0 = ver nota)',transferOrBodyKB:xfer||'(0 = caché/SW o política del navegador)'});
+    }
+    window.addEventListener('load',function(){
+        requestAnimationFrame(function(){
+            logNavigationSummary();
+            log('desde inicio de este <script> hasta window load:',Math.round(performance.now()-tScript)+'ms');
+        });
     },{once:true});
     window.__hecomPerf={verbose:perfVerbose,log:log,warn:warn};
 })();
@@ -674,7 +705,7 @@ function scheduleResize(){
     },140);
 }
 let mx=-100,my=-100,gx=-100,gy=-100,ccx=-100,ccy=-100;
-const trail=[];const TL=8;
+const trail=[];const TL=5;
 const spot=document.getElementById('spotlight');
 if(!isTouchDevice&&spot){
     document.addEventListener('mousemove',function(e){
@@ -777,7 +808,7 @@ window.addEventListener('scroll',function(){
     });
 },{passive:true});
 
-let tl=30;const cdEl=document.getElementById('countdown'),cdB=document.getElementById('countdownBadge'),hc=document.getElementById('hiddenContent');
+let tl=10;const cdEl=document.getElementById('countdown'),cdB=document.getElementById('countdownBadge'),hc=document.getElementById('hiddenContent');
 const tmr=setInterval(function(){
     tl--;if(cdEl)cdEl.textContent=tl;
     if(tl<=0){
