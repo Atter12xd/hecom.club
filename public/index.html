@@ -427,7 +427,7 @@ window.addEventListener('load',function(){
     fbq('track', 'PageView');
     console.log('[hecom:perf] Meta Pixel: script inyectado (tras load + idle)');
   }
-  var mobileSlow=window.matchMedia('(max-width:768px)').matches||('ontouchstart'in window)||navigator.maxTouchPoints>0;
+  var mobileSlow=window.matchMedia('(max-width:640px)').matches;
   if('requestIdleCallback'in window)requestIdleCallback(injectFb,{timeout:mobileSlow?9000:4000});
   else setTimeout(injectFb,mobileSlow?5500:2200);
 },{once:true});
@@ -694,8 +694,8 @@ const LOOM_EMBED_BASE='https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64
     var save=navigator.connection&&navigator.connection.saveData;
     var reduced=false;
     try{reduced=window.matchMedia('(prefers-reduced-data: reduce)').matches;}catch(_){}
-    var narrow=window.matchMedia('(max-width:768px)').matches;
-    var lite=narrow||isTouchDevice||save||reduced;
+    var narrow=window.matchMedia('(max-width:640px)').matches;
+    var lite=narrow||save||reduced;
     function mkIframe(autoplay){
         var f=document.createElement('iframe');
         f.src=LOOM_EMBED_BASE+(autoplay?'&autoplay=1&muted=1':'');
@@ -720,7 +720,7 @@ const LOOM_EMBED_BASE='https://www.loom.com/embed/e8716e0e62dd448b8c5d9f3828ab64
             btn.remove();
             host.appendChild(mkIframe(true));
         },{once:true});
-        if(window.__hecomPerf)window.__hecomPerf.log('Loom: modo móvil/ahorro — iframe solo al tocar');
+        if(window.__hecomPerf)window.__hecomPerf.log('Loom: ≤640px o ahorro datos — iframe solo al tocar');
     }else{
         host.appendChild(mkIframe(true));
         if(window.__hecomPerf)window.__hecomPerf.log('Loom: escritorio — iframe con autoplay');
@@ -832,7 +832,7 @@ window.addEventListener('scroll',function(){
     });
 },{passive:true});
 
-const CD_SEC=(window.matchMedia('(max-width:768px)').matches||isTouchDevice)?3:10;
+const CD_SEC=window.matchMedia('(max-width:640px)').matches?3:10;
 let tl=CD_SEC;
 const cdEl=document.getElementById('countdown'),cdB=document.getElementById('countdownBadge'),hc=document.getElementById('hiddenContent');
 if(cdEl)cdEl.textContent=String(CD_SEC);
