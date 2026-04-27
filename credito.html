@@ -10,7 +10,7 @@
   <script src="/credito-app/auth-config.js?v=20260427i"></script>
   <script>
     (function () {
-      var VERSION = "credito-preflight-20260427i";
+      var VERSION = "credito-preflight-20260427j";
       var panel;
       function ensurePanel() {
         if (panel) return;
@@ -99,8 +99,21 @@
           return redirectLogin("preflight-error");
         }
         var app = document.getElementById("credito-app-script");
-        if (app) app.setAttribute("src", "/credito-app/credito-app.js?v=20260427i");
+        if (app) {
+          app.onload = function () { log("app-loaded", { src: app.getAttribute("src") || null }); };
+          app.onerror = function () { log("app-load-error", { src: app.getAttribute("src") || null }); };
+          app.setAttribute("src", "/credito-app/credito-app.js?v=20260427j");
+        }
       }
+      window.addEventListener("error", function (ev) {
+        try { log("window-error", { message: ev && ev.message ? ev.message : "unknown" }); } catch (_) {}
+      });
+      window.addEventListener("unhandledrejection", function (ev) {
+        try {
+          var reason = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : "unknown";
+          log("unhandled-rejection", { reason: reason });
+        } catch (_) {}
+      });
       preflight();
     })();
   </script>
