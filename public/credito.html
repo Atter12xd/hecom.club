@@ -112,6 +112,13 @@
         });
       }
       function loadCreditoApp() {
+        try {
+          if (location.pathname === "/credito") {
+            var to = "/credito/dashboard" + location.search + location.hash;
+            history.replaceState(null, "", to);
+            write("[credito] route patched to " + to + " (evitar modo placeholder)");
+          }
+        } catch (_) {}
         var primarySrc = "/credito-app/assets/index-DWhg57tg.js?v=20260427f";
         var fallbackSrc = "/credito-app/credito-app.js?v=20260427f";
         var s = document.createElement("script");
