@@ -13,6 +13,8 @@
   "rewrites": [
     { "source": "/credito", "destination": "/credito.html" },
     { "source": "/credito.html", "destination": "/credito.html" },
+    { "source": "/credito/dashboard", "destination": "/credito.html" },
+    { "source": "/credito/dashboard/:path*", "destination": "/credito.html" },
     { "source": "/dashboard", "destination": "/credito.html" },
     { "source": "/dashboard/:path*", "destination": "/credito.html" },
     { "source": "/credito-app/:path*", "destination": "/credito-app/:path*" },
@@ -50,6 +52,12 @@
     },
     {
       "source": "/credito",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/credito/dashboard",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
       ]
