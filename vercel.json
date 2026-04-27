@@ -2,6 +2,14 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "hecom.club" }],
+      "destination": "https://www.hecom.club/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/credito", "destination": "/credito/index.html" },
     { "source": "/credito.html", "destination": "/credito.html" },

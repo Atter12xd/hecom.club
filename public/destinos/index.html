@@ -389,6 +389,7 @@ var STORAGE_NAME = 'holistic_hub_destino_nombre';
  * false = URLs limpias (más login en el panel).
  */
 var USE_URL_SESSION_HANDOFF = true;
+var CANONICAL_HECOM_ORIGIN = 'https://www.hecom.club';
 
 /* Rutas de panel (setSession desde hash en cliente). Añadir aquí paths que NUNCA deban llevar tokens. */
 var MARKETING_HANDOFF_DENYLIST = [];
@@ -398,22 +399,22 @@ var DESTINOS = [
     {
         name: 'Crédito',
         desc: 'Línea de crédito, cuentas TikTok y seguimiento con clientes.',
-        url: '/credito',
+        url: CANONICAL_HECOM_ORIGIN + '/credito',
     },
     {
         name: 'Pendientes Holistic',
         desc: 'Operación: clientes, entregables, tickets y calendario.',
-        url: '/pendientes',
+        url: CANONICAL_HECOM_ORIGIN + '/pendientes',
     },
     {
         name: 'Creativos Holistic',
         desc: 'Pipeline creativo, proyectos y entregables de diseño.',
-        url: '/creativos',
+        url: CANONICAL_HECOM_ORIGIN + '/creativos',
     },
     {
         name: 'Finanzas Holistic',
         desc: 'Panel financiero y vista económica de la agencia.',
-        url: '/finanzas',
+        url: CANONICAL_HECOM_ORIGIN + '/finanzas',
     },
 ];
 
