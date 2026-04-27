@@ -79,6 +79,39 @@
           }
         };
       }
+      function installXhrTrace() {
+        if (window.__CREDITO_XHR_TRACE__) return;
+        window.__CREDITO_XHR_TRACE__ = true;
+        var OrigXhr = window.XMLHttpRequest;
+        if (!OrigXhr) return;
+        function TracedXhr() {
+          var xhr = new OrigXhr();
+          var method = "GET";
+          var url = "";
+          var open = xhr.open;
+          xhr.open = function (m, u) {
+            method = String(m || "GET").toUpperCase();
+            url = String(u || "");
+            return open.apply(xhr, arguments);
+          };
+          xhr.addEventListener("loadend", function () {
+            try {
+              var interesting =
+                /supabase\.co\/(auth|rest|functions)\/v1/i.test(url) ||
+                /\/rest\/v1\//i.test(url) ||
+                /gerentes|clientes_acceso|clientes|cobranza|credito/i.test(url);
+              if (interesting && (DEBUG || xhr.status >= 400)) {
+                logInfo("xhr", { method: method, url: url.slice(0, 220), status: xhr.status });
+              }
+              if (interesting && xhr.status >= 400) {
+                sendClientLog("error", "xhr-error", { method: method, url: url.slice(0, 220), status: xhr.status });
+              }
+            } catch (_) {}
+          });
+          return xhr;
+        }
+        window.XMLHttpRequest = TracedXhr;
+      }
       function parseHashSession() {
         var h = window.location.hash || "";
         if (!h) return null;
@@ -138,7 +171,7 @@
       function detectLoginScreen() {
         try {
           var txt = (document.body && document.body.innerText) ? document.body.innerText : "";
-          return /Iniciar sesi[oó]n/i.test(txt) && /Enviar enlace al correo/i.test(txt);
+          return /Iniciar sesi[oó]n/i.test(txt) && (/Enviar enlace al correo/i.test(txt) || /Correo electr[oó]nico/i.test(txt));
         } catch (_) {
           return false;
         }
@@ -174,6 +207,7 @@
       }
       async function preflight() {
         installFetchTrace();
+        installXhrTrace();
         logInfo("version", { v: VERSION, debug: DEBUG });
         logInfo("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
         try {
@@ -227,6 +261,9 @@
             setTimeout(function () {
               tryRecoverIfLoginScreen(window.__CREDITO_PREFLIGHT_SESSION__ || null);
             }, 900);
+            setTimeout(function () {
+              tryRecoverIfLoginScreen(window.__CREDITO_PREFLIGHT_SESSION__ || null);
+            }, 2200);
           };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.setAttribute("src", "/credito-app/credito-app.js?v=20260427m");
