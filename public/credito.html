@@ -7,37 +7,106 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Credito | Holistic Marketing</title>
-  <script src="/credito-app/auth-config.js?v=20260427h"></script>
+  <script src="/credito-app/auth-config.js?v=20260427i"></script>
   <script>
     (function () {
-      function hasHashSession() {
-        var h = window.location.hash || "";
-        return h.indexOf("access_token=") >= 0 && h.indexOf("refresh_token=") >= 0;
+      var VERSION = "credito-preflight-20260427i";
+      var panel;
+      function ensurePanel() {
+        if (panel) return;
+        panel = document.createElement("pre");
+        panel.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;max-height:34vh;overflow:auto;padding:10px;margin:0;z-index:99999;background:rgba(15,23,42,.96);color:#e2e8f0;font:12px/1.35 monospace;border:1px solid #334155;border-radius:8px;white-space:pre-wrap";
+        panel.id = "credito-debug-panel";
+        if (document.body) document.body.appendChild(panel);
       }
-      function hasStoredSession() {
+      function log(msg, extra) {
+        try {
+          ensurePanel();
+          var line = "[credito] " + msg + (extra ? " " + JSON.stringify(extra) : "");
+          if (panel) panel.textContent += line + "\n";
+          console.log(line);
+          fetch("/api/client-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ route: "/credito", level: "info", event: msg, detail: extra || null }) }).catch(function () {});
+        } catch (_) {}
+      }
+      function parseHashSession() {
+        var h = window.location.hash || "";
+        if (!h) return null;
+        var p = new URLSearchParams(h.slice(1));
+        var at = p.get("access_token");
+        var rt = p.get("refresh_token");
+        return at && rt ? { access_token: at, refresh_token: rt } : null;
+      }
+      function findStoredSession() {
         try {
           for (var i = 0; i < localStorage.length; i++) {
             var k = localStorage.key(i) || "";
             if (k.indexOf("sb-") === 0 && k.indexOf("-auth-token") > 0) {
               var raw = localStorage.getItem(k) || "";
-              if (raw.indexOf("access_token") >= 0 && raw.indexOf("refresh_token") >= 0) return true;
+              var obj = JSON.parse(raw);
+              if (obj && obj.access_token && obj.refresh_token) return obj;
+              if (obj && obj.currentSession && obj.currentSession.access_token && obj.currentSession.refresh_token) return obj.currentSession;
             }
           }
         } catch (_) {}
-        return false;
+        return null;
       }
-      if (!hasHashSession() && !hasStoredSession()) {
+      function loadSupabaseUmd() {
+        return new Promise(function (resolve, reject) {
+          if (window.supabase && window.supabase.createClient) return resolve();
+          var s = document.createElement("script");
+          s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+          s.async = true;
+          s.onload = resolve;
+          s.onerror = function () { reject(new Error("umd load failed")); };
+          document.head.appendChild(s);
+        });
+      }
+      function redirectLogin(reason) {
+        log("redirect-login", { reason: reason });
         var redirect = encodeURIComponent("/credito");
         window.location.replace("/login?redirect=" + redirect);
       }
+      async function preflight() {
+        log("version", { v: VERSION });
+        log("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
+        if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
+        var fromHash = parseHashSession();
+        var fromStore = findStoredSession();
+        log("session-source", { hash: !!fromHash, storage: !!fromStore });
+        if (!fromHash && !fromStore) return redirectLogin("no-session");
+        try {
+          await loadSupabaseUmd();
+          var sb = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: localStorage }
+          });
+          if (fromHash) {
+            await sb.auth.setSession(fromHash);
+            history.replaceState(null, "", location.pathname + location.search);
+            log("set-session", { source: "hash" });
+          } else {
+            await sb.auth.setSession({ access_token: fromStore.access_token, refresh_token: fromStore.refresh_token });
+            log("set-session", { source: "storage" });
+          }
+          var userRes = await sb.auth.getUser();
+          var ok = !!(userRes && userRes.data && userRes.data.user);
+          log("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
+          if (!ok) return redirectLogin("invalid-session");
+        } catch (e) {
+          log("preflight-error", { message: e && e.message ? e.message : String(e) });
+          return redirectLogin("preflight-error");
+        }
+        var app = document.getElementById("credito-app-script");
+        if (app) app.setAttribute("src", "/credito-app/credito-app.js?v=20260427i");
+      }
+      preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427h" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427i" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
 <body style="margin:0;min-height:100%;background:#f5f3ee">
   <div id="root"></div>
-  <script type="module" crossorigin src="/credito-app/credito-app.js?v=20260427h"></script>
+  <script id="credito-app-script" type="module" crossorigin></script>
 </body>
 </html>
