@@ -3,13 +3,15 @@
 // Fallback código sin email_otp: signInWithOtp (correo plantilla Supabase, no Resend) — raro en proyectos actuales.
 // Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, RESEND_FROM; SUPABASE_ANON_KEY solo para ese fallback.
 //
-// Redirect post–magic link: Hecom (por defecto /destinos). Dominio marketing sigue permitido si el cliente lo pide explícito.
-// Secret opcional: APP_URL o PUBLIC_APP_URL = https://www.hecom.club/destinos (sin barra final).
+// Coordinación Hecom + marketing (mismo Supabase; repos distintos, mensaje vía el usuario):
+// - marketingconholistic.com = web pública; hecom.club = app Hecom + herramientas bajo /credito, /pendientes, etc. (Vercel rewrites → proxy al deploy de marketing).
+// - Redirect por defecto del magic link: Hecom /credito (misma base que el edge en marketing). APP_URL / PUBLIC_APP_URL pisan el default.
+// - Hosts de redirect explícito permitidos: hecom + marketing (isAllowedRedirectHost).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-/** Tras validar el enlace, Auth redirige aquí si no hay otro redirect válido. Alineado con el login Hecom → /destinos. */
-const DEFAULT_HECOM_APP_URL = "https://www.hecom.club/destinos";
+/** Tras validar el enlace, Auth redirige aquí si no hay otro redirect válido. Mantener coordinado con el repo marketing. */
+const DEFAULT_HECOM_APP_URL = "https://www.hecom.club/credito";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
