@@ -50,6 +50,35 @@
         } catch (_) {}
         sendClientLog("error", event, detail);
       }
+      function installFetchTrace() {
+        if (window.__CREDITO_FETCH_TRACE__) return;
+        window.__CREDITO_FETCH_TRACE__ = true;
+        var origFetch = window.fetch;
+        if (!origFetch) return;
+        window.fetch = async function (input, init) {
+          var url = "";
+          try { url = typeof input === "string" ? input : (input && input.url) ? String(input.url) : ""; } catch (_) {}
+          var method = (init && init.method) ? String(init.method).toUpperCase() : "GET";
+          try {
+            var res = await origFetch.apply(this, arguments);
+            var interesting =
+              /supabase\.co\/(auth|rest|functions)\/v1/i.test(url) ||
+              /\/rest\/v1\//i.test(url) ||
+              /gerentes|clientes_acceso|clientes|cobranza|credito/i.test(url);
+            if (interesting && (DEBUG || res.status >= 400)) {
+              logInfo("fetch", { method: method, url: url.slice(0, 220), status: res.status });
+            }
+            if (interesting && res.status >= 400) {
+              sendClientLog("error", "fetch-error", { method: method, url: url.slice(0, 220), status: res.status });
+            }
+            return res;
+          } catch (err) {
+            var msg = err && err.message ? err.message : String(err);
+            logError("fetch-exception", { method: method, url: url.slice(0, 220), message: msg });
+            throw err;
+          }
+        };
+      }
       function parseHashSession() {
         var h = window.location.hash || "";
         if (!h) return null;
@@ -98,6 +127,7 @@
         window.location.replace("/login?redirect=" + redirect);
       }
       async function preflight() {
+        installFetchTrace();
         logInfo("version", { v: VERSION, debug: DEBUG });
         logInfo("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
         try {
