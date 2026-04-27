@@ -7,10 +7,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Credito | Holistic Marketing</title>
-  <script src="/credito-app/auth-config.js?v=20260427o"></script>
+  <script src="/credito-app/auth-config.js?v=20260427p"></script>
   <script>
     (function () {
-      var VERSION = "credito-preflight-20260427o";
+      var VERSION = "credito-preflight-20260427p";
       var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
       var panel = null;
       function ensurePanel() {
@@ -128,48 +128,49 @@
           return null;
         }
       }
+      function normalizeSessionForStorage(session) {
+        if (!session || !session.access_token || !session.refresh_token) return null;
+        var now = Math.round(Date.now() / 1000);
+        var expAt = session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN;
+        var expiresIn = session.expires_in != null && !isNaN(Number(session.expires_in))
+          ? Math.floor(Number(session.expires_in))
+          : (!isNaN(expAt) ? Math.max(0, expAt - now) : 3600);
+        var expAtOut = !isNaN(expAt) ? expAt : (session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN);
+        return {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_in: expiresIn,
+          expires_at: !isNaN(expAtOut) ? expAtOut : undefined,
+          token_type: session.token_type || "bearer",
+          user: session.user
+        };
+      }
+      function notifySupabaseAuthStorage(key) {
+        try {
+          if (!key) return;
+          var val = localStorage.getItem(key);
+          if (!val) return;
+          window.dispatchEvent(new StorageEvent("storage", {
+            key: key,
+            newValue: val,
+            oldValue: null,
+            url: window.location.href,
+            storageArea: localStorage
+          }));
+        } catch (_) {}
+      }
       function persistSessionForApp(session) {
         try {
           if (!session) return null;
           var key = storageKeyForSupabaseUrl(window.__SUPABASE_URL__);
           if (!key) return null;
-          // Compatibilidad: algunas builds leen sesión directa, otras currentSession.
-          localStorage.setItem(key, JSON.stringify(session));
-          localStorage.setItem(key + ":wrapped", JSON.stringify({
-            currentSession: session,
-            expiresAt: session.expires_at || null
-          }));
+          var normalized = normalizeSessionForStorage(session);
+          if (!normalized) return null;
+          localStorage.setItem(key, JSON.stringify(normalized));
+          notifySupabaseAuthStorage(key);
           return key;
         } catch (_) {
           return null;
-        }
-      }
-      function injectSessionHash(session) {
-        try {
-          if (!session || !session.access_token || !session.refresh_token) return false;
-          var now = Math.round(Date.now() / 1000);
-          var expAt = session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN;
-          var expiresIn = !isNaN(expAt) ? Math.max(30, expAt - now) : 3600;
-          var tokenType = (session.token_type || "bearer").toLowerCase();
-          var hash = [
-            "access_token=" + encodeURIComponent(session.access_token),
-            "expires_in=" + encodeURIComponent(String(expiresIn)),
-            "refresh_token=" + encodeURIComponent(session.refresh_token),
-            "token_type=" + encodeURIComponent(tokenType),
-            "type=magiclink"
-          ];
-          if (session.expires_at != null) hash.push("expires_at=" + encodeURIComponent(String(session.expires_at)));
-          history.replaceState(null, "", location.pathname + location.search + "#" + hash.join("&"));
-          setTimeout(function () {
-            try {
-              if (!detectLoginScreen()) {
-                history.replaceState(null, "", location.pathname + location.search);
-              }
-            } catch (_) {}
-          }, 20000);
-          return true;
-        } catch (_) {
-          return false;
         }
       }
       function detectLoginScreen() {
@@ -279,11 +280,15 @@
           var onceKey = "credito_force_recover_once";
           if (sessionStorage.getItem(onceKey) === "1") return;
           sessionStorage.setItem(onceKey, "1");
-          var injected = injectSessionHash(session);
-          sendClientLog("error", "forced-recover-login-screen", { injected: !!injected });
-          var next = "/credito" + location.search + location.hash;
-          logInfo("forced-recover-reload", { to: next, injected: !!injected });
-          location.replace(next);
+          var key = persistSessionForApp(session);
+          sendClientLog("error", "forced-recover-login-screen", { key: key || null });
+          logInfo("forced-recover-reload", { kind: "reload", key: key || null });
+          try {
+            var u = new URL(window.location.href);
+            u.hash = "";
+            history.replaceState(null, "", u.pathname + u.search);
+          } catch (_) {}
+          location.reload();
         } catch (_) {}
       }
       function loadSupabaseUmd() {
@@ -340,8 +345,6 @@
           }
           var persistedKey = persistSessionForApp(session);
           logInfo("session-persisted", { key: persistedKey || "(none)" });
-          var injected = injectSessionHash(session);
-          logInfo("session-hash-injected", { ok: injected });
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
           logInfo("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
@@ -355,7 +358,7 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260427o";
+          var appSrc = "/credito-app/credito-app.js?v=20260427p";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -382,7 +385,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427o" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427p" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
