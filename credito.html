@@ -180,6 +180,86 @@
           return false;
         }
       }
+      function rewriteDashboardUrl(inputUrl) {
+        try {
+          var u = new URL(String(inputUrl || ""), window.location.origin);
+          var p = u.pathname || "";
+          if (p === "/dashboard" || p.indexOf("/dashboard/") === 0 || p === "/credito/dashboard" || p.indexOf("/credito/dashboard/") === 0) {
+            return "/credito" + (u.search || "") + (u.hash || "");
+          }
+          return null;
+        } catch (_) {
+          return null;
+        }
+      }
+      function installDashboardRouteGuard() {
+        if (window.__CREDITO_ROUTE_GUARD__) return;
+        window.__CREDITO_ROUTE_GUARD__ = true;
+        try {
+          var origPush = history.pushState;
+          history.pushState = function (state, title, url) {
+            var rewritten = rewriteDashboardUrl(url);
+            if (rewritten) {
+              logInfo("route-guard-push", { from: String(url || ""), to: rewritten });
+              return origPush.call(history, state, title, rewritten);
+            }
+            return origPush.apply(history, arguments);
+          };
+        } catch (_) {}
+        try {
+          var origReplaceState = history.replaceState;
+          history.replaceState = function (state, title, url) {
+            var rewritten = rewriteDashboardUrl(url);
+            if (rewritten) {
+              logInfo("route-guard-replace", { from: String(url || ""), to: rewritten });
+              return origReplaceState.call(history, state, title, rewritten);
+            }
+            return origReplaceState.apply(history, arguments);
+          };
+        } catch (_) {}
+        try {
+          var origAssign = window.location.assign.bind(window.location);
+          window.location.assign = function (url) {
+            var rewritten = rewriteDashboardUrl(url);
+            if (rewritten) {
+              logInfo("route-guard-assign", { from: String(url || ""), to: rewritten });
+              return origAssign(rewritten);
+            }
+            return origAssign(url);
+          };
+        } catch (_) {}
+        try {
+          var origReplace = window.location.replace.bind(window.location);
+          window.location.replace = function (url) {
+            var rewritten = rewriteDashboardUrl(url);
+            if (rewritten) {
+              logInfo("route-guard-location-replace", { from: String(url || ""), to: rewritten });
+              return origReplace(rewritten);
+            }
+            return origReplace(url);
+          };
+        } catch (_) {}
+        try {
+          document.addEventListener("click", function (ev) {
+            var node = ev.target;
+            while (node && node !== document.body) {
+              if (node.tagName === "A" && node.getAttribute) {
+                var href = node.getAttribute("href");
+                var rewritten = rewriteDashboardUrl(href);
+                if (rewritten) {
+                  ev.preventDefault();
+                  ev.stopPropagation();
+                  logInfo("route-guard-click", { from: String(href || ""), to: rewritten });
+                  window.location.replace(rewritten);
+                  return;
+                }
+                break;
+              }
+              node = node.parentElement;
+            }
+          }, true);
+        } catch (_) {}
+      }
       function monitorPostLoad(session) {
         var checks = 0;
         var timer = setInterval(function () {
@@ -225,6 +305,7 @@
       async function preflight() {
         installFetchTrace();
         installXhrTrace();
+        installDashboardRouteGuard();
         logInfo("version", { v: VERSION, debug: DEBUG });
         logInfo("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
         try {
