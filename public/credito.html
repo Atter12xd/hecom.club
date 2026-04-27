@@ -58,6 +58,29 @@
         var rt = p.get("refresh_token");
         return at && rt ? { access_token: at, refresh_token: rt } : null;
       }
+      function storageKeyForSupabaseUrl(url) {
+        try {
+          var ref = new URL(url).hostname.split(".")[0];
+          return ref ? "sb-" + ref + "-auth-token" : null;
+        } catch (_) {
+          return null;
+        }
+      }
+      function persistSessionForApp(session) {
+        try {
+          if (!session) return null;
+          var key = storageKeyForSupabaseUrl(window.__SUPABASE_URL__);
+          if (!key) return null;
+          var payload = JSON.stringify({
+            currentSession: session,
+            expiresAt: session.expires_at || null
+          });
+          localStorage.setItem(key, payload);
+          return key;
+        } catch (_) {
+          return null;
+        }
+      }
       function loadSupabaseUmd() {
         return new Promise(function (resolve, reject) {
           if (window.supabase && window.supabase.createClient) return resolve();
@@ -106,6 +129,8 @@
             sendClientLog("error", "preflight-no-session", { version: VERSION });
             return redirectLogin("no-session");
           }
+          var persistedKey = persistSessionForApp(session);
+          logInfo("session-persisted", { key: persistedKey || "(none)" });
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
           logInfo("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
