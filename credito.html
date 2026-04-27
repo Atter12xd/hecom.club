@@ -161,8 +161,12 @@
           if (session.expires_at != null) hash.push("expires_at=" + encodeURIComponent(String(session.expires_at)));
           history.replaceState(null, "", location.pathname + location.search + "#" + hash.join("&"));
           setTimeout(function () {
-            try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {}
-          }, 2500);
+            try {
+              if (!detectLoginScreen()) {
+                history.replaceState(null, "", location.pathname + location.search);
+              }
+            } catch (_) {}
+          }, 20000);
           return true;
         } catch (_) {
           return false;
@@ -198,6 +202,7 @@
           var injected = injectSessionHash(session);
           sendClientLog("error", "forced-recover-login-screen", { injected: !!injected });
           var next = "/credito" + location.search + location.hash;
+          logInfo("forced-recover-reload", { to: next, injected: !!injected });
           location.replace(next);
         } catch (_) {}
       }
