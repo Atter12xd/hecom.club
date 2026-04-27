@@ -276,14 +276,6 @@
         try {
           if (!session) return;
           if (!detectLoginScreen()) return;
-          var currentUrl = new URL(window.location.href);
-          if (currentUrl.searchParams.get("bundle") !== "alt") {
-            currentUrl.searchParams.set("bundle", "alt");
-            var nextAlt = currentUrl.pathname + currentUrl.search + currentUrl.hash;
-            logInfo("bundle-fallback-redirect", { to: nextAlt });
-            location.replace(nextAlt);
-            return;
-          }
           var onceKey = "credito_force_recover_once";
           if (sessionStorage.getItem(onceKey) === "1") return;
           sessionStorage.setItem(onceKey, "1");
@@ -363,13 +355,7 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var useAltBundle = false;
-          try {
-            useAltBundle = new URL(window.location.href).searchParams.get("bundle") === "alt";
-          } catch (_) {}
-          var appSrc = useAltBundle
-            ? "/credito-app/assets/index-DWhg57tg.js?v=20260427o"
-            : "/credito-app/credito-app.js?v=20260427o";
+          var appSrc = "/credito-app/credito-app.js?v=20260427o";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
