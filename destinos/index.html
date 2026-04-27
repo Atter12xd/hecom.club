@@ -345,15 +345,15 @@ a:hover { text-decoration: underline; }
         </div>
 
         <div>
-            <a class="brand-logo" href="https://www.marketingconholistic.com/" rel="noopener noreferrer" aria-label="Holistic Marketing — sitio web">
+            <div class="brand-logo" aria-label="Holistic Marketing">
                 <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="640" height="186">
-            </a>
+            </div>
 
             <h1 class="form-title" id="hub-heading">Tus paneles</h1>
             <p class="form-sub">Elegí un espacio interno: crédito, operación, creativos o finanzas.</p>
             <details class="hint-details">
                 <summary>Sesión entre sitios (mismo navegador)</summary>
-                <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los enlaces pueden llevar tokens en el fragmento hacia marketing (<code>/credito</code> y rutas <code>acceso-*</code>). Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar (magic link u otro flujo). Ningún redirect ni meta refresh debe consumir el <code>#</code> antes de que el cliente de marketing lea el hash. <strong>Importante (marketing):</strong> el handoff usa flujo implícito en el hash; el cliente de Supabase en marketing debe tener <code>auth.flowType: 'implicit'</code> (o detectar el hash y llamar <code>setSession</code>). Si está en <code>pkce</code> por defecto, Auth puede borrar la sesión al cargar y verás pantalla vacía o sin tema.</p>
+                <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los paneles se abren en el mismo sitio (p. ej. <code>/credito</code>, <code>/pendientes</code>) y el fragmento puede llevar tokens hacia el cliente de cada herramienta. Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar. Ningún redirect ni meta refresh del servidor debe consumir el <code>#</code> antes de que el cliente lea el hash. <strong>Importante:</strong> el handoff usa flujo implícito en el hash; el Supabase de la app del panel debe usar <code>auth.flowType: 'implicit'</code> (o detectar el hash y llamar <code>setSession</code>). Con <code>pkce</code> por defecto, Auth a veces borra la sesión al cargar.</p>
             </details>
 
             <div class="last-wrap" id="lastWrap" aria-live="polite">
@@ -368,14 +368,14 @@ a:hover { text-decoration: underline; }
     </section>
 
     <aside class="panel-right" aria-label="Contexto">
-        <p class="panel-right-copy">Mismo correo y magic link en Hecom y en marketing.</p>
+        <p class="panel-right-copy">Mismo acceso con tu correo y magic link en Hecom.</p>
     </aside>
 </div>
 
 <script type="module">
 import { getSupabaseClient } from '/js/supabase-auth.js';
 
-/** Cliente ya inicializado; sirve para reenviar la sesión al abrir paneles en marketing. */
+/** Cliente ya inicializado; sirve para reenviar la sesión al abrir paneles (rutas Hecom con proxy). */
 var globalSupabase = null;
 /** Copia síncrona de la sesión (mismo clic → window.open sin about:blank intermedio). */
 var sessionSnapshot = null;
@@ -384,35 +384,35 @@ var STORAGE_KEY = 'holistic_hub_destino_preferido';
 var STORAGE_NAME = 'holistic_hub_destino_nombre';
 
 /**
- * Pegar sesión en el hash hacia marketing (implicit). Mismo navegador + marketing con bootstrap/AuthGate OK.
- * false = URLs limpias (más login en marketing).
+ * Pegar sesión en el hash (implicit). Mismo navegador + app del panel con bootstrap/AuthGate OK.
+ * false = URLs limpias (más login en el panel).
  */
 var USE_URL_SESSION_HANDOFF = true;
 
-/* Rutas de panel en marketing (setSession desde hash en cliente). Añadir aquí paths que NUNCA deban llevar tokens. */
+/* Rutas de panel (setSession desde hash en cliente). Añadir aquí paths que NUNCA deban llevar tokens. */
 var MARKETING_HANDOFF_DENYLIST = [];
 
-/* Pendientes / creativos / finanzas: acceso-*. Crédito: /credito (React). */
+/* Rutas en este sitio (vercel rewrites al proyecto de herramientas). */
 var DESTINOS = [
     {
         name: 'Crédito',
         desc: 'Línea de crédito, cuentas TikTok y seguimiento con clientes.',
-        url: 'https://www.marketingconholistic.com/credito',
+        url: '/credito',
     },
     {
         name: 'Pendientes Holistic',
         desc: 'Operación: clientes, entregables, tickets y calendario.',
-        url: 'https://www.marketingconholistic.com/acceso-pendientes',
+        url: '/pendientes',
     },
     {
         name: 'Creativos Holistic',
         desc: 'Pipeline creativo, proyectos y entregables de diseño.',
-        url: 'https://www.marketingconholistic.com/acceso-creativos',
+        url: '/creativos',
     },
     {
         name: 'Finanzas Holistic',
         desc: 'Panel financiero y vista económica de la agencia.',
-        url: 'https://www.marketingconholistic.com/acceso-finanzas',
+        url: '/finanzas',
     },
 ];
 
@@ -428,30 +428,52 @@ function escapeAttr(s) {
 
 function isHolisticPanelUrl(urlStr) {
     try {
-        var u = new URL(urlStr);
+        var u = new URL(urlStr, location.origin);
         var h = u.hostname.toLowerCase();
-        return h === 'www.marketingconholistic.com' || h === 'marketingconholistic.com';
+        if (h === 'www.marketingconholistic.com' || h === 'marketingconholistic.com') return true;
+        if (h === 'www.hecom.club' || h === 'hecom.club' || h.endsWith('.hecom.club')) return true;
+        return false;
     } catch (_) {
         return false;
     }
 }
 
+function parseDestinoPath(urlStr) {
+    try {
+        var raw = (new URL(urlStr, location.origin).pathname || '/').toLowerCase();
+        return raw.replace(/\/+$/, '') || '/';
+    } catch (_) {
+        return '';
+    }
+}
+
+function findDestinoByStoredRef(storedUrl) {
+    if (!storedUrl) return null;
+    var p = parseDestinoPath(storedUrl);
+    for (var i = 0; i < DESTINOS.length; i++) {
+        if (parseDestinoPath(DESTINOS[i].url) === p) return DESTINOS[i];
+    }
+    return null;
+}
+
 /**
- * ¿Incluir #access_token=… en la URL? Sí en /credito y /acceso-* (alineado con holistic: main bootstrap + AuthGate).
+ * ¿Incluir #access_token=… en la URL? Sí en /credito, /pendientes, /creativos, /finanzas y /acceso-* (bootstrap + AuthGate).
  * Denylist: paths normalizados sin barra final, p. ej. '/promo'.
  */
 function needsSessionHandoff(urlStr) {
     try {
         if (!isHolisticPanelUrl(urlStr)) return false;
-        var raw = (new URL(urlStr).pathname || '/').toLowerCase();
-        var path = raw.replace(/\/+$/, '') || '/';
+        var path = parseDestinoPath(urlStr);
         for (var i = 0; i < MARKETING_HANDOFF_DENYLIST.length; i++) {
             var d = String(MARKETING_HANDOFF_DENYLIST[i] || '')
                 .toLowerCase()
                 .replace(/\/+$/, '') || '/';
             if (path === d || path.indexOf(d + '/') === 0) return false;
         }
-        if (path === '/credito') return true;
+        if (path === '/credito' || path.indexOf('/credito/') === 0) return true;
+        if (path === '/pendientes' || path.indexOf('/pendientes/') === 0) return true;
+        if (path === '/creativos' || path.indexOf('/creativos/') === 0) return true;
+        if (path === '/finanzas' || path.indexOf('/finanzas/') === 0) return true;
         if (path.indexOf('/acceso-') >= 0) return true;
         return false;
     } catch (_) {
@@ -460,12 +482,12 @@ function needsSessionHandoff(urlStr) {
 }
 
 /**
- * Misma sesión en otro dominio: hash implicit (access_token, refresh_token, expires_in, token_type).
+ * Misma sesión: hash implicit (access_token, refresh_token, expires_in, token_type).
  * Los 302/301 del servidor no envían el fragmento al destino: el cliente debe abrir ya la URL final con #…;
  * si un proxy o HTML hace salto sin preservar hash, el handoff falla (no se arregla solo en marketing).
  */
 function buildSessionHandoffUrl(baseUrl, session) {
-    var u = new URL(baseUrl);
+    var u = new URL(baseUrl, location.origin);
     var now = Math.round(Date.now() / 1000);
     var expAt = session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN;
     var expiresIn;
@@ -482,7 +504,7 @@ function buildSessionHandoffUrl(baseUrl, session) {
         'expires_in=' + encodeURIComponent(expiresIn),
         'refresh_token=' + encodeURIComponent(session.refresh_token),
         'token_type=' + encodeURIComponent(tokenType),
-        /* Sin esto, el bootstrap de marketing (getSessionFromUrl / AuthGate) a veces no hidrata y queda pantalla en negro o sin tema. */
+        /* Sin esto, el bootstrap (getSessionFromUrl / AuthGate) a veces no hidrata. */
         'type=magiclink',
     ];
     if (session.expires_at != null) {
@@ -643,14 +665,15 @@ function showLastAccess() {
     var wrap = document.getElementById('lastWrap');
     var label = document.getElementById('lastLabel');
     var btn = document.getElementById('btnLast');
-    if (!url || !DESTINOS.some(function (x) { return x.url === url; })) {
+    var d = findDestinoByStoredRef(url);
+    if (!url || !d) {
         wrap.classList.remove('visible');
         return;
     }
-    label.textContent = 'Último panel de trabajo: ' + (name || 'tu elección');
+    label.textContent = 'Último panel de trabajo: ' + (name || d.name || 'tu elección');
     wrap.classList.add('visible');
     btn.onclick = async function () {
-        await openHolisticPanel(url, name);
+        await openHolisticPanel(d.url, d.name);
     };
 }
 
