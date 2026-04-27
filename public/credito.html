@@ -7,13 +7,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Credito | Holistic Marketing</title>
-  <script src="/credito-app/auth-config.js?v=20260427g"></script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427g" />
+  <script src="/credito-app/auth-config.js?v=20260427h"></script>
+  <script>
+    (function () {
+      function hasHashSession() {
+        var h = window.location.hash || "";
+        return h.indexOf("access_token=") >= 0 && h.indexOf("refresh_token=") >= 0;
+      }
+      function hasStoredSession() {
+        try {
+          for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i) || "";
+            if (k.indexOf("sb-") === 0 && k.indexOf("-auth-token") > 0) {
+              var raw = localStorage.getItem(k) || "";
+              if (raw.indexOf("access_token") >= 0 && raw.indexOf("refresh_token") >= 0) return true;
+            }
+          }
+        } catch (_) {}
+        return false;
+      }
+      if (!hasHashSession() && !hasStoredSession()) {
+        var redirect = encodeURIComponent("/credito");
+        window.location.replace("/login?redirect=" + redirect);
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427h" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
 <body style="margin:0;min-height:100%;background:#f5f3ee">
   <div id="root"></div>
-  <script type="module" crossorigin src="/credito-app/credito-app.js?v=20260427g"></script>
+  <script type="module" crossorigin src="/credito-app/credito-app.js?v=20260427h"></script>
 </body>
 </html>
