@@ -11,12 +11,12 @@
     .hm-report-calendar-wrap input[type="date"]:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.2); background: #fff; }
     .hm-report-calendar-wrap input[type="date"]::-webkit-calendar-picker-indicator { opacity: .7; cursor: pointer; }
   </style>
-  <script src="/credito-app/auth-config.js?v=20260427e"></script>
+  <script src="/credito-app/auth-config.js?v=20260427f"></script>
   <script>
     (function () {
       var DEBUG = true;
-      var VERSION = "credito-bootstrap-20260427e";
-      var POST_HYDRATE_RELOAD_KEY = "credito_post_hydrate_reload_e";
+      var VERSION = "credito-bootstrap-20260427f";
+      var POST_HYDRATE_RELOAD_KEY = "credito_post_hydrate_reload_f";
       var panel;
 
       function ensurePanel() {
@@ -112,10 +112,27 @@
         });
       }
       function loadCreditoApp() {
+        var primarySrc = "/credito-app/assets/index-DWhg57tg.js?v=20260427f";
+        var fallbackSrc = "/credito-app/credito-app.js?v=20260427f";
         var s = document.createElement("script");
         s.type = "module";
         s.crossOrigin = "anonymous";
-        s.src = "/credito-app/assets/index-DWhg57tg.js?v=20260427e";
+        s.src = primarySrc;
+        write("[credito] loading app src=" + primarySrc);
+        s.onload = function () {
+          write("[credito] app loaded OK (primary)");
+        };
+        s.onerror = function () {
+          write("[credito] app load failed (primary), trying fallback");
+          var sf = document.createElement("script");
+          sf.type = "module";
+          sf.crossOrigin = "anonymous";
+          sf.src = fallbackSrc;
+          write("[credito] loading fallback src=" + fallbackSrc);
+          sf.onload = function () { write("[credito] app loaded OK (fallback)"); };
+          sf.onerror = function () { write("[credito] app load failed (fallback)"); };
+          document.head.appendChild(sf);
+        };
         document.head.appendChild(s);
       }
       function installFetchTrace() {
@@ -218,7 +235,7 @@
       })();
     })();
   </script>
-  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css?v=20260427e">
+  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css?v=20260427f">
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" />
 </head>
