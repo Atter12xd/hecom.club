@@ -638,12 +638,46 @@ var resendCodeBtn = document.getElementById('resendCodeBtn');
 var backMethodBtn = document.getElementById('backMethodBtn');
 var emailInput = document.getElementById('email');
 var formSub = document.getElementById('formSub');
+var LOGIN_DEBUG = true;
 
 function hideMsgs() {
     info.classList.remove('visible');
     err.classList.remove('visible');
     info.textContent = '';
     err.textContent = '';
+}
+
+function sendClientLog(event, detail, level) {
+    try {
+        fetch('/api/client-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                route: '/login',
+                level: level || 'info',
+                event: event,
+                detail: detail || null
+            })
+        }).catch(function () {});
+    } catch (_) {}
+}
+
+function debugLog(event, detail) {
+    if (LOGIN_DEBUG) {
+        try { console.log('[login]', event, detail || ''); } catch (_) {}
+    }
+    sendClientLog(event, detail, 'info');
+}
+
+function withTimeout(promise, ms, label) {
+    return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+            setTimeout(function () {
+                reject(new Error('Tiempo de espera agotado (' + label + ')'));
+            }, ms);
+        })
+    ]);
 }
 
 function getMethod() {
@@ -693,6 +727,7 @@ async function tryConsumeMagicLinkHash() {
 }
 
 async function init() {
+    debugLog('init-start');
     if (await tryConsumeMagicLinkHash()) return;
 
     try {
@@ -704,6 +739,7 @@ async function init() {
         }
     } catch (_) {
         /* seguir: mostrar formulario de magic link */
+        debugLog('session-check-error');
     }
 
     var dots = document.querySelectorAll('.dots button');
@@ -742,25 +778,31 @@ async function init() {
         }
         var method = getMethod();
         btn.disabled = true;
+        debugLog('submit', { method: method, emailMasked: email.slice(0, 2) + '***' });
         try {
             var redirectTo = window.location.origin + '/destinos';
             if (method === 'code') {
-                var supabase = await getSupabaseClient();
-                var otpRes = await supabase.auth.signInWithOtp({
+                var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
+                debugLog('supabase-client-ok', { method: 'code' });
+                var otpRes = await withTimeout(supabase.auth.signInWithOtp({
                     email: email,
                     options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
-                });
+                }), 15000, 'signInWithOtp');
+                debugLog('otp-send-result', { hasError: !!otpRes.error });
                 if (otpRes.error) throw otpRes.error;
                 info.textContent = 'Revisá tu correo e ingresá el código abajo.';
                 info.classList.add('visible');
                 showOtpStep(true);
             } else {
-                var data = await invokeMagicLinkLogin(email, redirectTo, method);
+                var data = await withTimeout(invokeMagicLinkLogin(email, redirectTo, method), 20000, 'invokeMagicLinkLogin');
+                debugLog('magic-link-result', { ok: true });
                 showOtpStep(false);
                 info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
                 info.classList.add('visible');
             }
         } catch (ex) {
+            debugLog('submit-error', { message: ex && ex.message ? ex.message : String(ex) });
+            sendClientLog('submit-error', { message: ex && ex.message ? ex.message : String(ex) }, 'error');
             err.textContent = ex.message || (method === 'code' ? 'No se pudo enviar el código.' : 'No se pudo enviar el enlace.');
             err.classList.add('visible');
         } finally {
@@ -778,9 +820,11 @@ async function init() {
             return;
         }
         verifyOtpBtn.disabled = true;
+        debugLog('verify-otp-click');
         try {
-            var supabase = await getSupabaseClient();
-            var res = await supabase.auth.verifyOtp({ email: email, token: code, type: 'email' });
+            var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
+            var res = await withTimeout(supabase.auth.verifyOtp({ email: email, token: code, type: 'email' }), 15000, 'verifyOtp');
+            debugLog('verify-otp-result', { hasError: !!res.error, hasSession: !!(res.data && res.data.session) });
             if (res.error) {
                 err.textContent = res.error.message || 'Código incorrecto o vencido.';
                 err.classList.add('visible');
@@ -793,6 +837,8 @@ async function init() {
             err.textContent = 'No se pudo iniciar sesión. Probá de nuevo o pedí un código nuevo.';
             err.classList.add('visible');
         } catch (ex) {
+            debugLog('verify-otp-error', { message: ex && ex.message ? ex.message : String(ex) });
+            sendClientLog('verify-otp-error', { message: ex && ex.message ? ex.message : String(ex) }, 'error');
             err.textContent = ex.message || 'Error al verificar el código.';
             err.classList.add('visible');
         } finally {
@@ -809,17 +855,21 @@ async function init() {
             return;
         }
         resendCodeBtn.disabled = true;
+        debugLog('resend-code-click');
         try {
             var redirectTo = window.location.origin + '/destinos';
-            var supabase = await getSupabaseClient();
-            var otpRes = await supabase.auth.signInWithOtp({
+            var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
+            var otpRes = await withTimeout(supabase.auth.signInWithOtp({
                 email: email,
                 options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
-            });
+            }), 15000, 'resendSignInWithOtp');
+            debugLog('resend-code-result', { hasError: !!otpRes.error });
             if (otpRes.error) throw otpRes.error;
             info.textContent = 'Te enviamos otro código.';
             info.classList.add('visible');
         } catch (ex) {
+            debugLog('resend-code-error', { message: ex && ex.message ? ex.message : String(ex) });
+            sendClientLog('resend-code-error', { message: ex && ex.message ? ex.message : String(ex) }, 'error');
             err.textContent = ex.message || 'No se pudo reenviar el código.';
             err.classList.add('visible');
         } finally {
