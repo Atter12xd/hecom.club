@@ -11,7 +11,7 @@
     }
   ],
   "rewrites": [
-    { "source": "/credito", "destination": "/credito/index.html" },
+    { "source": "/credito", "destination": "/credito.html" },
     { "source": "/credito.html", "destination": "/credito.html" },
     { "source": "/credito-app/:path*", "destination": "/credito-app/:path*" },
     { "source": "/pendientes", "destination": "/pendientes/index.html" },
@@ -46,6 +46,18 @@
     },
     {
       "source": "/credito",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/credito.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/credito-app/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
       ]
