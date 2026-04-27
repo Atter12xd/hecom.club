@@ -121,11 +121,15 @@
           var sessRes = await sb.auth.getSession();
           var session = sessRes && sessRes.data ? sessRes.data.session : null;
           logInfo("get-session", { ok: !!session });
-          if (!session) return redirectLogin("no-session");
+          if (!session) {
+            sendClientLog("error", "preflight-no-session", { version: VERSION });
+          }
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
           logInfo("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
-          if (!ok) return redirectLogin("invalid-session");
+          if (!ok) {
+            sendClientLog("error", "preflight-invalid-user", { version: VERSION, error: userRes && userRes.error ? userRes.error.message : null });
+          }
         } catch (e) {
           logError("preflight-error", { message: e && e.message ? e.message : String(e) });
           return redirectLogin("preflight-error");
