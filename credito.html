@@ -100,11 +100,12 @@
           if (!session) return null;
           var key = storageKeyForSupabaseUrl(window.__SUPABASE_URL__);
           if (!key) return null;
-          var payload = JSON.stringify({
+          // Compatibilidad: algunas builds leen sesión directa, otras currentSession.
+          localStorage.setItem(key, JSON.stringify(session));
+          localStorage.setItem(key + ":wrapped", JSON.stringify({
             currentSession: session,
             expiresAt: session.expires_at || null
-          });
-          localStorage.setItem(key, payload);
+          }));
           return key;
         } catch (_) {
           return null;
