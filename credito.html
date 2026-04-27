@@ -176,6 +176,18 @@
           return false;
         }
       }
+      function monitorPostLoad(session) {
+        var checks = 0;
+        var timer = setInterval(function () {
+          checks += 1;
+          var isLogin = detectLoginScreen();
+          logInfo("postload-check", { n: checks, login: isLogin });
+          if (isLogin) {
+            tryRecoverIfLoginScreen(session);
+          }
+          if (checks >= 8) clearInterval(timer);
+        }, 1000);
+      }
       function tryRecoverIfLoginScreen(session) {
         try {
           if (!session) return;
@@ -264,6 +276,7 @@
             setTimeout(function () {
               tryRecoverIfLoginScreen(window.__CREDITO_PREFLIGHT_SESSION__ || null);
             }, 2200);
+            monitorPostLoad(window.__CREDITO_PREFLIGHT_SESSION__ || null);
           };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.setAttribute("src", "/credito-app/credito-app.js?v=20260427m");
