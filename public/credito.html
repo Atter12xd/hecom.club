@@ -222,13 +222,6 @@
         installXhrTrace();
         logInfo("version", { v: VERSION, debug: DEBUG });
         logInfo("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
-        try {
-          if (window.location.pathname === "/credito") {
-            var nextPath = "/credito/dashboard" + window.location.search + window.location.hash;
-            history.replaceState(null, "", nextPath);
-            logInfo("route-patched", { to: nextPath });
-          }
-        } catch (_) {}
         if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
         var fromHash = parseHashSession();
         logInfo("session-source", { hash: !!fromHash });
