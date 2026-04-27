@@ -15,11 +15,64 @@
   <script src="/credito-app/auth-config.js"></script>
   <script>
     (function () {
+      var panel = document.createElement("pre");
+      panel.id = "credito-debug-panel";
+      panel.style.cssText = [
+        "position:fixed",
+        "left:8px",
+        "right:8px",
+        "bottom:8px",
+        "max-height:34vh",
+        "overflow:auto",
+        "padding:10px",
+        "margin:0",
+        "z-index:99999",
+        "background:rgba(15,23,42,.96)",
+        "color:#e2e8f0",
+        "font:12px/1.35 monospace",
+        "border:1px solid #334155",
+        "border-radius:8px",
+        "white-space:pre-wrap"
+      ].join(";");
+
+      function write(line) {
+        panel.textContent += line + "\n";
+      }
+
+      function send(level, event, detail) {
+        try {
+          fetch("/api/client-log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              route: "/credito",
+              level: level,
+              event: event,
+              detail: detail || null
+            })
+          }).catch(function () {});
+        } catch (_) {}
+      }
+
+      function bootPanel() {
+        if (document.body) {
+          document.body.appendChild(panel);
+          return true;
+        }
+        return false;
+      }
+      if (!bootPanel()) {
+        document.addEventListener("DOMContentLoaded", bootPanel, { once: true });
+      }
+
+      write("[credito] boot path=" + location.pathname + " hash=" + (location.hash ? "yes" : "no"));
       console.log("[credito] boot", { path: location.pathname, hasHash: !!location.hash });
       console.log("[credito] auth-config", {
         supabaseUrl: window.__SUPABASE_URL__ || null,
         hasAnon: !!window.__SUPABASE_ANON_KEY__,
       });
+      write("[credito] auth-config supabaseUrl=" + (window.__SUPABASE_URL__ ? "ok" : "missing") + " anon=" + (!!window.__SUPABASE_ANON_KEY__));
+      send("info", "boot", { hasHash: !!location.hash, hasSupabaseUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
 
       window.addEventListener("error", function (ev) {
         var t = ev && ev.target;
@@ -28,18 +81,31 @@
             tag: t.tagName,
             src: t.src || t.href || null,
           });
+          write("[credito] resource-error " + t.tagName + " " + (t.src || t.href || "unknown"));
+          send("error", "resource-error", { tag: t.tagName, src: t.src || t.href || null });
         }
       }, true);
+
+      window.addEventListener("unhandledrejection", function (ev) {
+        var msg = ev && ev.reason && ev.reason.message ? ev.reason.message : String(ev && ev.reason ? ev.reason : "unknown");
+        write("[credito] unhandledrejection " + msg);
+        send("error", "unhandledrejection", { message: msg });
+      });
 
       fetch("/api/supabase-config", { credentials: "same-origin" })
         .then(function (r) {
           console.log("[credito] /api/supabase-config status", r.status);
+          write("[credito] /api/supabase-config status=" + r.status);
           return r.text().then(function (txt) {
             console.log("[credito] /api/supabase-config body", txt.slice(0, 300));
+            write("[credito] /api/supabase-config body=" + txt.slice(0, 160));
+            send("info", "supabase-config", { status: r.status, body: txt.slice(0, 200) });
           });
         })
         .catch(function (err) {
           console.error("[credito] /api/supabase-config fetch error", err && err.message ? err.message : err);
+          write("[credito] /api/supabase-config fetch-error " + (err && err.message ? err.message : err));
+          send("error", "supabase-config-fetch-error", { message: err && err.message ? err.message : String(err) });
         });
     })();
   </script>
