@@ -782,22 +782,15 @@ async function init() {
         try {
             var redirectTo = window.location.origin + '/destinos';
             if (method === 'code') {
-                var data;
-                try {
-                    data = await withTimeout(invokeMagicLinkLogin(email, redirectTo, 'code'), 20000, 'invokeMagicLinkLogin-code');
-                    debugLog('otp-send-via-function', { ok: true });
-                } catch (fnErr) {
-                    debugLog('otp-send-via-function-error', { message: fnErr && fnErr.message ? fnErr.message : String(fnErr) });
-                    var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
-                    debugLog('supabase-client-ok', { method: 'code-fallback' });
-                    var otpRes = await withTimeout(supabase.auth.signInWithOtp({
-                        email: email,
-                        options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
-                    }), 15000, 'signInWithOtp');
-                    debugLog('otp-send-result-fallback', { hasError: !!otpRes.error });
-                    if (otpRes.error) throw otpRes.error;
-                    data = { message: 'Te enviamos el código por correo (fallback).' };
-                }
+                var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
+                debugLog('supabase-client-ok', { method: 'code-direct' });
+                var otpRes = await withTimeout(supabase.auth.signInWithOtp({
+                    email: email,
+                    options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
+                }), 15000, 'signInWithOtp');
+                debugLog('otp-send-result-direct', { hasError: !!otpRes.error });
+                if (otpRes.error) throw otpRes.error;
+                var data = { message: 'Te enviamos el código por correo.' };
                 info.textContent = (data && data.message) || 'Revisá tu correo e ingresá el código abajo.';
                 info.classList.add('visible');
                 showOtpStep(true);
@@ -866,21 +859,14 @@ async function init() {
         debugLog('resend-code-click');
         try {
             var redirectTo = window.location.origin + '/destinos';
-            var data;
-            try {
-                data = await withTimeout(invokeMagicLinkLogin(email, redirectTo, 'code'), 20000, 'invokeMagicLinkLogin-resend-code');
-                debugLog('resend-code-via-function', { ok: true });
-            } catch (fnErr) {
-                debugLog('resend-code-via-function-error', { message: fnErr && fnErr.message ? fnErr.message : String(fnErr) });
-                var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
-                var otpRes = await withTimeout(supabase.auth.signInWithOtp({
-                    email: email,
-                    options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
-                }), 15000, 'resendSignInWithOtp');
-                debugLog('resend-code-result-fallback', { hasError: !!otpRes.error });
-                if (otpRes.error) throw otpRes.error;
-                data = { message: 'Te enviamos otro código (fallback).' };
-            }
+            var supabase = await withTimeout(getSupabaseClient(), 10000, 'getSupabaseClient');
+            var otpRes = await withTimeout(supabase.auth.signInWithOtp({
+                email: email,
+                options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
+            }), 15000, 'resendSignInWithOtp');
+            debugLog('resend-code-result-direct', { hasError: !!otpRes.error });
+            if (otpRes.error) throw otpRes.error;
+            var data = { message: 'Te enviamos otro código.' };
             info.textContent = (data && data.message) || 'Te enviamos otro código.';
             info.classList.add('visible');
         } catch (ex) {
