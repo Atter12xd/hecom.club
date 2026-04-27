@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,11 +11,13 @@
     .hm-report-calendar-wrap input[type="date"]:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.2); background: #fff; }
     .hm-report-calendar-wrap input[type="date"]::-webkit-calendar-picker-indicator { opacity: .7; cursor: pointer; }
   </style>
-  <script src="/credito-app/auth-config.js"></script>
+  <script src="/credito-app/auth-config.js?v=20260427d"></script>
   <script>
     (function () {
       var DEBUG = true;
-      var panel = null;
+      var VERSION = "credito-bootstrap-20260427d";
+      var panel;
+
       function ensurePanel() {
         if (!DEBUG || panel) return;
         panel = document.createElement("pre");
@@ -32,6 +33,7 @@
         if (!DEBUG) return;
         ensurePanel();
         if (panel) panel.textContent += line + "\n";
+        console.log(line);
       }
       function send(level, event, detail) {
         try {
@@ -42,38 +44,6 @@
           }).catch(function () {});
         } catch (_) {}
       }
-      write("[credito] boot path=" + location.pathname + " hash=" + (location.hash ? "yes" : "no"));
-      write("[credito] auth-config supabaseUrl=" + (window.__SUPABASE_URL__ ? "ok" : "missing") + " anon=" + (!!window.__SUPABASE_ANON_KEY__));
-      send("info", "boot", { hasHash: !!location.hash, hasSupabaseUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
-
-      window.addEventListener("error", function (ev) {
-        var t = ev && ev.target;
-        if (t && t.tagName) {
-          write("[credito] resource-error " + t.tagName + " " + (t.src || t.href || "unknown"));
-          send("error", "resource-error", { tag: t.tagName, src: t.src || t.href || null });
-        }
-      }, true);
-
-      window.addEventListener("unhandledrejection", function (ev) {
-        var msg = ev && ev.reason && ev.reason.message ? ev.reason.message : String(ev && ev.reason ? ev.reason : "unknown");
-        write("[credito] unhandledrejection " + msg);
-        send("error", "unhandledrejection", { message: msg });
-      });
-
-      fetch("/api/supabase-config", { credentials: "same-origin" })
-        .then(function (r) {
-          write("[credito] /api/supabase-config status=" + r.status);
-          return r.json().then(function (cfg) {
-            var hasCfg = !!(cfg && cfg.url && cfg.anonKey);
-            write("[credito] /api/supabase-config ok=" + hasCfg);
-            send("info", "supabase-config", { status: r.status, hasConfig: hasCfg });
-          });
-        })
-        .catch(function (err) {
-          write("[credito] /api/supabase-config fetch-error " + (err && err.message ? err.message : err));
-          send("error", "supabase-config-fetch-error", { message: err && err.message ? err.message : String(err) });
-        });
-
       function parseHashSession() {
         if (!location.hash || location.hash.length < 2) return null;
         var params = new URLSearchParams(location.hash.slice(1));
@@ -82,7 +52,29 @@
         if (!at || !rt) return null;
         return { access_token: at, refresh_token: rt };
       }
-
+      function extractSessionFromStorageValue(raw) {
+        if (!raw) return null;
+        try {
+          var parsed = JSON.parse(raw);
+          if (parsed && parsed.access_token && parsed.refresh_token) return parsed;
+          if (parsed && parsed.currentSession && parsed.currentSession.access_token && parsed.currentSession.refresh_token) return parsed.currentSession;
+          if (Array.isArray(parsed) && parsed.length && parsed[0] && parsed[0].access_token && parsed[0].refresh_token) return parsed[0];
+        } catch (_) {}
+        return null;
+      }
+      function findStoredSession() {
+        try {
+          for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i) || "";
+            if (k.indexOf("sb-") === 0 && k.indexOf("-auth-token") > 0) {
+              var v = localStorage.getItem(k);
+              var s = extractSessionFromStorageValue(v);
+              if (s) return { key: k, session: s };
+            }
+          }
+        } catch (_) {}
+        return null;
+      }
       function storageKeyFor(url) {
         try {
           var ref = new URL(url).hostname.split(".")[0];
@@ -91,7 +83,6 @@
           return undefined;
         }
       }
-
       function loadSupabaseUmd() {
         return new Promise(function (resolve, reject) {
           if (window.supabase && window.supabase.createClient) return resolve();
@@ -103,48 +94,63 @@
           document.head.appendChild(s);
         });
       }
-
       function loadCreditoApp() {
         var s = document.createElement("script");
         s.type = "module";
         s.crossOrigin = "anonymous";
-        s.src = "/credito-app/credito-app.js";
+        s.src = "/credito-app/credito-app.js?v=20260427d";
         document.head.appendChild(s);
       }
 
+      write("[credito] version=" + VERSION);
+      write("[credito] boot path=" + location.pathname + " hash=" + (location.hash ? "yes" : "no"));
+      write("[credito] auth-config present=" + (!!window.__SUPABASE_URL__ && !!window.__SUPABASE_ANON_KEY__));
+
       (async function bootstrapCredito() {
+        var src = "none";
         try {
-          var sess = parseHashSession();
-          if (sess && window.__SUPABASE_URL__ && window.__SUPABASE_ANON_KEY__) {
-            write("[credito] hash detectado, hidratando sesion...");
-            await loadSupabaseUmd();
-            var opts = {
-              auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: false,
-                storage: localStorage
-              }
-            };
-            var sk = storageKeyFor(window.__SUPABASE_URL__);
-            if (sk) opts.auth.storageKey = sk;
-            var sb = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, opts);
-            await sb.auth.setSession(sess);
-            history.replaceState(null, "", location.pathname + location.search);
-            write("[credito] sesion hidratada OK");
-            send("info", "hash-session-hydrated", { ok: true });
+          var fromHash = parseHashSession();
+          var fromStore = findStoredSession();
+          write("[credito] session hash=" + (!!fromHash) + " storage=" + (!!fromStore));
+          if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) {
+            send("error", "missing-config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
+            return;
           }
+          if (!fromHash && !fromStore) {
+            send("info", "no-session-found", { hasHash: !!fromHash, hasStorageSession: !!fromStore });
+            return;
+          }
+          await loadSupabaseUmd();
+          var opts = {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: localStorage }
+          };
+          var sk = storageKeyFor(window.__SUPABASE_URL__);
+          if (sk) opts.auth.storageKey = sk;
+          var sb = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, opts);
+          if (fromHash) {
+            src = "hash";
+            await sb.auth.setSession(fromHash);
+            history.replaceState(null, "", location.pathname + location.search);
+          } else if (fromStore && fromStore.session) {
+            src = "storage";
+            await sb.auth.setSession({
+              access_token: fromStore.session.access_token,
+              refresh_token: fromStore.session.refresh_token
+            });
+          }
+          write("[credito] session hydrated from " + src);
+          send("info", "session-hydrated", { source: src });
         } catch (err) {
           var msg = err && err.message ? err.message : String(err);
-          write("[credito] error hidratando hash: " + msg);
-          send("error", "hash-session-hydrate-error", { message: msg });
+          write("[credito] hydrate error: " + msg);
+          send("error", "session-hydrate-error", { message: msg, source: src });
         } finally {
           loadCreditoApp();
         }
       })();
     })();
   </script>
-  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css">
+  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css?v=20260427d">
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" />
 </head>
