@@ -11,6 +11,25 @@
   <script>
     (function () {
       var VERSION = "credito-preflight-20260427l";
+      var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
+      var panel = null;
+      function ensurePanel() {
+        if (!DEBUG || panel) return;
+        panel = document.createElement("pre");
+        panel.id = "credito-debug-panel";
+        panel.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;max-height:34vh;overflow:auto;padding:10px;margin:0;z-index:99999;background:rgba(15,23,42,.96);color:#e2e8f0;font:12px/1.35 monospace;border:1px solid #334155;border-radius:8px;white-space:pre-wrap";
+        if (document.body) document.body.appendChild(panel);
+        else document.documentElement.appendChild(panel);
+      }
+      function logInfo(event, detail) {
+        if (!DEBUG) return;
+        try {
+          ensurePanel();
+          var line = "[credito] " + event + (detail ? " " + JSON.stringify(detail) : "");
+          if (panel) panel.textContent += line + "\n";
+          console.log(line);
+        } catch (_) {}
+      }
       function sendClientLog(level, event, detail) {
         try {
           fetch("/api/client-log", {
@@ -65,14 +84,18 @@
         });
       }
       function redirectLogin(reason) {
+        logInfo("redirect-login", { reason: reason, version: VERSION });
         sendClientLog("info", "redirect-login", { reason: reason, version: VERSION });
         var redirect = encodeURIComponent("/credito");
         window.location.replace("/login?redirect=" + redirect);
       }
       async function preflight() {
+        logInfo("version", { v: VERSION, debug: DEBUG });
+        logInfo("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
         if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
         var fromHash = parseHashSession();
         var fromStore = findStoredSession();
+        logInfo("session-source", { hash: !!fromHash, storage: !!fromStore });
         if (!fromHash && !fromStore) return redirectLogin("no-session");
         try {
           await loadSupabaseUmd();
@@ -82,11 +105,14 @@
           if (fromHash) {
             await sb.auth.setSession(fromHash);
             history.replaceState(null, "", location.pathname + location.search);
+            logInfo("set-session", { source: "hash" });
           } else {
             await sb.auth.setSession({ access_token: fromStore.access_token, refresh_token: fromStore.refresh_token });
+            logInfo("set-session", { source: "storage" });
           }
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
+          logInfo("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
           if (!ok) return redirectLogin("invalid-session");
         } catch (e) {
           logError("preflight-error", { message: e && e.message ? e.message : String(e) });
@@ -94,7 +120,10 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          app.onload = function () { sendClientLog("info", "app-loaded", { src: app.getAttribute("src") || null, version: VERSION }); };
+          app.onload = function () {
+            logInfo("app-loaded", { src: app.getAttribute("src") || null });
+            sendClientLog("info", "app-loaded", { src: app.getAttribute("src") || null, version: VERSION });
+          };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.setAttribute("src", "/credito-app/credito-app.js?v=20260427l");
         }
