@@ -10,7 +10,7 @@
   <script src="/credito-app/auth-config.js?v=20260427k"></script>
   <script>
     (function () {
-      var VERSION = "credito-preflight-20260427j";
+      var VERSION = "credito-preflight-20260427l";
       function sendClientLog(level, event, detail) {
         try {
           fetch("/api/client-log", {
@@ -70,7 +70,6 @@
         window.location.replace("/login?redirect=" + redirect);
       }
       async function preflight() {
-        sendClientLog("info", "preflight-start", { v: VERSION });
         if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
         var fromHash = parseHashSession();
         var fromStore = findStoredSession();
@@ -97,7 +96,7 @@
         if (app) {
           app.onload = function () { sendClientLog("info", "app-loaded", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
-          app.setAttribute("src", "/credito-app/credito-app.js?v=20260427k");
+          app.setAttribute("src", "/credito-app/credito-app.js?v=20260427l");
         }
       }
       window.addEventListener("error", function (ev) {
@@ -112,7 +111,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427k" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427l" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
