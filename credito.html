@@ -115,8 +115,36 @@
         var s = document.createElement("script");
         s.type = "module";
         s.crossOrigin = "anonymous";
-        s.src = "/credito-app/credito-app.js?v=20260427d";
+        s.src = "/credito-app/credito-app.js?v=20260427e";
         document.head.appendChild(s);
+      }
+      function installFetchTrace() {
+        if (window.__CREDITO_FETCH_TRACE_INSTALLED__) return;
+        window.__CREDITO_FETCH_TRACE_INSTALLED__ = true;
+        var origFetch = window.fetch;
+        window.fetch = async function(input, init) {
+          var url = "";
+          try { url = typeof input === "string" ? input : (input && input.url) ? String(input.url) : ""; } catch (_) {}
+          var method = (init && init.method) ? String(init.method).toUpperCase() : "GET";
+          try {
+            var res = await origFetch.apply(this, arguments);
+            var interesting = /supabase\.co|\/auth\/v1|\/rest\/v1|\/functions\/v1|\/api\//i.test(url);
+            if (interesting || res.status >= 400) {
+              write("[credito][fetch] " + method + " " + url + " -> " + res.status);
+              send(res.status >= 400 ? "error" : "info", "fetch-trace", {
+                method: method,
+                url: url.slice(0, 220),
+                status: res.status
+              });
+            }
+            return res;
+          } catch (err) {
+            var msg = err && err.message ? err.message : String(err);
+            write("[credito][fetch] " + method + " " + url + " -> ERROR " + msg);
+            send("error", "fetch-trace-error", { method: method, url: url.slice(0, 220), message: msg });
+            throw err;
+          }
+        };
       }
 
       write("[credito] version=" + VERSION);
@@ -126,6 +154,7 @@
       (async function bootstrapCredito() {
         var src = "none";
         try {
+          installFetchTrace();
           var fromHash = parseHashSession();
           var fromStore = findStoredSession();
           var sbKeys = listSbKeys();
