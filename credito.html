@@ -197,7 +197,7 @@
           sessionStorage.setItem(onceKey, "1");
           var injected = injectSessionHash(session);
           sendClientLog("error", "forced-recover-login-screen", { injected: !!injected });
-          var next = "/credito/dashboard" + location.search + location.hash;
+          var next = "/credito" + location.search + location.hash;
           location.replace(next);
         } catch (_) {}
       }
@@ -222,6 +222,14 @@
         installXhrTrace();
         logInfo("version", { v: VERSION, debug: DEBUG });
         logInfo("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
+        try {
+          var p = window.location.pathname || "";
+          if (p === "/dashboard" || p.indexOf("/dashboard/") === 0 || p === "/credito/dashboard" || p.indexOf("/credito/dashboard/") === 0) {
+            var canonical = "/credito" + window.location.search + window.location.hash;
+            history.replaceState(null, "", canonical);
+            logInfo("canonical-route", { from: p, to: canonical });
+          }
+        } catch (_) {}
         if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
         var fromHash = parseHashSession();
         logInfo("session-source", { hash: !!fromHash });
