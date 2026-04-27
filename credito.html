@@ -75,6 +75,22 @@
         } catch (_) {}
         return null;
       }
+      function listSbKeys() {
+        var out = [];
+        try {
+          for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i) || "";
+            if (k.indexOf("sb-") === 0 && k.indexOf("-auth-token") > 0) out.push(k);
+          }
+        } catch (_) {}
+        return out;
+      }
+      function maskEmail(email) {
+        var e = String(email || "");
+        var at = e.indexOf("@");
+        if (at <= 1) return e ? "***" : "";
+        return e.slice(0, 2) + "***" + e.slice(at);
+      }
       function storageKeyFor(url) {
         try {
           var ref = new URL(url).hostname.split(".")[0];
@@ -111,7 +127,9 @@
         try {
           var fromHash = parseHashSession();
           var fromStore = findStoredSession();
+          var sbKeys = listSbKeys();
           write("[credito] session hash=" + (!!fromHash) + " storage=" + (!!fromStore));
+          write("[credito] localStorage sb-keys=" + (sbKeys.length ? sbKeys.join(", ") : "(none)"));
           if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) {
             send("error", "missing-config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
             return;
@@ -125,6 +143,8 @@
             auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: localStorage }
           };
           var sk = storageKeyFor(window.__SUPABASE_URL__);
+          write("[credito] storageKey target=" + (sk || "(none)"));
+          if (fromStore && fromStore.key) write("[credito] storage session key=" + fromStore.key);
           if (sk) opts.auth.storageKey = sk;
           var sb = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, opts);
           if (fromHash) {
@@ -139,7 +159,14 @@
             });
           }
           write("[credito] session hydrated from " + src);
-          send("info", "session-hydrated", { source: src });
+          var sessRes = await sb.auth.getSession();
+          var s = sessRes && sessRes.data ? sessRes.data.session : null;
+          write("[credito] getSession after hydrate -> " + (!!s));
+          if (s && s.expires_at) write("[credito] session expires_at=" + s.expires_at);
+          var userRes = await sb.auth.getUser();
+          var u = userRes && userRes.data ? userRes.data.user : null;
+          write("[credito] getUser after hydrate -> " + (!!u) + (u && u.email ? " email=" + maskEmail(u.email) : ""));
+          send("info", "session-hydrated", { source: src, hasSession: !!s, hasUser: !!u });
         } catch (err) {
           var msg = err && err.message ? err.message : String(err);
           write("[credito] hydrate error: " + msg);
