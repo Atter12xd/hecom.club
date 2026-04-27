@@ -4,6 +4,26 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/dashboard",
+      "destination": "/credito",
+      "permanent": false
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "/credito",
+      "permanent": false
+    },
+    {
+      "source": "/credito/dashboard",
+      "destination": "/credito",
+      "permanent": false
+    },
+    {
+      "source": "/credito/dashboard/:path*",
+      "destination": "/credito",
+      "permanent": false
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "hecom.club" }],
       "destination": "https://www.hecom.club/:path*",
