@@ -11,7 +11,7 @@
   <script>
     (function () {
       var VERSION = "credito-preflight-20260427l";
-      var DEBUG = true;
+      var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
       var panel = null;
       function ensurePanel() {
         if (!DEBUG || panel) return;
@@ -85,7 +85,6 @@
       }
       function redirectLogin(reason) {
         logInfo("redirect-login", { reason: reason, version: VERSION });
-        sendClientLog("info", "redirect-login", { reason: reason, version: VERSION });
         var redirect = encodeURIComponent("/credito");
         window.location.replace("/login?redirect=" + redirect);
       }
@@ -138,7 +137,6 @@
         if (app) {
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
-            sendClientLog("info", "app-loaded", { src: app.getAttribute("src") || null, version: VERSION });
           };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.setAttribute("src", "/credito-app/credito-app.js?v=20260427l");
