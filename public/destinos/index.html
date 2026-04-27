@@ -388,7 +388,7 @@ var STORAGE_NAME = 'holistic_hub_destino_nombre';
  * Pegar sesión en el hash (implicit). Mismo navegador + app del panel con bootstrap/AuthGate OK.
  * false = URLs limpias (más login en el panel).
  */
-var USE_URL_SESSION_HANDOFF = false;
+var USE_URL_SESSION_HANDOFF = true;
 var CANONICAL_HECOM_ORIGIN = 'https://www.hecom.club';
 var PANEL_URL_VERSION = 'v=20260427c';
 
@@ -460,7 +460,7 @@ function findDestinoByStoredRef(storedUrl) {
 }
 
 /**
- * ¿Incluir #access_token=… en la URL? Sí en /credito, /pendientes, /creativos, /finanzas y /acceso-* (bootstrap + AuthGate).
+ * ¿Incluir #access_token=… en la URL? En Hecom, solo para /credito.
  * Denylist: paths normalizados sin barra final, p. ej. '/promo'.
  */
 function needsSessionHandoff(urlStr) {
@@ -474,10 +474,6 @@ function needsSessionHandoff(urlStr) {
             if (path === d || path.indexOf(d + '/') === 0) return false;
         }
         if (path === '/credito' || path.indexOf('/credito/') === 0) return true;
-        if (path === '/pendientes' || path.indexOf('/pendientes/') === 0) return true;
-        if (path === '/creativos' || path.indexOf('/creativos/') === 0) return true;
-        if (path === '/finanzas' || path.indexOf('/finanzas/') === 0) return true;
-        if (path.indexOf('/acceso-') >= 0) return true;
         return false;
     } catch (_) {
         return false;
