@@ -11,11 +11,12 @@
     .hm-report-calendar-wrap input[type="date"]:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.2); background: #fff; }
     .hm-report-calendar-wrap input[type="date"]::-webkit-calendar-picker-indicator { opacity: .7; cursor: pointer; }
   </style>
-  <script src="/credito-app/auth-config.js?v=20260427d"></script>
+  <script src="/credito-app/auth-config.js?v=20260427e"></script>
   <script>
     (function () {
       var DEBUG = true;
-      var VERSION = "credito-bootstrap-20260427d";
+      var VERSION = "credito-bootstrap-20260427e";
+      var POST_HYDRATE_RELOAD_KEY = "credito_post_hydrate_reload_e";
       var panel;
 
       function ensurePanel() {
@@ -159,6 +160,17 @@
             });
           }
           write("[credito] session hydrated from " + src);
+          if (src !== "none") {
+            var alreadyReloaded = false;
+            try { alreadyReloaded = sessionStorage.getItem(POST_HYDRATE_RELOAD_KEY) === "1"; } catch (_) {}
+            if (!alreadyReloaded) {
+              try { sessionStorage.setItem(POST_HYDRATE_RELOAD_KEY, "1"); } catch (_) {}
+              write("[credito] forcing one-time reload after hydrate");
+              var sep = location.search && location.search.length ? "&" : "?";
+              location.replace(location.pathname + location.search + sep + "post_hydrate=1");
+              return;
+            }
+          }
           var sessRes = await sb.auth.getSession();
           var s = sessRes && sessRes.data ? sessRes.data.session : null;
           write("[credito] getSession after hydrate -> " + (!!s));
@@ -177,7 +189,7 @@
       })();
     })();
   </script>
-  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css?v=20260427d">
+  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css?v=20260427e">
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" />
 </head>
