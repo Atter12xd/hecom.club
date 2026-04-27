@@ -744,12 +744,18 @@ async function init() {
         btn.disabled = true;
         try {
             var redirectTo = window.location.origin + '/destinos';
-            var data = await invokeMagicLinkLogin(email, redirectTo, method);
             if (method === 'code') {
-                info.textContent = data.message || 'Revisá tu correo e ingresá el código abajo.';
+                var supabase = await getSupabaseClient();
+                var otpRes = await supabase.auth.signInWithOtp({
+                    email: email,
+                    options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
+                });
+                if (otpRes.error) throw otpRes.error;
+                info.textContent = 'Revisá tu correo e ingresá el código abajo.';
                 info.classList.add('visible');
                 showOtpStep(true);
             } else {
+                var data = await invokeMagicLinkLogin(email, redirectTo, method);
                 showOtpStep(false);
                 info.textContent = data.message || 'Revisá tu correo y abrí el enlace para entrar.';
                 info.classList.add('visible');
@@ -805,8 +811,13 @@ async function init() {
         resendCodeBtn.disabled = true;
         try {
             var redirectTo = window.location.origin + '/destinos';
-            var data = await invokeMagicLinkLogin(email, redirectTo, 'code');
-            info.textContent = data.message || 'Te enviamos otro código.';
+            var supabase = await getSupabaseClient();
+            var otpRes = await supabase.auth.signInWithOtp({
+                email: email,
+                options: { shouldCreateUser: false, emailRedirectTo: redirectTo }
+            });
+            if (otpRes.error) throw otpRes.error;
+            info.textContent = 'Te enviamos otro código.';
             info.classList.add('visible');
         } catch (ex) {
             err.textContent = ex.message || 'No se pudo reenviar el código.';
