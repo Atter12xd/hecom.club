@@ -7,10 +7,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Credito | Holistic Marketing</title>
-  <script src="/credito-app/auth-config.js?v=20260427n"></script>
+  <script src="/credito-app/auth-config.js?v=20260427o"></script>
   <script>
     (function () {
-      var VERSION = "credito-preflight-20260427n";
+      var VERSION = "credito-preflight-20260427o";
       var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
       var panel = null;
       function ensurePanel() {
@@ -276,6 +276,14 @@
         try {
           if (!session) return;
           if (!detectLoginScreen()) return;
+          var currentUrl = new URL(window.location.href);
+          if (currentUrl.searchParams.get("bundle") !== "alt") {
+            currentUrl.searchParams.set("bundle", "alt");
+            var nextAlt = currentUrl.pathname + currentUrl.search + currentUrl.hash;
+            logInfo("bundle-fallback-redirect", { to: nextAlt });
+            location.replace(nextAlt);
+            return;
+          }
           var onceKey = "credito_force_recover_once";
           if (sessionStorage.getItem(onceKey) === "1") return;
           sessionStorage.setItem(onceKey, "1");
@@ -355,6 +363,13 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
+          var useAltBundle = false;
+          try {
+            useAltBundle = new URL(window.location.href).searchParams.get("bundle") === "alt";
+          } catch (_) {}
+          var appSrc = useAltBundle
+            ? "/credito-app/assets/index-DWhg57tg.js?v=20260427o"
+            : "/credito-app/credito-app.js?v=20260427o";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -366,7 +381,7 @@
             monitorPostLoad(window.__CREDITO_PREFLIGHT_SESSION__ || null);
           };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
-          app.setAttribute("src", "/credito-app/credito-app.js?v=20260427m");
+          app.setAttribute("src", appSrc);
         }
       }
       window.addEventListener("error", function (ev) {
@@ -381,7 +396,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427m" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427o" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
