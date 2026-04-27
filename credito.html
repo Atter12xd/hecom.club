@@ -110,6 +110,30 @@
           return null;
         }
       }
+      function injectSessionHash(session) {
+        try {
+          if (!session || !session.access_token || !session.refresh_token) return false;
+          var now = Math.round(Date.now() / 1000);
+          var expAt = session.expires_at != null ? Math.floor(Number(session.expires_at)) : NaN;
+          var expiresIn = !isNaN(expAt) ? Math.max(30, expAt - now) : 3600;
+          var tokenType = (session.token_type || "bearer").toLowerCase();
+          var hash = [
+            "access_token=" + encodeURIComponent(session.access_token),
+            "expires_in=" + encodeURIComponent(String(expiresIn)),
+            "refresh_token=" + encodeURIComponent(session.refresh_token),
+            "token_type=" + encodeURIComponent(tokenType),
+            "type=magiclink"
+          ];
+          if (session.expires_at != null) hash.push("expires_at=" + encodeURIComponent(String(session.expires_at)));
+          history.replaceState(null, "", location.pathname + location.search + "#" + hash.join("&"));
+          setTimeout(function () {
+            try { history.replaceState(null, "", location.pathname + location.search); } catch (_) {}
+          }, 2500);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
       function loadSupabaseUmd() {
         return new Promise(function (resolve, reject) {
           if (window.supabase && window.supabase.createClient) return resolve();
@@ -161,6 +185,8 @@
           }
           var persistedKey = persistSessionForApp(session);
           logInfo("session-persisted", { key: persistedKey || "(none)" });
+          var injected = injectSessionHash(session);
+          logInfo("session-hash-injected", { ok: injected });
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
           logInfo("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
