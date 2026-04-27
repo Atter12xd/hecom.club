@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light" style="color-scheme: light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <title>Crédito | Holistic Marketing</title>
+  <style>
+    .hm-report-calendar-wrap input[type="date"]:focus { border-color: #f97316; box-shadow: 0 0 0 3px rgba(249,115,22,.2); background: #fff; }
+    .hm-report-calendar-wrap input[type="date"]::-webkit-calendar-picker-indicator { opacity: .7; cursor: pointer; }
+  </style>
+  <script src="/credito-app/auth-config.js"></script>
+  <script>
+    (function () {
+      var panel = document.createElement("pre");
+      panel.id = "credito-debug-panel";
+      panel.style.cssText = [
+        "position:fixed",
+        "left:8px",
+        "right:8px",
+        "bottom:8px",
+        "max-height:34vh",
+        "overflow:auto",
+        "padding:10px",
+        "margin:0",
+        "z-index:99999",
+        "background:rgba(15,23,42,.96)",
+        "color:#e2e8f0",
+        "font:12px/1.35 monospace",
+        "border:1px solid #334155",
+        "border-radius:8px",
+        "white-space:pre-wrap"
+      ].join(";");
+
+      function write(line) {
+        panel.textContent += line + "\n";
+      }
+
+      function send(level, event, detail) {
+        try {
+          fetch("/api/client-log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              route: "/credito",
+              level: level,
+              event: event,
+              detail: detail || null
+            })
+          }).catch(function () {});
+        } catch (_) {}
+      }
+
+      function bootPanel() {
+        if (document.body) {
+          document.body.appendChild(panel);
+          return true;
+        }
+        return false;
+      }
+      if (!bootPanel()) {
+        document.addEventListener("DOMContentLoaded", bootPanel, { once: true });
+      }
+
+      write("[credito] boot path=" + location.pathname + " hash=" + (location.hash ? "yes" : "no"));
+      console.log("[credito] boot", { path: location.pathname, hasHash: !!location.hash });
+      console.log("[credito] auth-config", {
+        supabaseUrl: window.__SUPABASE_URL__ || null,
+        hasAnon: !!window.__SUPABASE_ANON_KEY__,
+      });
+      write("[credito] auth-config supabaseUrl=" + (window.__SUPABASE_URL__ ? "ok" : "missing") + " anon=" + (!!window.__SUPABASE_ANON_KEY__));
+      send("info", "boot", { hasHash: !!location.hash, hasSupabaseUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
+
+      window.addEventListener("error", function (ev) {
+        var t = ev && ev.target;
+        if (t && t.tagName) {
+          console.error("[credito] resource error", {
+            tag: t.tagName,
+            src: t.src || t.href || null,
+          });
+          write("[credito] resource-error " + t.tagName + " " + (t.src || t.href || "unknown"));
+          send("error", "resource-error", { tag: t.tagName, src: t.src || t.href || null });
+        }
+      }, true);
+
+      window.addEventListener("unhandledrejection", function (ev) {
+        var msg = ev && ev.reason && ev.reason.message ? ev.reason.message : String(ev && ev.reason ? ev.reason : "unknown");
+        write("[credito] unhandledrejection " + msg);
+        send("error", "unhandledrejection", { message: msg });
+      });
+
+      fetch("/api/supabase-config", { credentials: "same-origin" })
+        .then(function (r) {
+          console.log("[credito] /api/supabase-config status", r.status);
+          write("[credito] /api/supabase-config status=" + r.status);
+          return r.text().then(function (txt) {
+            console.log("[credito] /api/supabase-config body", txt.slice(0, 300));
+            write("[credito] /api/supabase-config body=" + txt.slice(0, 160));
+            send("info", "supabase-config", { status: r.status, body: txt.slice(0, 200) });
+          });
+        })
+        .catch(function (err) {
+          console.error("[credito] /api/supabase-config fetch error", err && err.message ? err.message : err);
+          write("[credito] /api/supabase-config fetch-error " + (err && err.message ? err.message : err));
+          send("error", "supabase-config-fetch-error", { message: err && err.message ? err.message : String(err) });
+        });
+    })();
+  </script>
+  <script type="module" crossorigin src="/credito-app/credito-app.js"></script>
+  <link rel="stylesheet" crossorigin href="/credito-app/credito-app.css">
+<link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" /><link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=2" /></head>
+<body style="margin:0;min-height:100%;background:#f5f3ee">
+  <div id="root"></div>
+</body>
+</html>
