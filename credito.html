@@ -7,27 +7,29 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Credito | Holistic Marketing</title>
-  <script src="/credito-app/auth-config.js?v=20260427i"></script>
+  <script src="/credito-app/auth-config.js?v=20260427k"></script>
   <script>
     (function () {
       var VERSION = "credito-preflight-20260427j";
-      var panel;
-      function ensurePanel() {
-        if (panel) return;
-        panel = document.createElement("pre");
-        panel.style.cssText = "position:fixed;left:8px;right:8px;bottom:8px;max-height:34vh;overflow:auto;padding:10px;margin:0;z-index:99999;background:rgba(15,23,42,.96);color:#e2e8f0;font:12px/1.35 monospace;border:1px solid #334155;border-radius:8px;white-space:pre-wrap";
-        panel.id = "credito-debug-panel";
-        if (document.body) document.body.appendChild(panel);
-        else document.documentElement.appendChild(panel);
-      }
-      function log(msg, extra) {
+      function sendClientLog(level, event, detail) {
         try {
-          ensurePanel();
-          var line = "[credito] " + msg + (extra ? " " + JSON.stringify(extra) : "");
-          if (panel) panel.textContent += line + "\n";
-          console.log(line);
-          fetch("/api/client-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ route: "/credito", level: "info", event: msg, detail: extra || null }) }).catch(function () {});
+          fetch("/api/client-log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              route: "/credito",
+              level: level || "info",
+              event: event,
+              detail: detail || null
+            })
+          }).catch(function () {});
         } catch (_) {}
+      }
+      function logError(event, detail) {
+        try {
+          console.error("[credito]", event, detail || "");
+        } catch (_) {}
+        sendClientLog("error", event, detail);
       }
       function parseHashSession() {
         var h = window.location.hash || "";
@@ -63,19 +65,15 @@
         });
       }
       function redirectLogin(reason) {
-        log("redirect-login", { reason: reason });
+        sendClientLog("info", "redirect-login", { reason: reason, version: VERSION });
         var redirect = encodeURIComponent("/credito");
-        setTimeout(function () {
-          window.location.replace("/login?redirect=" + redirect);
-        }, 1200);
+        window.location.replace("/login?redirect=" + redirect);
       }
       async function preflight() {
-        log("version", { v: VERSION });
-        log("config", { hasUrl: !!window.__SUPABASE_URL__, hasAnon: !!window.__SUPABASE_ANON_KEY__ });
+        sendClientLog("info", "preflight-start", { v: VERSION });
         if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
         var fromHash = parseHashSession();
         var fromStore = findStoredSession();
-        log("session-source", { hash: !!fromHash, storage: !!fromStore });
         if (!fromHash && !fromStore) return redirectLogin("no-session");
         try {
           await loadSupabaseUmd();
@@ -85,39 +83,36 @@
           if (fromHash) {
             await sb.auth.setSession(fromHash);
             history.replaceState(null, "", location.pathname + location.search);
-            log("set-session", { source: "hash" });
           } else {
             await sb.auth.setSession({ access_token: fromStore.access_token, refresh_token: fromStore.refresh_token });
-            log("set-session", { source: "storage" });
           }
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
-          log("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
           if (!ok) return redirectLogin("invalid-session");
         } catch (e) {
-          log("preflight-error", { message: e && e.message ? e.message : String(e) });
+          logError("preflight-error", { message: e && e.message ? e.message : String(e) });
           return redirectLogin("preflight-error");
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          app.onload = function () { log("app-loaded", { src: app.getAttribute("src") || null }); };
-          app.onerror = function () { log("app-load-error", { src: app.getAttribute("src") || null }); };
-          app.setAttribute("src", "/credito-app/credito-app.js?v=20260427j");
+          app.onload = function () { sendClientLog("info", "app-loaded", { src: app.getAttribute("src") || null, version: VERSION }); };
+          app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
+          app.setAttribute("src", "/credito-app/credito-app.js?v=20260427k");
         }
       }
       window.addEventListener("error", function (ev) {
-        try { log("window-error", { message: ev && ev.message ? ev.message : "unknown" }); } catch (_) {}
+        logError("window-error", { message: ev && ev.message ? ev.message : "unknown" });
       });
       window.addEventListener("unhandledrejection", function (ev) {
         try {
           var reason = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : "unknown";
-          log("unhandled-rejection", { reason: reason });
+          logError("unhandled-rejection", { reason: reason });
         } catch (_) {}
       });
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427i" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427k" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
