@@ -11,9 +11,9 @@
     }
   ],
   "rewrites": [
-    { "source": "/credito", "destination": "/credito.html" },
-    { "source": "/credito.html", "destination": "/credito.html" },
-    { "source": "/credito-app/:path*", "destination": "/credito-app/:path*" },
+    { "source": "/credito", "destination": "https://www.marketingconholistic.com/credito" },
+    { "source": "/credito.html", "destination": "https://www.marketingconholistic.com/credito.html" },
+    { "source": "/credito-app/:path*", "destination": "https://www.marketingconholistic.com/credito-app/:path*" },
     { "source": "/pendientes", "destination": "/pendientes/index.html" },
     { "source": "/pendientes/:path*", "destination": "/pendientes/:path*" },
     { "source": "/creativos", "destination": "/creativos/index.html" },
