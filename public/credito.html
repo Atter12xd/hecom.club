@@ -11,7 +11,7 @@
   <script>
     (function () {
       var VERSION = "credito-preflight-20260427l";
-      var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
+      var DEBUG = true;
       var panel = null;
       function ensurePanel() {
         if (!DEBUG || panel) return;
@@ -96,20 +96,25 @@
         var fromHash = parseHashSession();
         var fromStore = findStoredSession();
         logInfo("session-source", { hash: !!fromHash, storage: !!fromStore });
-        if (!fromHash && !fromStore) return redirectLogin("no-session");
         try {
           await loadSupabaseUmd();
           var sb = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, {
             auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: localStorage }
           });
-          if (fromHash) {
-            await sb.auth.setSession(fromHash);
-            history.replaceState(null, "", location.pathname + location.search);
-            logInfo("set-session", { source: "hash" });
-          } else {
-            await sb.auth.setSession({ access_token: fromStore.access_token, refresh_token: fromStore.refresh_token });
-            logInfo("set-session", { source: "storage" });
+          if (fromHash || fromStore) {
+            if (fromHash) {
+              await sb.auth.setSession(fromHash);
+              history.replaceState(null, "", location.pathname + location.search);
+              logInfo("set-session", { source: "hash" });
+            } else if (fromStore) {
+              await sb.auth.setSession({ access_token: fromStore.access_token, refresh_token: fromStore.refresh_token });
+              logInfo("set-session", { source: "storage" });
+            }
           }
+          var sessRes = await sb.auth.getSession();
+          var session = sessRes && sessRes.data ? sessRes.data.session : null;
+          logInfo("get-session", { ok: !!session });
+          if (!session) return redirectLogin("no-session");
           var userRes = await sb.auth.getUser();
           var ok = !!(userRes && userRes.data && userRes.data.user);
           logInfo("get-user", { ok: ok, error: userRes && userRes.error ? userRes.error.message : null });
