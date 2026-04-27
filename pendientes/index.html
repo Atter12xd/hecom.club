@@ -4,8 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pendientes | Redirigiendo...</title>
-  <meta http-equiv="refresh" content="0; url=/pendientes/tarea">
-  <script>window.location.replace('/pendientes/tarea');</script>
+  <script>
+    (function () {
+      var target = "/pendientes/tarea" + (location.search || "") + (location.hash || "");
+      window.location.replace(target);
+    })();
+  </script>
 </head>
 <body></body>
 </html>

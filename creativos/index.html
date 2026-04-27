@@ -4,8 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Creativos | Redirigiendo...</title>
-  <meta http-equiv="refresh" content="0; url=/creativos/creativo">
-  <script>window.location.replace('/creativos/creativo');</script>
+  <script>
+    (function () {
+      var target = "/creativos/creativo" + (location.search || "") + (location.hash || "");
+      window.location.replace(target);
+    })();
+  </script>
 </head>
 <body></body>
 </html>
