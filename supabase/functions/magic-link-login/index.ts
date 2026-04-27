@@ -3,9 +3,13 @@
 // Fallback código sin email_otp: signInWithOtp (correo plantilla Supabase, no Resend) — raro en proyectos actuales.
 // Secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, RESEND_FROM; SUPABASE_ANON_KEY solo para ese fallback.
 //
-// Cambios vs. versión solo marketing: redirect permitido también para hecom.club (www, apex y subdominios).
+// Redirect post–magic link: Hecom (por defecto /destinos). Dominio marketing sigue permitido si el cliente lo pide explícito.
+// Secret opcional: APP_URL o PUBLIC_APP_URL = https://www.hecom.club/destinos (sin barra final).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+/** Tras validar el enlace, Auth redirige aquí si no hay otro redirect válido. Alineado con el login Hecom → /destinos. */
+const DEFAULT_HECOM_APP_URL = "https://www.hecom.club/destinos";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,7 +19,7 @@ const corsHeaders = {
 function getAppUrl(): string {
   const url = Deno.env.get("APP_URL") || Deno.env.get("PUBLIC_APP_URL") || "";
   if (url) return url.replace(/\/$/, "");
-  return "https://www.marketingconholistic.com/credito";
+  return DEFAULT_HECOM_APP_URL;
 }
 
 function normalizeEmail(email: string): string {
@@ -134,13 +138,13 @@ Deno.serve(async (req) => {
             if (isAllowedRedirectHost(th)) {
               appUrl = trimmedRedirect;
             } else {
-              appUrl = "https://www.marketingconholistic.com/credito";
+              appUrl = DEFAULT_HECOM_APP_URL;
             }
           } catch {
-            appUrl = "https://www.marketingconholistic.com/credito";
+            appUrl = DEFAULT_HECOM_APP_URL;
           }
         } else {
-          appUrl = "https://www.marketingconholistic.com/credito";
+          appUrl = DEFAULT_HECOM_APP_URL;
         }
       }
     } catch {
