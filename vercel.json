@@ -14,6 +14,8 @@
     { "source": "/credito", "destination": "/credito.html" },
     { "source": "/credito.html", "destination": "/credito.html" },
     { "source": "/credito-app/:path*", "destination": "/credito-app/:path*" },
+    { "source": "/logo/:path*", "destination": "/credito-app/logo/:path*" },
+    { "source": "/favicon/:path*", "destination": "/credito-app/favicon/:path*" },
     { "source": "/pendientes", "destination": "/pendientes/index.html" },
     { "source": "/pendientes/:path*", "destination": "/pendientes/:path*" },
     { "source": "/creativos", "destination": "/creativos/index.html" },
