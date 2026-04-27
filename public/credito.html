@@ -135,6 +135,27 @@
           return false;
         }
       }
+      function detectLoginScreen() {
+        try {
+          var txt = (document.body && document.body.innerText) ? document.body.innerText : "";
+          return /Iniciar sesi[oó]n/i.test(txt) && /Enviar enlace al correo/i.test(txt);
+        } catch (_) {
+          return false;
+        }
+      }
+      function tryRecoverIfLoginScreen(session) {
+        try {
+          if (!session) return;
+          if (!detectLoginScreen()) return;
+          var onceKey = "credito_force_recover_once";
+          if (sessionStorage.getItem(onceKey) === "1") return;
+          sessionStorage.setItem(onceKey, "1");
+          var injected = injectSessionHash(session);
+          sendClientLog("error", "forced-recover-login-screen", { injected: !!injected });
+          var next = "/credito/dashboard" + location.search + location.hash;
+          location.replace(next);
+        } catch (_) {}
+      }
       function loadSupabaseUmd() {
         return new Promise(function (resolve, reject) {
           if (window.supabase && window.supabase.createClient) return resolve();
@@ -194,6 +215,7 @@
           if (!ok) {
             sendClientLog("error", "preflight-invalid-user", { version: VERSION, error: userRes && userRes.error ? userRes.error.message : null });
           }
+          window.__CREDITO_PREFLIGHT_SESSION__ = session;
         } catch (e) {
           logError("preflight-error", { message: e && e.message ? e.message : String(e) });
           return redirectLogin("preflight-error");
@@ -202,6 +224,9 @@
         if (app) {
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
+            setTimeout(function () {
+              tryRecoverIfLoginScreen(window.__CREDITO_PREFLIGHT_SESSION__ || null);
+            }, 900);
           };
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.setAttribute("src", "/credito-app/credito-app.js?v=20260427m");
