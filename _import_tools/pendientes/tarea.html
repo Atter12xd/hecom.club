@@ -2440,7 +2440,7 @@ button.att-action-btn:disabled {
 </style>
 </head>
 <body>
-<script src="/credito-app/auth-config.js"></script>
+<script src="/api/auth-config?v=20260428api"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
@@ -2480,7 +2480,7 @@ button.att-action-btn:disabled {
     return;
   }
   var url=window.__SUPABASE_URL__;var key=window.__SUPABASE_ANON_KEY__;
-  if(!url||!key){ console.warn('[Pendientes] auth: faltan URL o KEY de Supabase (auth-config.js)'); return; }
+  if(!url||!key){ console.warn('[Pendientes] auth: faltan URL o KEY de Supabase (/api/auth-config · PUBLIC_* en Vercel)'); return; }
   var lib=window.supabase;
   var createClientFn=lib&&(lib.createClient||(lib.default&&(lib.default.createClient||lib.default)));
   if(!lib||typeof createClientFn!=='function'){ console.warn('[Pendientes] auth: createClient no encontrado en window.supabase'); return; }
@@ -3220,7 +3220,7 @@ function tryInitSupabase(retryCount) {
     scriptTagsWithSupabase: scripts
   });
   if (!url || !key) {
-    console.warn('[Pendientes] Supabase: faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__. ¿Está cargado /credito-app/auth-config.js?');
+    console.warn('[Pendientes] Supabase: faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__. ¿Responde GET /api/auth-config y está PUBLIC_* en Vercel?');
     return;
   }
   var lib = window.supabase;

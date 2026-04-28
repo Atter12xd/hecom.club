@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="docTitlePendientes">Pendientes Holistic</title>
-<link rel="icon" type="image/png" href="/pendientes/favicon/favicon.png" /><link rel="shortcut icon" type="image/png" href="/pendientes/favicon/favicon.png" />
+<link rel="icon" type="image/png" href="/favicon/favicon.png" /><link rel="shortcut icon" type="image/png" href="/favicon/favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2440,7 +2440,7 @@ button.att-action-btn:disabled {
 </style>
 </head>
 <body>
-<script src="/credito-app/auth-config.js"></script>
+<script src="/api/auth-config?v=20260428api"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
@@ -2480,7 +2480,7 @@ button.att-action-btn:disabled {
     return;
   }
   var url=window.__SUPABASE_URL__;var key=window.__SUPABASE_ANON_KEY__;
-  if(!url||!key){ console.warn('[Pendientes] auth: faltan URL o KEY de Supabase (auth-config.js)'); return; }
+  if(!url||!key){ console.warn('[Pendientes] auth: faltan URL o KEY de Supabase (/api/auth-config · PUBLIC_* en Vercel)'); return; }
   var lib=window.supabase;
   var createClientFn=lib&&(lib.createClient||(lib.default&&(lib.default.createClient||lib.default)));
   if(!lib||typeof createClientFn!=='function'){ console.warn('[Pendientes] auth: createClient no encontrado en window.supabase'); return; }
@@ -2542,7 +2542,7 @@ button.att-action-btn:disabled {
 <!-- ══════ SIDEBAR ══════ -->
 <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navegación principal">
   <div class="sidebar-brand">
-    <img class="sidebar-logo" src="/pendientes/logo/logoh.png" alt="Holistic Marketing" style="height: 48px; width: 200px; max-width: 100%; object-fit: contain; display: block;">
+    <img class="sidebar-logo" src="/credito-app/logo/logoh.png" alt="Holistic Marketing" style="height: 48px; width: 200px; max-width: 100%; object-fit: contain; display: block;">
     <div class="sidebar-wordmark">
       <h1>Pendientes <span class="sidebar-wordmark-accent">Holistic</span></h1>
     </div>
@@ -3220,7 +3220,7 @@ function tryInitSupabase(retryCount) {
     scriptTagsWithSupabase: scripts
   });
   if (!url || !key) {
-    console.warn('[Pendientes] Supabase: faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__. ¿Está cargado /credito-app/auth-config.js?');
+    console.warn('[Pendientes] Supabase: faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__. ¿Responde GET /api/auth-config y está PUBLIC_* en Vercel?');
     return;
   }
   var lib = window.supabase;
