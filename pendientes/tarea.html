@@ -189,6 +189,67 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
   border-top: 1px solid var(--sidebar-border);
   flex-shrink: 0;
 }
+.sidebar-profile {
+  padding: var(--sp-3);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+.hm-user-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, rgba(248,250,252,0.98), rgba(241,245,249,0.94));
+  border: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  transition: background var(--tr), box-shadow var(--tr);
+}
+.hm-user-card:hover {
+  background: var(--sidebar-hover);
+  box-shadow: 0 1px 0 rgba(15,23,42,0.05);
+}
+.hm-user-card-body { flex: 1; min-width: 0; }
+.user-welcome {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+.user-display-name {
+  color: var(--sidebar-text-active);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-word;
+}
+.user-photo-hint {
+  font-size: 0.5625rem;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+.user-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+.user-role-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #059669;
+  flex-shrink: 0;
+}
 .user-card {
   display: flex;
   align-items: center;
@@ -200,23 +261,23 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
 }
 .user-card:hover { background: var(--sidebar-hover); }
 .user-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #EA580C, #F97316);
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #fce7f3, #fbcfe8);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.8125rem;
+  color: #be123c;
+  font-weight: 800;
+  font-size: 1.125rem;
   letter-spacing: -0.02em;
   flex-shrink: 0;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 2px 8px rgba(0,0,0,.12);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.35) inset, 0 2px 8px rgba(0,0,0,.08);
 }
-.user-avatar img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+.user-avatar img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
 .user-name { color: var(--sidebar-text-active); font-size: var(--text-sm); font-weight: 600; }
 .user-role { color: #94a3b8; font-size: 0.625rem; }
 .user-role-hint { font-size: 0.5625rem; margin-top: 2px; opacity: 0.9; }
@@ -2570,6 +2631,25 @@ window.__HECOM_SB_READY__.then(function(){
     </div>
   </div>
 
+  <div class="sidebar-profile">
+    <input type="file" id="tareasAvatarInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
+    <div class="hm-user-card user-card user-card-avatar" role="button" tabindex="0" title="Clic para cambiar foto">
+      <div class="user-avatar" id="tareasUserAvatar" aria-hidden="true">
+        <img id="tareasUserAvatarImg" src="" alt="" style="display:none" />
+        <span id="tareasUserAvatarIniciales">·</span>
+        <span class="user-avatar-camera" aria-hidden="true" title="Clic para poner tu foto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </span>
+      </div>
+      <div class="hm-user-card-body">
+        <div class="user-welcome">Bienvenido</div>
+        <div class="user-display-name" id="tareasUserName" title="Clic para cambiar tu nombre" style="cursor:pointer">…</div>
+        <div class="user-photo-hint" id="tareasUserPhotoHint">Clic para poner tu foto</div>
+        <div class="user-role-pill" id="tareasUserRolePill"><span class="user-role-dot" aria-hidden="true"></span><span id="tareasUserRoleLabel">—</span></div>
+      </div>
+    </div>
+  </div>
+
   <nav class="sidebar-nav">
     <div class="nav-section">
       <div class="nav-section-label">General</div>
@@ -2651,23 +2731,6 @@ window.__HECOM_SB_READY__.then(function(){
 
   </nav>
 
-  <div class="sidebar-footer">
-    <input type="file" id="tareasAvatarInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
-    <div class="user-card user-card-avatar" role="button" tabindex="0" title="Clic para cambiar foto">
-      <div class="user-avatar" id="tareasUserAvatar" aria-hidden="true">
-        <img id="tareasUserAvatarImg" src="" alt="" style="display:none" />
-        <span id="tareasUserAvatarIniciales">·</span>
-        <span class="user-avatar-camera" aria-hidden="true" title="Clic para poner tu foto">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </span>
-      </div>
-      <div>
-        <div class="user-name" id="tareasUserName" title="Clic para cambiar tu nombre" style="cursor:pointer">…</div>
-        <div class="user-role">Director de Agencia</div>
-        <div class="user-role user-role-hint"><button type="button" class="sidebar-name-btn" onclick="event.stopPropagation();promptUserNameTareas()">Cambiar nombre</button> · Clic en la foto para cambiarla</div>
-      </div>
-    </div>
-  </div>
 </aside>
 
 <!-- ══════ MAIN ══════ -->
@@ -3399,6 +3462,11 @@ function permMiembroLabel(gr) {
   if (tareasPermBool(gr.perm_analista_financiero)) bits.push('Analista financiero');
   return bits.length ? bits.join(' · ') : 'Miembro';
 }
+/** Una línea corta para el badge verde del sidebar (misma idea que Crédito). */
+function tareasSidebarRoleBadgeText(gr) {
+  if (!gr) return 'Equipo';
+  return permMiembroLabel(gr).split(' · ')[0];
+}
 function tareasPermBool(v) {
   return v === true || v === 'true' || v === 't' || v === 1;
 }
@@ -3602,6 +3670,17 @@ function tareasApplyPermissionUi() {
   if (hl) hl.textContent = p.admin ? 'Nuevo' : 'Nuevo ticket';
   try { applyTareasSidebarAvatarFromGerente(); } catch (e) {}
 }
+function tareasRefreshPhotoHint() {
+  var imgEl = document.getElementById('tareasUserAvatarImg');
+  var hintEl = document.getElementById('tareasUserPhotoHint');
+  if (!hintEl) return;
+  var show = true;
+  if (imgEl && imgEl.style.display === 'block' && imgEl.src) {
+    var s = imgEl.src;
+    if (s.indexOf('http://') === 0 || s.indexOf('https://') === 0 || s.indexOf('data:image') === 0) show = false;
+  }
+  hintEl.style.display = show ? '' : 'none';
+}
 /** Foto de perfil: prioridad gerentes.avatar_url (misma que Crédito), luego caché local. */
 function applyTareasSidebarAvatarFromGerente() {
   var imgEl = document.getElementById('tareasUserAvatarImg');
@@ -3615,21 +3694,27 @@ function applyTareasSidebarAvatarFromGerente() {
       imgEl.onerror = null;
       imgEl.style.display = 'none';
       iniEl.style.display = '';
+      tareasRefreshPhotoHint();
     };
     imgEl.onload = function() {
       imgEl.style.display = 'block';
       iniEl.style.display = 'none';
+      tareasRefreshPhotoHint();
     };
     imgEl.src = url + bust;
     return;
   }
   try {
     var ls = localStorage.getItem('tareas_avatar_url');
-    if (!ls) return;
+    if (!ls) {
+      tareasRefreshPhotoHint();
+      return;
+    }
     if (ls.indexOf('data:image') === 0) {
       imgEl.src = ls;
       imgEl.style.display = 'block';
       iniEl.style.display = 'none';
+      tareasRefreshPhotoHint();
       return;
     }
     if ((ls.indexOf('http://') === 0 || ls.indexOf('https://') === 0) && typeof tareasHotlinkAvatarLikelyBlocked === 'function' && !tareasHotlinkAvatarLikelyBlocked(ls)) {
@@ -3638,14 +3723,18 @@ function applyTareasSidebarAvatarFromGerente() {
         imgEl.onerror = null;
         imgEl.style.display = 'none';
         iniEl.style.display = '';
+        tareasRefreshPhotoHint();
       };
       imgEl.onload = function() {
         imgEl.style.display = 'block';
         iniEl.style.display = 'none';
+        tareasRefreshPhotoHint();
       };
       imgEl.src = ls + b2;
+      return;
     }
   } catch (e) {}
+  tareasRefreshPhotoHint();
 }
 function gerenteEmailSlug(email) {
   return String(email || '').trim().toLowerCase().replace(/@/g, '_at_').replace(/\./g, '_').replace(/[^a-z0-9_]/g, '_');
@@ -8566,6 +8655,7 @@ function initTareasAvatar() {
         imgEl.src = r.result;
         imgEl.style.display = 'block';
         iniEl.style.display = 'none';
+        try { tareasRefreshPhotoHint(); } catch (e) {}
       };
       r.readAsDataURL(f);
       inp.value = '';
@@ -8587,14 +8677,14 @@ function initTareasAvatar() {
           window.__tareasGerentePerms.avatar_url = url;
         }
         try { localStorage.setItem(key, url); } catch (e) {}
-        imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; };
-        imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; };
+        imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { tareasRefreshPhotoHint(); } catch (e) {} };
+        imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { tareasRefreshPhotoHint(); } catch (e) {} };
         imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
       });
     });
     inp.value = '';
   };
-  var card = document.querySelector('.sidebar-footer .user-card-avatar');
+  var card = document.querySelector('.sidebar .user-card-avatar');
   if (card) card.addEventListener('click', function() { inp.click(); });
 }
 
@@ -8655,8 +8745,11 @@ function updateTareasUserNameDisplay() {
       ? 'Completá tu nombre (también te lo pedimos en el aviso al entrar)'
       : 'Clic para cambiar tu nombre';
   }
+  var roleL = document.getElementById('tareasUserRoleLabel');
+  if (roleL) roleL.textContent = tareasSidebarRoleBadgeText(window.__tareasGerentePerms);
   var titleEl = document.getElementById('docTitlePendientes');
   if (titleEl) titleEl.textContent = titleName ? ('Pendientes · ' + titleName) : 'Pendientes Holistic';
+  try { tareasRefreshPhotoHint(); } catch (e2) {}
 }
 
 var RECORDATORIOS_KEY_PENDIENTES = 'pendientes_recordatorios';

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title id="pageTitle">Creativos Holistic</title>
-<link rel="icon" type="image/png" href="/creativos/favicon/favicon.png" /><link rel="shortcut icon" type="image/png" href="/creativos/favicon/favicon.png" />
+<link rel="icon" type="image/png" href="/favicon/favicon.png" /><link rel="shortcut icon" type="image/png" href="/favicon/favicon.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -136,16 +136,77 @@ h1,h2,h3,h4,h5,h6 { text-wrap: balance; line-height: 1.2; font-family: var(--fon
 .sidebar-footer {
   padding: var(--space-4) var(--space-4);
   border-top: 1px solid var(--sidebar-border);
-  display: flex; align-items: center; gap: var(--space-3);
+  display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3);
+}
+.sidebar-profile {
+  padding: var(--space-4);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+.hm-user-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(248,250,252,0.98), rgba(241,245,249,0.94));
+  border: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  transition: background var(--transition-interactive), box-shadow var(--transition-interactive);
+}
+.hm-user-card:hover {
+  background: var(--sidebar-hover);
+  box-shadow: 0 1px 0 rgba(15,23,42,0.05);
+}
+.hm-user-card-body { flex: 1; min-width: 0; }
+.creativos-user-welcome {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+.creativos-display-name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--sidebar-text);
+  line-height: 1.25;
+  word-break: break-word;
+}
+.creativos-photo-hint {
+  font-size: 0.5625rem;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  line-height: 1.35;
+}
+.creativos-role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+.creativos-role-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #059669;
+  flex-shrink: 0;
 }
 .sidebar-avatar {
-  width: 48px; height: 48px; border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary), #e85d04);
+  width: 56px; height: 56px; border-radius: 12px;
+  background: linear-gradient(145deg, #fce7f3, #fbcfe8);
   display: flex; align-items: center; justify-content: center;
-  font-size: 0.8125rem; font-weight: 700; color: white; flex-shrink: 0;
+  font-size: 1.125rem; font-weight: 800; color: #be123c; flex-shrink: 0;
   letter-spacing: -0.02em;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 2px 8px rgba(0,0,0,.12);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.35) inset, 0 2px 8px rgba(0,0,0,.08);
 }
 .sidebar-avatar img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
 .sidebar-avatar-camera {
@@ -1472,9 +1533,27 @@ body.kanban-pipeline-dragging {
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand" onclick="navigateTo('dashboard');return false;">
-      <img class="sidebar-logo-img" src="/creativos/logo/logoh.png" alt="Holistic Marketing" style="height: 48px; width: 200px; max-width: 100%; object-fit: contain; display: block;">
+      <img class="sidebar-logo-img" src="/credito-app/logo/logoh.png?v=2" alt="Holistic Marketing" width="200" height="48" decoding="async" style="height: 48px; width: 200px; max-width: 100%; object-fit: contain; display: block;" onerror="if(!this.dataset._fb){this.dataset._fb='1';this.src='/logo/logoh.png?v=2';return;}this.style.visibility='hidden';">
       <div class="sidebar-logo-text">Creativos <span>Holistic</span></div>
     </a>
+    <div class="sidebar-profile">
+      <input type="file" id="creativosAvatarInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
+      <div class="hm-user-card sidebar-footer-user" title="Clic para cambiar foto" style="display:flex;align-items:flex-start;gap:var(--space-3);flex:1;min-width:0;cursor:pointer;margin:0">
+        <div class="sidebar-avatar sidebar-avatar-clickable" id="creativosUserAvatar" style="position:relative;overflow:hidden">
+          <img id="creativosUserAvatarImg" src="" alt="" style="display:none;position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;z-index:1" />
+          <span id="creativosUserAvatarIniciales">·</span>
+          <span class="sidebar-avatar-camera" aria-hidden="true" title="Clic para poner tu foto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </span>
+        </div>
+        <div class="hm-user-card-body sidebar-user-info">
+          <div class="creativos-user-welcome">Bienvenido</div>
+          <div class="creativos-display-name sidebar-user-name" id="creativosUserName" title="Clic para cambiar tu nombre (aparece en Revisado por y notas)" style="cursor:pointer;white-space:normal">…</div>
+          <div class="creativos-photo-hint" id="creativosUserPhotoHint">Clic para poner tu foto</div>
+          <div class="creativos-role-pill" id="creativosUserRolePill"><span class="creativos-role-dot" aria-hidden="true"></span><span id="creativosUserRoleLabel">—</span></div>
+        </div>
+      </div>
+    </div>
     <nav class="sidebar-nav">
       <div class="sidebar-section-label">Principal</div>
       <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
@@ -1512,21 +1591,6 @@ body.kanban-pipeline-dragging {
       </button>
     </nav>
     <div class="sidebar-footer">
-      <input type="file" id="creativosAvatarInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
-      <div class="sidebar-footer-user" title="Clic para cambiar foto" style="display:flex;align-items:center;gap:var(--space-3);flex:1;min-width:0;cursor:pointer">
-        <div class="sidebar-avatar sidebar-avatar-clickable" id="creativosUserAvatar" style="position:relative;overflow:hidden">
-          <img id="creativosUserAvatarImg" src="" alt="" style="display:none;position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover" />
-          <span id="creativosUserAvatarIniciales">·</span>
-          <span class="sidebar-avatar-camera" aria-hidden="true" title="Clic para poner tu foto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          </span>
-        </div>
-        <div class="sidebar-user-info">
-          <div class="sidebar-user-name" id="creativosUserName" title="Clic para cambiar tu nombre (aparece en Revisado por y notas)" style="cursor:pointer">…</div>
-          <div class="sidebar-user-role">Administrador</div>
-          <div class="sidebar-user-role sidebar-user-role-hint"><button type="button" class="sidebar-name-btn" onclick="event.stopPropagation();promptUserNameCreativos()">Cambiar nombre</button> · Clic en la foto para cambiarla</div>
-        </div>
-      </div>
       <button class="theme-toggle-btn" id="themeToggle" data-theme-toggle aria-label="Cambiar tema">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
@@ -1737,6 +1801,35 @@ function creativosHotlinkAvatarLikelyBlocked(url) {
     return true;
   }
 }
+function creativosPermBool(v) {
+  return v === true || v === 'true' || v === 't' || v === 1;
+}
+function creativosSidebarRoleBadgeText(row) {
+  if (!row) return 'Equipo';
+  var bits = [];
+  var pa = creativosPermBool(row.perm_admin);
+  if (pa) {
+    bits.push('Administrador');
+    if (creativosPermBool(row.perm_gestor_financiero)) bits.push('Gestor financiero');
+    if (creativosPermBool(row.perm_analista_financiero)) bits.push('Analista financiero');
+    return bits.join(' · ').split(' · ')[0];
+  }
+  if (creativosPermBool(row.perm_estandar)) bits.push('Asistente');
+  if (creativosPermBool(row.perm_gestor_financiero)) bits.push('Gestor financiero');
+  if (creativosPermBool(row.perm_analista_financiero)) bits.push('Analista financiero');
+  return bits.length ? bits.join(' · ').split(' · ')[0] : 'Miembro';
+}
+function creativosRefreshPhotoHint() {
+  var imgEl = document.getElementById('creativosUserAvatarImg');
+  var hintEl = document.getElementById('creativosUserPhotoHint');
+  if (!hintEl) return;
+  var show = true;
+  if (imgEl && imgEl.style.display === 'block' && imgEl.src) {
+    var s = imgEl.src;
+    if (s.indexOf('http://') === 0 || s.indexOf('https://') === 0 || s.indexOf('data:image') === 0) show = false;
+  }
+  hintEl.style.display = show ? '' : 'none';
+}
 function applyCreativosSidebarAvatarFromGerente() {
   var imgEl = document.getElementById('creativosUserAvatarImg');
   var iniEl = document.getElementById('creativosUserAvatarIniciales');
@@ -1749,29 +1842,45 @@ function applyCreativosSidebarAvatarFromGerente() {
       imgEl.onerror = null;
       imgEl.style.display = 'none';
       iniEl.style.display = '';
+      creativosRefreshPhotoHint();
     };
     imgEl.onload = function() {
       imgEl.style.display = 'block';
       iniEl.style.display = 'none';
+      creativosRefreshPhotoHint();
     };
     imgEl.src = url + bust;
     return;
   }
   try {
     var ls = localStorage.getItem('creativos_avatar_url');
-    if (!ls) return;
+    if (!ls) {
+      creativosRefreshPhotoHint();
+      return;
+    }
     if (ls.indexOf('data:image') === 0) {
       imgEl.src = ls;
       imgEl.style.display = 'block';
       iniEl.style.display = 'none';
+      creativosRefreshPhotoHint();
       return;
     }
     if ((ls.indexOf('http://') === 0 || ls.indexOf('https://') === 0) && !creativosHotlinkAvatarLikelyBlocked(ls)) {
+      imgEl.onerror = function() {
+        imgEl.style.display = 'none';
+        iniEl.style.display = '';
+        creativosRefreshPhotoHint();
+      };
+      imgEl.onload = function() {
+        imgEl.style.display = 'block';
+        iniEl.style.display = 'none';
+        creativosRefreshPhotoHint();
+      };
       imgEl.src = ls + ((ls.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now());
-      imgEl.style.display = 'block';
-      iniEl.style.display = 'none';
+      return;
     }
   } catch (e) {}
+  creativosRefreshPhotoHint();
 }
 function marketingStorageSignReadUrl(bucket, relPath, ttlSeconds) {
   var base = marketingStorageBase();
@@ -4830,7 +4939,7 @@ function doCreativosInitialLoad() {
         maybeShowHolisticNameGateCreativos();
         return;
       }
-      supabase.from('gerentes').select('nombre, apellido, email, display_name, avatar_url').eq('email', em).maybeSingle().then(function(gr) {
+      supabase.from('gerentes').select('nombre, apellido, email, display_name, avatar_url, perm_admin, perm_estandar, perm_gestor_financiero, perm_analista_financiero').eq('email', em).maybeSingle().then(function(gr) {
         window.__creativosGerenteSelfRow = gr.data || null;
         if (gr.data) tryApplyHolisticUserNameFromGerenteRow(gr.data);
         initApp();
@@ -4866,6 +4975,7 @@ function initCreativosAvatar() {
         imgEl.src = r.result;
         imgEl.style.display = 'block';
         iniEl.style.display = 'none';
+        try { creativosRefreshPhotoHint(); } catch (e) {}
       };
       r.readAsDataURL(f);
       inp.value = '';
@@ -4887,8 +4997,8 @@ function initCreativosAvatar() {
           window.__creativosGerenteSelfRow.avatar_url = url;
         }
         try { localStorage.setItem(key, url); } catch (e) {}
-        imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; };
-        imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; };
+        imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { creativosRefreshPhotoHint(); } catch (e) {} };
+        imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { creativosRefreshPhotoHint(); } catch (e) {} };
         imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
       });
     });
@@ -4931,6 +5041,8 @@ function promptUserNameCreativos() {
 }
 function updateCreativosUserNameDisplay() {
   try { applyCreativosSidebarAvatarFromGerente(); } catch (e) {}
+  var roleL = document.getElementById('creativosUserRoleLabel');
+  if (roleL) roleL.textContent = creativosSidebarRoleBadgeText(window.__creativosGerenteSelfRow);
   var el = document.getElementById('creativosUserName');
   var name = getCurrentUserName();
   var titleName = getResolvedHolisticDisplayTitleNameCreativos();
@@ -4949,6 +5061,7 @@ function updateCreativosUserNameDisplay() {
     var L = (titleName || name || '').trim();
     iniEl.textContent = L.length ? L.charAt(0).toUpperCase() : '·';
   }
+  try { creativosRefreshPhotoHint(); } catch (e) {}
 }
 updateCreativosUserNameDisplay();
 

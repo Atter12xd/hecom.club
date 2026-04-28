@@ -143,8 +143,10 @@ img,svg{display:block;max-width:100%}
 .finanzas-user-avatar-wrap span{font-size:1.125rem;font-weight:700;color:#be123c}
 .finanzas-user-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
 .finanzas-user-hi{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)}
-.finanzas-user-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.finanzas-user-role{font-size:11px;color:var(--text-muted)}
+.finanzas-user-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.25;word-break:break-word}
+.finanzas-photo-hint{font-size:9px;margin-top:4px;color:var(--text-muted);line-height:1.35}
+.finanzas-role-pill{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 10px;border-radius:999px;background:#ecfdf5;color:#047857;font-size:11px;font-weight:600}
+.finanzas-role-dot{width:6px;height:6px;border-radius:50%;background:#059669;flex-shrink:0}
 .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;color:var(--sidebar-text);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;position:relative;border-left:3px solid transparent;margin-left:-3px}
 .nav-item:hover{background:rgba(59,130,246,0.05);color:var(--text);box-shadow:0 0 0 1px rgba(59,130,246,0.06)}
@@ -389,7 +391,7 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 }
 @media(max-width:1024px){
   .sidebar{width:60px;min-width:60px}
-  .sidebar-tagline,.finanzas-user-text,.nav-item span,.sidebar-footer-item span,.currency-badge,.sidebar-footer-item .toggle-track{display:none}
+  .sidebar-tagline,.finanzas-user-text,.finanzas-photo-hint,.nav-item span,.sidebar-footer-item span,.currency-badge,.sidebar-footer-item .toggle-track{display:none}
   .sidebar-header{justify-content:center;padding:14px 8px 12px}
   .sidebar-logo-wide-wrap{min-height:36px}
   .sidebar-logo-wide{height:34px;max-width:40px}
@@ -530,7 +532,8 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
       <div class="finanzas-user-text">
         <span class="finanzas-user-hi">Bienvenido</span>
         <span class="finanzas-user-name" id="finanzasUserDisplayName">—</span>
-        <span class="finanzas-user-role" id="finanzasUserRole"></span>
+        <span class="finanzas-photo-hint" id="finanzasUserPhotoHint">Clic para poner tu foto</span>
+        <div class="finanzas-role-pill" id="finanzasUserRolePill"><span class="finanzas-role-dot" aria-hidden="true"></span><span id="finanzasUserRoleLabel">—</span></div>
       </div>
     </div>
   </div>
@@ -961,13 +964,29 @@ function finanzasHotlinkAvatarLikelyBlocked(url){
     return false;
   }catch(e){return true;}
 }
+function finanzasPermBool(v){return v===true||v==='true'||v==='t'||v===1;}
+function finanzasRolePillText(row){
+  if(!row) return 'Equipo';
+  var bits=[];
+  if(finanzasPermBool(row.perm_admin)){
+    bits.push('Administrador');
+    if(finanzasPermBool(row.perm_gestor_financiero)) bits.push('Gestor financiero');
+    if(finanzasPermBool(row.perm_analista_financiero)) bits.push('Analista financiero');
+    return bits.join(' · ').split(' · ')[0];
+  }
+  if(finanzasPermBool(row.perm_estandar)) bits.push('Asistente');
+  if(finanzasPermBool(row.perm_gestor_financiero)) bits.push('Gestor financiero');
+  if(finanzasPermBool(row.perm_analista_financiero)) bits.push('Analista financiero');
+  return bits.length?bits.join(' · ').split(' · ')[0]:'Miembro';
+}
 function finanzasApplyGerenteProfile(row,email){
   var card=document.getElementById('finanzasUserCard');
   var nameEl=document.getElementById('finanzasUserDisplayName');
-  var roleEl=document.getElementById('finanzasUserRole');
+  var roleLab=document.getElementById('finanzasUserRoleLabel');
+  var hintEl=document.getElementById('finanzasUserPhotoHint');
   var img=document.getElementById('finanzasUserAvatarImg');
   var ini=document.getElementById('finanzasUserAvatarIni');
-  if(!card||!nameEl||!roleEl||!img||!ini)return;
+  if(!card||!nameEl||!img||!ini)return;
   var fn='';
   if(row){
     fn=(row.display_name!=null&&String(row.display_name).trim())||(((row.nombre||'')+' '+(row.apellido||'')).trim());
@@ -977,16 +996,22 @@ function finanzasApplyGerenteProfile(row,email){
     fn=p.length?p.charAt(0).toUpperCase()+p.slice(1):'';
   }
   nameEl.textContent=fn||'—';
-  var pa=row&&(row.perm_admin===true||row.perm_admin==='true'||row.perm_admin==='t'||row.perm_admin===1);
-  roleEl.textContent=pa?'Gerente':'';
+  if(roleLab) roleLab.textContent=finanzasRolePillText(row);
   var urlAv=row&&row.avatar_url&&String(row.avatar_url).trim();
   if(urlAv&&!finanzasHotlinkAvatarLikelyBlocked(urlAv)){
-    img.onload=function(){img.style.display='block';ini.style.display='none';};
-    img.onerror=function(){img.style.display='none';ini.style.display='flex';};
+    img.onload=function(){
+      img.style.display='block';ini.style.display='none';
+      if(hintEl) hintEl.style.display='none';
+    };
+    img.onerror=function(){
+      img.style.display='none';ini.style.display='flex';
+      if(hintEl) hintEl.style.display='';
+    };
     img.src=urlAv+(urlAv.indexOf('?')>=0?'&':'?')+'v='+Date.now();
   }else{
     img.src='';img.style.display='none';ini.style.display='flex';
     var L=(fn||'').trim();ini.textContent=L.length?L.charAt(0).toUpperCase():'·';
+    if(hintEl) hintEl.style.display='';
   }
   card.hidden=false;
 }
@@ -998,7 +1023,7 @@ async function finanzasLoadGerenteProfile(){
     var u=ur&&ur.data&&ur.data.user;
     var em=u&&u.email?String(u.email).trim().toLowerCase():'';
     if(!em)return;
-    var gr=await sb.from('gerentes').select('nombre,apellido,display_name,avatar_url,perm_admin,email').eq('email',em).maybeSingle();
+    var gr=await sb.from('gerentes').select('nombre,apellido,display_name,avatar_url,perm_admin,perm_estandar,perm_gestor_financiero,perm_analista_financiero,email').eq('email',em).maybeSingle();
     if(gr&&gr.error)console.warn('[Finanzas] gerentes',gr.error);
     finanzasApplyGerenteProfile(gr&&gr.data?gr.data:null,em);
   }catch(e){console.warn('[Finanzas] perfil gerente',e);}
