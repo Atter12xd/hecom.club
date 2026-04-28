@@ -10,39 +10,54 @@
 <link rel="apple-touch-icon" href="/imagenes/favicon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
     --primary: #c2410c;
-    --primary-hover: #9a3412;
+    --primary-strong: #9a3412;
+    --primary-soft: #fff4ed;
+    --primary-glow: rgba(234, 88, 12, 0.18);
     --text: #0f172a;
     --text-muted: #64748b;
+    --text-subtle: #94a3b8;
     --border: #e2e8f0;
+    --border-strong: #cbd5e1;
     --card: #ffffff;
-    --bg: #fafafa;
-    --radius-sm: 6px;
-    --radius-md: 10px;
+    --bg: #fafaf7;
+    --bg-soft: #f5f3ee;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 22px;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03);
+    --shadow-md: 0 6px 22px -8px rgba(15,23,42,.16), 0 2px 6px rgba(15,23,42,.05);
+    --shadow-lg: 0 22px 50px -18px rgba(194,65,12,.28), 0 6px 18px rgba(15,23,42,.06);
     --font-display: 'Inter', system-ui, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-    color-scheme: light;
-}
+html { color-scheme: light; }
 
 html, body {
-    height: 100%;
+    min-height: 100%;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-size: 15px;
     color: var(--text);
     background: var(--bg);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
 }
 
+body {
+    background:
+        radial-gradient(1100px 520px at 90% -10%, rgba(234,88,12,.12), transparent 60%),
+        radial-gradient(900px 480px at -10% 110%, rgba(13,159,110,.08), transparent 55%),
+        linear-gradient(180deg, #faf7f2 0%, #fafaf7 60%, #f6f3ee 100%);
+}
+
 a { color: var(--primary); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a:hover { text-decoration: none; }
 
 .page {
     display: flex;
@@ -51,36 +66,43 @@ a:hover { text-decoration: underline; }
     width: 100%;
 }
 
-.panel-left {
+.shell {
     flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 40px clamp(18px, 3.5vw, 32px) 28px;
-    max-width: 920px;
-    margin: 0 auto;
     width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px clamp(18px, 3.5vw, 36px) 40px;
     position: relative;
 }
 
+/* ── Top bar ────────────────────────────────────────── */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: clamp(28px, 4.5vw, 56px);
+}
+
 .back-link {
-    position: absolute;
-    top: 24px;
-    left: 24px;
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--text-muted);
-    text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    transition: color .15s, background .15s, border-color .15s;
 }
-.back-link:hover { color: var(--primary); text-decoration: none; }
+.back-link:hover {
+    color: var(--text);
+    background: rgba(15,23,42,.04);
+    border-color: var(--border);
+}
 
 .top-actions {
-    position: absolute;
-    top: 24px;
-    right: 24px;
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
@@ -90,283 +112,381 @@ a:hover { text-decoration: underline; }
 .btn-ghost {
     font-family: inherit;
     font-size: 0.8125rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-muted);
     background: var(--card);
     border: 1px solid var(--border);
-    padding: 7px 12px;
-    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    border-radius: 999px;
     cursor: pointer;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
-    transition: border-color 0.15s, color 0.15s;
+    transition: border-color .15s, color .15s, background .15s, transform .15s;
+    box-shadow: var(--shadow-sm);
 }
-.btn-ghost:hover { border-color: #cbd5e1; color: var(--text); }
+.btn-ghost:hover {
+    border-color: var(--border-strong);
+    color: var(--text);
+    transform: translateY(-1px);
+}
 
+/* ── Hero ────────────────────────────────────────── */
+.hero {
+    text-align: center;
+    margin-bottom: clamp(28px, 4vw, 44px);
+}
 .brand-logo {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    margin: 0 auto 20px;
+    margin: 0 auto 22px;
     line-height: 0;
 }
 .brand-logo img {
     height: auto;
-    max-height: 100px;
+    max-height: 90px;
     width: auto;
-    max-width: min(92%, 320px);
+    max-width: min(86%, 300px);
     object-fit: contain;
-    object-position: center center;
+}
+
+.eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-soft);
+    border: 1px solid #fde0c8;
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+}
+.eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 0 3px rgba(234,88,12,.18);
 }
 
 .form-title {
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 3.2vw, 1.5rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
     color: var(--text);
-    margin-bottom: 6px;
-    line-height: 1.25;
-    text-align: center;
+    line-height: 1.15;
+    margin-bottom: 10px;
+}
+.form-title .accent {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 60%, #9a3412 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .form-sub {
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     color: var(--text-muted);
-    margin-bottom: 16px;
-    line-height: 1.45;
-    text-align: center;
-    max-width: 28rem;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.hint-details {
-    max-width: 32rem;
-    margin: 0 auto 20px;
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-}
-.hint-details summary {
-    cursor: pointer;
-    text-align: center;
-    list-style: none;
-    user-select: none;
-}
-.hint-details summary::-webkit-details-marker { display: none; }
-.hint-details .hint-body {
-    margin-top: 10px;
     line-height: 1.5;
-    text-align: left;
-}
-.hint-details .hint-body code {
-    font-size: 0.78em;
-    background: #f1f5f9;
-    padding: 0.1em 0.35em;
-    border-radius: 4px;
+    max-width: 36rem;
+    margin: 0 auto;
 }
 
+/* ── Last access ────────────────────────────────────────── */
 .last-wrap {
     display: none;
-    margin-bottom: 16px;
-    padding: 12px 14px;
-    border-radius: var(--radius-md);
-    background: var(--card);
-    border: 1px solid var(--border);
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
+    padding: 12px 16px 12px 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #fff 0%, #fffaf6 100%);
+    border: 1px solid #fde0c8;
+    box-shadow: var(--shadow-sm);
+    margin: 0 auto 26px;
+    max-width: 640px;
 }
 .last-wrap.visible { display: flex; }
-.last-wrap span { font-size: 0.875rem; color: var(--text); }
+.last-wrap .last-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.last-wrap .pill-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 0 4px rgba(234,88,12,.15);
+    flex-shrink: 0;
+}
+.last-wrap span.label {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .btn-last {
     font-family: var(--font-display);
     font-size: 0.8125rem;
     font-weight: 600;
     color: #fff;
-    background: var(--primary);
+    background: linear-gradient(135deg, #ea580c, #c2410c);
     border: none;
-    padding: 8px 14px;
-    border-radius: var(--radius-sm);
+    padding: 9px 16px;
+    border-radius: 10px;
     cursor: pointer;
-    touch-action: manipulation;
     white-space: nowrap;
+    box-shadow: 0 6px 14px -4px rgba(194,65,12,.45);
+    transition: transform .15s, box-shadow .15s;
 }
-.btn-last:hover { background: var(--primary-hover); }
+.btn-last:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px -6px rgba(194,65,12,.5);
+}
 
+/* ── Cards grid ────────────────────────────────────────── */
 .grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(12px, 1.8vw, 18px);
-    margin-bottom: 22px;
+    gap: clamp(14px, 2vw, 22px);
+    margin-bottom: 28px;
     width: 100%;
 }
 
 .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 16px 16px 14px;
+    border-radius: var(--radius-lg);
+    padding: 22px 22px 20px;
     position: relative;
-    transition: border-color 0.15s;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
-.card:hover { border-color: #cbd5e1; }
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--accent-bg, transparent);
+    opacity: 0;
+    transition: opacity .25s ease;
+    pointer-events: none;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-color, var(--border-strong));
+}
+.card:hover::before { opacity: .08; }
 
-.card h2 {
+.card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+}
+.card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-bg, var(--primary-soft));
+    color: var(--accent-color, var(--primary));
+    border: 1px solid var(--accent-border, transparent);
+    flex-shrink: 0;
+}
+.card-icon svg { width: 22px; height: 22px; }
+.card-title {
     font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-size: 1.05rem;
+    font-weight: 700;
     letter-spacing: -0.02em;
     color: var(--text);
+    line-height: 1.2;
+}
+.card-meta {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-color, var(--text-muted));
 }
 
 .card p.desc {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
-    line-height: 1.45;
+    line-height: 1.5;
     flex: 1;
-    margin-bottom: 12px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
 }
 
 .card .go {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 8px;
     width: 100%;
-    min-height: 40px;
-    padding: 10px 14px;
+    min-height: 44px;
+    padding: 10px 16px;
     font-family: var(--font-display);
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    color: #fff;
-    background: var(--primary);
-    border-radius: var(--radius-sm);
-    border: none;
+    color: var(--text);
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 12px;
     cursor: pointer;
     text-decoration: none;
-    touch-action: manipulation;
-    transition: background 0.15s;
+    transition: background .15s, color .15s, border-color .15s, transform .15s;
+    position: relative;
+    z-index: 1;
 }
-.card .go:hover { background: var(--primary-hover); text-decoration: none; }
+.card .go .arrow {
+    width: 16px; height: 16px;
+    transition: transform .2s ease;
+}
+.card:hover .go {
+    background: var(--accent-color, var(--primary));
+    border-color: var(--accent-color, var(--primary));
+    color: #fff;
+}
+.card:hover .go .arrow { transform: translateX(3px); }
 
+/* ── Foot ────────────────────────────────────────── */
 .foot-note {
     text-align: center;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    line-height: 1.45;
-    max-width: 34rem;
+    font-size: 0.78rem;
+    color: var(--text-subtle);
+    line-height: 1.5;
+    max-width: 38rem;
     margin: 0 auto;
+}
+
+.hint-details {
+    max-width: 32rem;
+    margin: 18px auto 0;
+    font-size: 0.78rem;
+    color: var(--text-subtle);
+}
+.hint-details summary {
+    cursor: pointer;
+    text-align: center;
+    list-style: none;
+    user-select: none;
+    color: var(--text-muted);
+}
+.hint-details summary::-webkit-details-marker { display: none; }
+.hint-details .hint-body {
+    margin-top: 10px;
+    line-height: 1.55;
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+.hint-details .hint-body code {
+    font-size: 0.85em;
+    background: #fff;
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+    border: 1px solid var(--border);
 }
 
 .panel-right {
     flex: 0 0 auto;
     width: 100%;
     border-top: 1px solid var(--border);
-    background: var(--bg);
+    background: rgba(255,255,255,.6);
+    backdrop-filter: blur(6px);
     color: var(--text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px clamp(18px, 3vw, 32px) max(20px, env(safe-area-inset-bottom, 0px));
+    padding: 14px clamp(18px, 3vw, 32px) max(18px, env(safe-area-inset-bottom, 0px));
 }
-
 .panel-right-copy {
-    font-size: 0.8125rem;
-    line-height: 1.45;
+    font-size: 0.78rem;
+    line-height: 1.5;
     text-align: center;
-    max-width: 26rem;
+    max-width: 28rem;
     margin: 0;
 }
 
-@media (max-width: 960px) {
-    html, body { font-size: 16px; }
-
-    .panel-left {
-        justify-content: flex-start;
-        min-height: 0;
-        padding-top: max(5.5rem, calc(env(safe-area-inset-top, 0px) + 3.25rem));
-        padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
-    }
-
-    .back-link {
-        top: max(0.75rem, env(safe-area-inset-top, 0px));
-        left: max(0.75rem, env(safe-area-inset-left, 0px));
-        padding: 0.5rem 0.65rem;
-        min-height: 44px;
-        min-width: 44px;
-    }
-
-    .top-actions {
-        top: max(0.75rem, env(safe-area-inset-top, 0px));
-        right: max(0.75rem, env(safe-area-inset-right, 0px));
-    }
-
-    .brand-logo { margin-top: 0.25rem; margin-bottom: 1rem; }
-    .brand-logo img {
-        max-height: min(22vw, 88px);
-        max-width: min(88vw, 260px);
-    }
-
-    .panel-right {
-        padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
-        padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
-    }
-}
-
-@media (max-width: 700px) {
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 760px) {
     .grid { grid-template-columns: 1fr; }
+    .topbar { margin-bottom: 22px; }
+    .brand-logo img { max-height: 70px; }
+    .form-title { font-size: 1.6rem; }
 }
 
-@media (max-width: 640px) {
-    .brand-logo img {
-        max-height: min(20vw, 80px);
-        max-width: min(86vw, 240px);
-    }
-    .card .go { min-height: 44px; font-size: 0.875rem; }
+@media (max-width: 480px) {
+    .shell { padding: 22px 16px 28px; }
+    .card { padding: 18px 18px 16px; border-radius: 18px; }
+    .card-icon { width: 40px; height: 40px; border-radius: 11px; }
+    .card-icon svg { width: 20px; height: 20px; }
 }
 </style>
 </head>
 <body>
 <div class="page">
-    <section class="panel-left" aria-labelledby="hub-heading">
-        <a class="back-link" href="/">← Volver al inicio</a>
-        <div class="top-actions">
-            <a class="btn-ghost" href="/login" style="text-decoration:none;color:inherit">Cambiar correo</a>
-            <button type="button" class="btn-ghost" id="btnLogout">Cerrar sesión</button>
-        </div>
+    <main class="shell" aria-labelledby="hub-heading">
+        <header class="topbar">
+            <a class="back-link" href="/">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+                Volver al inicio
+            </a>
+            <div class="top-actions">
+                <a class="btn-ghost" href="/login">Cambiar correo</a>
+                <button type="button" class="btn-ghost" id="btnLogout">Cerrar sesión</button>
+            </div>
+        </header>
 
-        <div>
+        <section class="hero">
             <div class="brand-logo" aria-label="Holistic Marketing">
                 <img src="/imagenes/logo-holistic-marketing.png?v=1" alt="holistic marketing" width="640" height="186">
             </div>
+            <span class="eyebrow">Hub interno</span>
+            <h1 class="form-title" id="hub-heading">Tus <span class="accent">paneles</span> de trabajo</h1>
+            <p class="form-sub">Elegí un espacio interno: crédito, operación, creativos o finanzas. Tu sesión se mantiene entre paneles.</p>
+        </section>
 
-            <h1 class="form-title" id="hub-heading">Tus paneles</h1>
-            <p class="form-sub">Elegí un espacio interno: crédito, operación, creativos o finanzas.</p>
-            <details class="hint-details">
-                <summary>Sesión entre sitios (mismo navegador)</summary>
-                <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los paneles se abren en el mismo sitio (p. ej. <code>/credito</code>, <code>/pendientes</code>) y el fragmento puede llevar tokens hacia el cliente de cada herramienta. Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar. Ningún redirect ni meta refresh del servidor debe consumir el <code>#</code> antes de que el cliente lea el hash. <strong>Importante:</strong> el handoff usa flujo implícito en el hash; el Supabase de la app del panel debe usar <code>auth.flowType: 'implicit'</code> (o detectar el hash y llamar <code>setSession</code>). Con <code>pkce</code> por defecto, Auth a veces borra la sesión al cargar.</p>
-            </details>
-
-            <div class="last-wrap" id="lastWrap" aria-live="polite">
-                <span id="lastLabel"></span>
-                <button type="button" class="btn-last" id="btnLast">Ir al último panel</button>
+        <div class="last-wrap" id="lastWrap" aria-live="polite">
+            <div class="last-info">
+                <span class="pill-dot" aria-hidden="true"></span>
+                <span class="label" id="lastLabel"></span>
             </div>
-
-            <div class="grid" id="destinosGrid" role="list"></div>
-
-            <p class="foot-note"><strong>Abrir panel</strong> usa una pestaña nueva y deja /destinos acá. Si bloquea popups, permití ventanas para hecom.club. La última elección se guarda solo en este navegador.</p>
+            <button type="button" class="btn-last" id="btnLast">Ir al último panel</button>
         </div>
-    </section>
+
+        <div class="grid" id="destinosGrid" role="list"></div>
+
+        <p class="foot-note"><strong>Abrir panel</strong> usa una pestaña nueva y deja /destinos acá. Si bloquea popups, permití ventanas para hecom.club. La última elección se guarda solo en este navegador.</p>
+
+        <details class="hint-details">
+            <summary>Sesión entre sitios (mismo navegador)</summary>
+            <p class="hint-body">Con la sesión de Hecom ya activa en <strong>este</strong> navegador, los paneles se abren en el mismo sitio (p. ej. <code>/credito</code>, <code>/pendientes</code>) y el fragmento puede llevar tokens hacia el cliente de cada herramienta. Otro navegador, incógnito o perfil no comparte <code>localStorage</code>: ahí hace falta volver a entrar. Ningún redirect ni meta refresh del servidor debe consumir el <code>#</code> antes de que el cliente lea el hash. <strong>Importante:</strong> el handoff usa flujo implícito en el hash; el Supabase de la app del panel debe usar <code>auth.flowType: 'implicit'</code> (o detectar el hash y llamar <code>setSession</code>). Con <code>pkce</code> por defecto, Auth a veces borra la sesión al cargar.</p>
+        </details>
+    </main>
 
     <aside class="panel-right" aria-label="Contexto">
         <p class="panel-right-copy">Mismo acceso con tu correo y magic link en Hecom.</p>
@@ -395,27 +515,55 @@ var PANEL_URL_VERSION = 'v=20260430sb';
 /* Rutas de panel (setSession desde hash en cliente). Añadir aquí paths que NUNCA deban llevar tokens. */
 var MARKETING_HANDOFF_DENYLIST = [];
 
+/* SVG icons inline (sin libs externas) */
+var ICONS = {
+    credito: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>',
+    pendientes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>',
+    creativos: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>',
+    finanzas: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+};
+
 /* Rutas en este sitio (vercel rewrites al proyecto de herramientas). */
 var DESTINOS = [
     {
         name: 'Crédito',
+        meta: 'Cuentas y cobros',
         desc: 'Línea de crédito, cuentas TikTok y seguimiento con clientes.',
         url: CANONICAL_HECOM_ORIGIN + '/credito?' + PANEL_URL_VERSION,
+        icon: ICONS.credito,
+        accentColor: '#0d9f6e',
+        accentBg: 'linear-gradient(135deg, #ecfdf5, #d1fae5)',
+        accentBorder: '#a7f3d0',
     },
     {
         name: 'Pendientes Holistic',
+        meta: 'Operación',
         desc: 'Operación: clientes, entregables, tickets y calendario.',
         url: CANONICAL_HECOM_ORIGIN + '/pendientes?' + PANEL_URL_VERSION,
+        icon: ICONS.pendientes,
+        accentColor: '#2563eb',
+        accentBg: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+        accentBorder: '#bfdbfe',
     },
     {
         name: 'Creativos Holistic',
+        meta: 'Pipeline',
         desc: 'Pipeline creativo, proyectos y entregables de diseño.',
         url: CANONICAL_HECOM_ORIGIN + '/creativos?' + PANEL_URL_VERSION,
+        icon: ICONS.creativos,
+        accentColor: '#7c3aed',
+        accentBg: 'linear-gradient(135deg, #f5f3ff, #ede9fe)',
+        accentBorder: '#ddd6fe',
     },
     {
         name: 'Finanzas Holistic',
+        meta: 'Económico',
         desc: 'Panel financiero y vista económica de la agencia.',
         url: CANONICAL_HECOM_ORIGIN + '/finanzas?' + PANEL_URL_VERSION,
+        icon: ICONS.finanzas,
+        accentColor: '#d97706',
+        accentBg: 'linear-gradient(135deg, #fffbeb, #fef3c7)',
+        accentBorder: '#fde68a',
     },
 ];
 
@@ -533,9 +681,7 @@ async function resolveHandoffUrl(targetUrl) {
 function openUrlInNewTabPreservingThisPage(urlToOpen) {
     var w = window.open(urlToOpen, '_blank');
     if (w) {
-        try {
-            w.opener = null;
-        } catch (_) {}
+        try { w.opener = null; } catch (_) {}
         return true;
     }
     try {
@@ -592,16 +738,12 @@ async function openHolisticPanel(targetUrl, panelName) {
     if (handoffWithTokens) {
         var ph = window.open('about:blank', '_blank');
         if (ph) {
-            try {
-                ph.opener = null;
-            } catch (_) {}
+            try { ph.opener = null; } catch (_) {}
             try {
                 ph.location.replace(urlToOpen);
                 return;
             } catch (_) {
-                try {
-                    ph.close();
-                } catch (_) {}
+                try { ph.close(); } catch (_) {}
             }
         }
     }
@@ -610,9 +752,7 @@ async function openHolisticPanel(targetUrl, panelName) {
     }
     var pending = window.open('about:blank', '_blank');
     if (pending) {
-        try {
-            pending.opener = null;
-        } catch (_) {}
+        try { pending.opener = null; } catch (_) {}
     }
     var u = targetUrl;
     try {
@@ -626,9 +766,7 @@ async function openHolisticPanel(targetUrl, panelName) {
             pending.location.replace(u);
             ok = true;
         } catch (_) {
-            try {
-                pending.close();
-            } catch (_) {}
+            try { pending.close(); } catch (_) {}
         }
     }
     if (!ok) {
@@ -648,16 +786,22 @@ function renderCards() {
         var article = document.createElement('article');
         article.className = 'card';
         article.setAttribute('role', 'listitem');
+        article.style.setProperty('--accent-color', d.accentColor || '#c2410c');
+        article.style.setProperty('--accent-bg', d.accentBg || 'transparent');
+        article.style.setProperty('--accent-border', d.accentBorder || 'transparent');
         article.innerHTML =
-            '<h2>' + escapeHtml(d.name) + '</h2>' +
+            '<div class="card-head">' +
+                '<div class="card-icon" aria-hidden="true">' + (d.icon || '') + '</div>' +
+                '<div style="min-width:0">' +
+                    '<div class="card-title">' + escapeHtml(d.name) + '</div>' +
+                    (d.meta ? '<div class="card-meta">' + escapeHtml(d.meta) + '</div>' : '') +
+                '</div>' +
+            '</div>' +
             '<p class="desc">' + escapeHtml(d.desc) + '</p>' +
-            '<a class="go" href="' +
-            escapeAttr(d.url) +
-            '" data-url="' +
-            escapeAttr(d.url) +
-            '" data-name="' +
-            escapeAttr(d.name) +
-            '" rel="noopener noreferrer" title="Se abre en una pestaña nueva con tu sesión">Abrir panel</a>';
+            '<a class="go" href="' + escapeAttr(d.url) + '" data-url="' + escapeAttr(d.url) + '" data-name="' + escapeAttr(d.name) + '" rel="noopener noreferrer" title="Se abre en una pestaña nueva con tu sesión">' +
+                '<span>Abrir panel</span>' +
+                '<svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' +
+            '</a>';
         grid.appendChild(article);
     });
 
@@ -687,7 +831,7 @@ function showLastAccess() {
         wrap.classList.remove('visible');
         return;
     }
-    label.textContent = 'Último panel de trabajo: ' + (name || d.name || 'tu elección');
+    label.textContent = 'Último panel: ' + (name || d.name || 'tu elección');
     wrap.classList.add('visible');
     btn.onclick = async function () {
         await openHolisticPanel(d.url, d.name);
