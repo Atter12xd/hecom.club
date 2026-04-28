@@ -468,12 +468,13 @@
                 return;
               }
               supabase.auth.getUser().then(function (ur) {
-                var em =
+                var emRaw =
                   ur &&
                   ur.data &&
                   ur.data.user &&
                   ur.data.user.email &&
                   String(ur.data.user.email).trim();
+                var em = emRaw ? String(emRaw).trim().toLowerCase() : '';
                 if (!em) {
                   if (typeof done === 'function') done(null);
                   return;
@@ -486,6 +487,17 @@
                     if (typeof done === 'function') done(null);
                     return;
                   }
+                  /* Igual que Pendientes/Creativos: la URL ya está en Storage; sincronizar local primero para que todas las apps la vean aunque falle el PATCH a gerentes. */
+                  holisticPersistGerenteAvatarLocal(url);
+                  try {
+                    window.__hmLastAvatarCommit = {
+                      at: Date.now(),
+                      url: url,
+                      email: em,
+                      persistedLocal: true,
+                    };
+                  } catch (_) {}
+                  if (typeof done === 'function') done(url);
                   supabase
                     .from('gerentes')
                     .update({ avatar_url: url })
@@ -493,19 +505,32 @@
                     .then(function (up) {
                       if (up && up.error) {
                         try {
-                          console.warn('[Credito] gerentes.avatar_url', up.error);
+                          console.error('[Credito] gerentes.avatar_url (la foto igual quedó en Storage/local):', up.error.message || up.error);
                         } catch (_) {}
-                        if (typeof done === 'function') done(null);
+                        sendClientLog('error', 'avatar-db-update', {
+                          email: em,
+                          message: up.error.message || String(up.error),
+                          code: up.error.code || null,
+                        });
+                        try {
+                          window.__hmLastAvatarCommit.dbError =
+                            up.error.message || String(up.error);
+                        } catch (_) {}
                         return;
                       }
-                      holisticPersistGerenteAvatarLocal(url);
-                      if (typeof done === 'function') done(url);
+                      sendClientLog('info', 'avatar-db-update-ok', { email: em });
+                      try {
+                        window.__hmLastAvatarCommit.dbSaved = true;
+                      } catch (_) {}
                     })
                     .catch(function (e) {
                       try {
-                        console.warn('[Credito] gerentes.avatar_url', e);
+                        console.error('[Credito] gerentes.avatar_url excepción:', e && e.message ? e.message : e);
                       } catch (_) {}
-                      if (typeof done === 'function') done(null);
+                      sendClientLog('error', 'avatar-db-exception', {
+                        email: em,
+                        message: e && e.message ? e.message : String(e),
+                      });
                     });
                 }
                 var msb = marketingStorageBase();
@@ -591,7 +616,7 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260427avatar";
+          var appSrc = "/credito-app/credito-app.js?v=20260427avatar3";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -618,7 +643,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427avatar" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427avatar3" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>

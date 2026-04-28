@@ -8839,21 +8839,21 @@ function initTareasAvatar() {
         alert('No se pudo subir la foto. Revisá permisos del bucket avatars en Supabase.');
         return;
       }
+      try {
+        localStorage.setItem(key, url);
+        localStorage.setItem('holistic_gerente_avatar_url', url);
+        localStorage.setItem('hm_gerente_avatar_url', url);
+        localStorage.setItem('creativos_avatar_url', url);
+      } catch (e0) {}
+      if (window.__tareasGerentePerms && String(window.__tareasGerentePerms.email || '').toLowerCase().trim() === em) {
+        window.__tareasGerentePerms.avatar_url = url;
+      }
+      imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { tareasRefreshPhotoHint(); } catch (e) {} };
+      imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { tareasRefreshPhotoHint(); } catch (e) {} };
+      hmPrepareSidebarAvatarImg(imgEl, url);
+      imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
       supabase.from('gerentes').update({ avatar_url: url }).eq('email', em).then(function(up) {
         if (up.error) console.warn('[Pendientes] gerentes avatar_url:', up.error);
-        if (window.__tareasGerentePerms && String(window.__tareasGerentePerms.email || '').toLowerCase().trim() === em) {
-          window.__tareasGerentePerms.avatar_url = url;
-        }
-        try { localStorage.setItem(key, url); } catch (e) {}
-        try {
-          localStorage.setItem('holistic_gerente_avatar_url', url);
-          localStorage.setItem('hm_gerente_avatar_url', url);
-          localStorage.setItem('creativos_avatar_url', url);
-        } catch (e2) {}
-        imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { tareasRefreshPhotoHint(); } catch (e) {} };
-        imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { tareasRefreshPhotoHint(); } catch (e) {} };
-        hmPrepareSidebarAvatarImg(imgEl, url);
-        imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
       });
     });
     inp.value = '';
