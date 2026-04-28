@@ -422,6 +422,33 @@
           if (!ok) {
             sendClientLog("error", "preflight-invalid-user", { version: VERSION, error: userRes && userRes.error ? userRes.error.message : null });
           }
+          try {
+            var u0 = userRes && userRes.data && userRes.data.user ? userRes.data.user : null;
+            var em0 = u0 && u0.email ? String(u0.email).trim().toLowerCase() : "";
+            if (em0) {
+              var gr0 = await sb.from("gerentes").select("display_name,nombre,apellido,avatar_url").eq("email", em0).maybeSingle();
+              if (!gr0 || !gr0.error) {
+                var gd0 = gr0 && gr0.data ? gr0.data : null;
+                if (gd0) {
+                  var dn0 = (gd0.display_name && String(gd0.display_name).trim()) || [gd0.nombre, gd0.apellido].filter(Boolean).join(" ").trim();
+                  if (dn0) {
+                    try { localStorage.setItem("holistic_gerente_nombre", dn0); } catch (_) {}
+                    try { localStorage.setItem("creativos_user_name", dn0); } catch (_) {}
+                  }
+                  var av0 = gd0.avatar_url && String(gd0.avatar_url).trim();
+                  if (av0 && (av0.indexOf("http://") === 0 || av0.indexOf("https://") === 0)) {
+                    try { localStorage.setItem("holistic_gerente_avatar_url", av0); } catch (_) {}
+                    try { localStorage.setItem("hm_gerente_avatar_url", av0); } catch (_) {}
+                    try { localStorage.setItem("tareas_avatar_url", av0); } catch (_) {}
+                    try { localStorage.setItem("creativos_avatar_url", av0); } catch (_) {}
+                  }
+                  console.info("[Holistic Sync][Credito] gerente synced", { email: em0, hasName: !!dn0, hasAvatar: !!av0 });
+                }
+              }
+            }
+          } catch (syncErr) {
+            console.warn("[Holistic Sync][Credito] preflight sync failed", syncErr);
+          }
           window.__CREDITO_SHARED_SUPABASE__ = sb;
           window.__CREDITO_PREFLIGHT_SESSION__ = session;
           (function installHolisticGerenteAvatarBridge() {

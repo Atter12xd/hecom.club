@@ -3686,8 +3686,19 @@ function refreshTareasSessionPerms(callback) {
         var au0 = gr.data && gr.data.avatar_url && String(gr.data.avatar_url).trim();
         if (au0 && (au0.indexOf('http://') === 0 || au0.indexOf('https://') === 0)) {
           localStorage.setItem('holistic_gerente_avatar_url', au0);
+          localStorage.setItem('hm_gerente_avatar_url', au0);
+          localStorage.setItem('tareas_avatar_url', au0);
+          localStorage.setItem('creativos_avatar_url', au0);
         }
       } catch (syncAv) {}
+      try {
+        var dn0 = (gr.data && gr.data.display_name && String(gr.data.display_name).trim()) || [gr.data && gr.data.nombre, gr.data && gr.data.apellido].filter(Boolean).join(' ').trim();
+        if (dn0) {
+          localStorage.setItem('holistic_gerente_nombre', dn0);
+          localStorage.setItem('creativos_user_name', dn0);
+        }
+        console.info('[Holistic Sync][Pendientes] gerente refresh', { email: em, hasName: !!dn0, hasAvatar: !!(gr.data && gr.data.avatar_url) });
+      } catch (syncName0) {}
       var uref = u;
       var gdata = gr.data;
       tareasEnsureOwnGerenteDisplayNamePersisted(uref, gdata).then(function(did) {
@@ -3705,8 +3716,19 @@ function refreshTareasSessionPerms(callback) {
                   var au2 = gr2.data.avatar_url && String(gr2.data.avatar_url).trim();
                   if (au2 && (au2.indexOf('http://') === 0 || au2.indexOf('https://') === 0)) {
                     localStorage.setItem('holistic_gerente_avatar_url', au2);
+                    localStorage.setItem('hm_gerente_avatar_url', au2);
+                    localStorage.setItem('tareas_avatar_url', au2);
+                    localStorage.setItem('creativos_avatar_url', au2);
                   }
                 } catch (syncAv2) {}
+                try {
+                  var dn2 = (gr2.data.display_name && String(gr2.data.display_name).trim()) || [gr2.data.nombre, gr2.data.apellido].filter(Boolean).join(' ').trim();
+                  if (dn2) {
+                    localStorage.setItem('holistic_gerente_nombre', dn2);
+                    localStorage.setItem('creativos_user_name', dn2);
+                  }
+                  console.info('[Holistic Sync][Pendientes] gerente post-reload', { email: em, hasName: !!dn2, hasAvatar: !!(gr2.data && gr2.data.avatar_url) });
+                } catch (syncName2) {}
               }
               finishRefresh();
             }).catch(function() { finishRefresh(); });
@@ -8892,6 +8914,16 @@ if (!window.__hmHolisticAvatarStorageListener) {
     if (ev.key === 'holistic_gerente_nombre' || ev.key === 'creativos_user_name') {
       try { updateTareasUserNameDisplay(); } catch (eNm) {}
     }
+  });
+}
+if (!window.__hmHolisticAvatarFocusRefreshPendientes) {
+  window.__hmHolisticAvatarFocusRefreshPendientes = true;
+  window.addEventListener('focus', function() {
+    try { if (typeof refreshTareasSessionPerms === 'function') refreshTareasSessionPerms(); } catch (eRf) {}
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState !== 'visible') return;
+    try { if (typeof refreshTareasSessionPerms === 'function') refreshTareasSessionPerms(); } catch (eRv) {}
   });
 }
 document.addEventListener('DOMContentLoaded', function() {
