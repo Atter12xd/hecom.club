@@ -627,6 +627,25 @@ a:hover { text-decoration: underline; }
 <script type="module">
 import { getSupabaseClient, invokeMagicLinkLogin } from '/js/supabase-auth.js';
 
+/**
+ * Después de login o si ya hay sesión: honor ?redirect= (p. ej. /credito desde preflight).
+ * Sin esto, /login?redirect=/credito manda siempre a /destinos y parece que «Crédito volvió» al hub.
+ * Solo mismo origen; no /login ni /forgot-password.
+ */
+function getSafePostLoginRedirect() {
+    try {
+        var raw = new URLSearchParams(window.location.search || '').get('redirect');
+        if (!raw) return '/destinos';
+        var u = new URL(decodeURIComponent(raw), window.location.origin);
+        if (u.origin !== window.location.origin) return '/destinos';
+        var p = u.pathname || '';
+        if (p.indexOf('/login') === 0 || p.indexOf('/forgot-password') === 0) return '/destinos';
+        return u.pathname + u.search + u.hash;
+    } catch (_) {
+        return '/destinos';
+    }
+}
+
 var form = document.getElementById('loginForm');
 var btn = document.getElementById('submitBtn');
 var info = document.getElementById('statusInfo');
@@ -717,7 +736,7 @@ async function tryConsumeMagicLinkHash() {
         var session = (await supabase.auth.getSession()).data.session;
         if (session) {
             history.replaceState(null, '', window.location.pathname + window.location.search);
-            window.location.replace('/destinos');
+            window.location.replace(getSafePostLoginRedirect());
             return true;
         }
     } catch (_) {
@@ -734,7 +753,7 @@ async function init() {
         var supabase = await getSupabaseClient();
         var session = (await supabase.auth.getSession()).data.session;
         if (session) {
-            window.location.replace('/destinos');
+            window.location.replace(getSafePostLoginRedirect());
             return;
         }
     } catch (_) {
@@ -832,7 +851,7 @@ async function init() {
                 return;
             }
             if (res.data && res.data.session) {
-                window.location.replace('/destinos');
+                window.location.replace(getSafePostLoginRedirect());
                 return;
             }
             err.textContent = 'No se pudo iniciar sesión. Probá de nuevo o pedí un código nuevo.';

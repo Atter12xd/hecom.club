@@ -386,9 +386,9 @@ var STORAGE_NAME = 'holistic_hub_destino_nombre';
 
 /**
  * Pegar sesión en el hash (implicit). Mismo navegador + app del panel con bootstrap/AuthGate OK.
- * false = URLs limpias (más login en el panel).
+ * true = nueva pestaña /credito recibe sesión por hash (menos dependencia de timing/localStorage).
  */
-var USE_URL_SESSION_HANDOFF = false;
+var USE_URL_SESSION_HANDOFF = true;
 var CANONICAL_HECOM_ORIGIN = 'https://www.hecom.club';
 var PANEL_URL_VERSION = 'v=20260427s';
 
@@ -400,7 +400,7 @@ var DESTINOS = [
     {
         name: 'Crédito',
         desc: 'Línea de crédito, cuentas TikTok y seguimiento con clientes.',
-        url: '/credito?' + PANEL_URL_VERSION + '&debug=1',
+        url: CANONICAL_HECOM_ORIGIN + '/credito?' + PANEL_URL_VERSION,
     },
     {
         name: 'Pendientes Holistic',
