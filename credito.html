@@ -424,13 +424,174 @@
           }
           window.__CREDITO_SHARED_SUPABASE__ = sb;
           window.__CREDITO_PREFLIGHT_SESSION__ = session;
+          (function installHolisticGerenteAvatarBridge() {
+            function gerenteEmailSlug(email) {
+              return String(email || '')
+                .trim()
+                .toLowerCase()
+                .replace(/@/g, '_at_')
+                .replace(/\./g, '_')
+                .replace(/[^a-z0-9_]/g, '_');
+            }
+            function marketingStorageBase() {
+              var b = typeof window !== 'undefined' ? window.__MARKETING_STORAGE_API__ : '';
+              if (!b || !String(b).trim()) return '';
+              return String(b).replace(/\/$/, '');
+            }
+            function holisticPersistGerenteAvatarLocal(httpsUrl) {
+              if (!httpsUrl || typeof httpsUrl !== 'string' || (httpsUrl.indexOf('http://') !== 0 && httpsUrl.indexOf('https://') !== 0)) return;
+              try {
+                localStorage.setItem('holistic_gerente_avatar_url', httpsUrl);
+              } catch (_) {}
+              try {
+                localStorage.setItem('hm_gerente_avatar_url', httpsUrl);
+              } catch (_) {}
+              try {
+                localStorage.setItem('tareas_avatar_url', httpsUrl);
+              } catch (_) {}
+              try {
+                localStorage.setItem('creativos_avatar_url', httpsUrl);
+              } catch (_) {}
+            }
+            window.__holisticPersistGerenteAvatarLocal = holisticPersistGerenteAvatarLocal;
+            window.__holisticCommitGerenteAvatarFile = function (file, done) {
+              var supabase = window.__CREDITO_SHARED_SUPABASE__;
+              if (!supabase || !file) {
+                if (typeof done === 'function') done(null);
+                return;
+              }
+              if (file.size && file.size > 5 * 1024 * 1024) {
+                try {
+                  alert('La imagen no puede superar 5 MB.');
+                } catch (_) {}
+                if (typeof done === 'function') done(null);
+                return;
+              }
+              supabase.auth.getUser().then(function (ur) {
+                var em =
+                  ur &&
+                  ur.data &&
+                  ur.data.user &&
+                  ur.data.user.email &&
+                  String(ur.data.user.email).trim();
+                if (!em) {
+                  if (typeof done === 'function') done(null);
+                  return;
+                }
+                var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'webp', 'gif'].indexOf(ext) < 0) ext = 'jpg';
+                var path = gerenteEmailSlug(em) + '/avatar.' + ext;
+                function afterUploadHttps(url) {
+                  if (!url) {
+                    if (typeof done === 'function') done(null);
+                    return;
+                  }
+                  supabase
+                    .from('gerentes')
+                    .update({ avatar_url: url })
+                    .eq('email', em)
+                    .then(function (up) {
+                      if (up && up.error) {
+                        try {
+                          console.warn('[Credito] gerentes.avatar_url', up.error);
+                        } catch (_) {}
+                        if (typeof done === 'function') done(null);
+                        return;
+                      }
+                      holisticPersistGerenteAvatarLocal(url);
+                      if (typeof done === 'function') done(url);
+                    })
+                    .catch(function (e) {
+                      try {
+                        console.warn('[Credito] gerentes.avatar_url', e);
+                      } catch (_) {}
+                      if (typeof done === 'function') done(null);
+                    });
+                }
+                var msb = marketingStorageBase();
+                if (msb) {
+                  supabase.auth.getSession().then(function (s) {
+                    var tok = s.data && s.data.session && s.data.session.access_token;
+                    if (!tok) {
+                      if (typeof done === 'function') done(null);
+                      return;
+                    }
+                    var fd = new FormData();
+                    fd.append('bucket', 'avatars');
+                    fd.append('path', path);
+                    fd.append('file', file, file.name || 'file');
+                    fetch(msb + '/v1/upload', {
+                      method: 'POST',
+                      headers: { Authorization: 'Bearer ' + tok },
+                      body: fd,
+                    })
+                      .then(function (r) {
+                        if (!r.ok) return r.text().then(function () {}).then(function () { throw new Error('upload'); });
+                        var pub =
+                          msb +
+                          '/v1/public/avatars/' +
+                          path
+                            .split('/')
+                            .map(function (p) {
+                              return encodeURIComponent(p);
+                            })
+                            .join('/');
+                        afterUploadHttps(
+                          pub +
+                            (pub.indexOf('?') >= 0 ? '&' : '?') +
+                            't=' +
+                            Date.now()
+                        );
+                      })
+                      .catch(function () {
+                        if (typeof done === 'function') done(null);
+                      });
+                  }).catch(function () {
+                    if (typeof done === 'function') done(null);
+                  });
+                  return;
+                }
+                supabase.storage
+                  .from('avatars')
+                  .upload(path, file, { upsert: true })
+                  .then(function (up) {
+                    if (up.error) {
+                      try {
+                        console.warn('[Credito] avatar storage', path, up.error);
+                      } catch (_) {}
+                      if (typeof done === 'function') done(null);
+                      return;
+                    }
+                    var pub = supabase.storage.from('avatars').getPublicUrl(path);
+                    if (!pub || !pub.data || !pub.data.publicUrl) {
+                      if (typeof done === 'function') done(null);
+                      return;
+                    }
+                    var fu =
+                      pub.data.publicUrl +
+                      (pub.data.publicUrl.indexOf('?') >= 0 ? '&' : '?') +
+                      't=' +
+                      Date.now();
+                    afterUploadHttps(fu);
+                  })
+                  .catch(function (e) {
+                    try {
+                      console.warn(e);
+                    } catch (_) {}
+                    if (typeof done === 'function') done(null);
+                  });
+              }).catch(function () {
+                if (typeof done === 'function') done(null);
+              });
+            };
+          })();
         } catch (e) {
           logError("preflight-error", { message: e && e.message ? e.message : String(e) });
           return redirectLogin("preflight-error");
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260429silence";
+          var appSrc = "/credito-app/credito-app.js?v=20260427avatar";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -457,7 +618,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260429silence" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260427avatar" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>

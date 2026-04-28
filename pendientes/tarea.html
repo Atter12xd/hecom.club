@@ -3772,6 +3772,39 @@ function applyTareasSidebarAvatarFromGerente() {
     return;
   }
   try {
+    var hz = '';
+    try {
+      hz = localStorage.getItem('holistic_gerente_avatar_url') || '';
+    } catch (ehz) {}
+    if (
+      hz &&
+      (hz.indexOf('http://') === 0 || hz.indexOf('https://') === 0) &&
+      typeof tareasHotlinkAvatarLikelyBlocked === 'function' &&
+      !tareasHotlinkAvatarLikelyBlocked(hz)
+    ) {
+      var bustHz = (hz.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+      imgEl.onerror = function() {
+        imgEl.onerror = null;
+        imgEl.style.display = 'none';
+        iniEl.style.display = '';
+        if (!imgEl.dataset._hmAvatarFallbackHolistic) {
+          imgEl.dataset._hmAvatarFallbackHolistic = '1';
+          tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
+          return;
+        }
+        tareasRefreshPhotoHint();
+      };
+      imgEl.onload = function() {
+        imgEl.style.display = 'block';
+        iniEl.style.display = 'none';
+        tareasRefreshPhotoHint();
+      };
+      hmPrepareSidebarAvatarImg(imgEl, hz);
+      imgEl.src = hz + bustHz;
+      return;
+    }
+  } catch (eHol) {}
+  try {
     var ls = localStorage.getItem('tareas_avatar_url');
     if (!ls) {
       tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
@@ -8798,6 +8831,11 @@ function initTareasAvatar() {
           window.__tareasGerentePerms.avatar_url = url;
         }
         try { localStorage.setItem(key, url); } catch (e) {}
+        try {
+          localStorage.setItem('holistic_gerente_avatar_url', url);
+          localStorage.setItem('hm_gerente_avatar_url', url);
+          localStorage.setItem('creativos_avatar_url', url);
+        } catch (e2) {}
         imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { tareasRefreshPhotoHint(); } catch (e) {} };
         imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { tareasRefreshPhotoHint(); } catch (e) {} };
         hmPrepareSidebarAvatarImg(imgEl, url);
