@@ -2504,12 +2504,32 @@ button.att-action-btn:disabled {
 <script>
 (function(){
   try {
-    window.__HM_APP_DEBUG__ = (typeof location !== 'undefined' && (location.search || '').indexOf('debug=1') >= 0) ||
-      (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('hm_app_debug') === '1');
+    var q = typeof location !== 'undefined' && location.search ? new URLSearchParams(location.search) : null;
+    /* Solo ?debug=1 en la URL (sin sessionStorage: evita depuración “pegada” en prod). */
+    window.__HM_APP_DEBUG__ = !!(q && q.get('debug') === '1');
   } catch (e) { window.__HM_APP_DEBUG__ = false; }
 })();
-window._hmDebugLog = function () { if (window.__HM_APP_DEBUG__ && typeof console !== 'undefined' && console.log) console.log.apply(console, arguments); };
-window._hmDebugWarn = function () { if (window.__HM_APP_DEBUG__ && typeof console !== 'undefined' && console.warn) console.warn.apply(console, arguments); };
+(function(){
+  var dbg = !!window.__HM_APP_DEBUG__;
+  var orig = {};
+  ['log','info','debug','warn'].forEach(function(name){
+    orig[name] = typeof console[name] === 'function' ? console[name].bind(console) : function(){};
+  });
+  window._hmDebugLog = function () { if (dbg) orig.log.apply(console, arguments); };
+  window._hmDebugWarn = function () { if (dbg) orig.warn.apply(console, arguments); };
+  if (dbg) return;
+  var PREFIX = '[Pendientes]';
+  function isPendientesNoise(args) {
+    var a = args && args[0];
+    return typeof a === 'string' && a.indexOf(PREFIX) === 0;
+  }
+  ['log','info','debug','warn'].forEach(function(name){
+    console[name] = function(){
+      if (isPendientesNoise(arguments)) return;
+      return orig[name].apply(console, arguments);
+    };
+  });
+})();
 </script>
 <script>
 (function(){

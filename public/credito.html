@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <script>
+    /* Crédito: el bundle usa console.info para ya() — silenciar en prod (?debug=1 lo desactiva). */
     (function () {
       try {
         var debug =
@@ -13,6 +14,7 @@
         console.log = noop;
         console.info = noop;
         console.debug = noop;
+        console.warn = noop;
       } catch (_) {}
     })();
   </script>
