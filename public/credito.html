@@ -2,6 +2,20 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function () {
+      try {
+        var debug =
+          (typeof location !== "undefined" && (location.search || "").indexOf("debug=1") >= 0) ||
+          (typeof sessionStorage !== "undefined" && sessionStorage.getItem("credito_console_debug") === "1");
+        if (debug) return;
+        var noop = function () {};
+        console.log = noop;
+        console.info = noop;
+        console.debug = noop;
+      } catch (_) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -387,7 +401,7 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260429quiet";
+          var appSrc = "/credito-app/credito-app.js?v=20260429silence";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -414,23 +428,11 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260429quiet" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260429silence" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
 <body style="margin:0;min-height:100%;background:#f5f3ee">
-  <script>
-    (function () {
-      try {
-        var debug = typeof location !== "undefined" && (location.search || "").indexOf("debug=1") >= 0;
-        if (debug) return;
-        var noop = function () {};
-        console.log = noop;
-        console.info = noop;
-        console.debug = noop;
-      } catch (_) {}
-    })();
-  </script>
   <div id="root"></div>
   <script id="credito-app-script" type="module" crossorigin></script>
 </body>
