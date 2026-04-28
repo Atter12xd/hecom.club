@@ -1504,6 +1504,24 @@ body.kanban-pipeline-dragging {
     };
   });
 })();
+window.hmDumpAuthUser = function() {
+  try {
+    var c = (typeof supabase !== 'undefined' && supabase) || window.__CREDITO_SHARED_SUPABASE__ || null;
+    if (!c || !c.auth) {
+      console.warn('[HM] Cliente Supabase aún no listo. Esperá 2–3 s y reintentá. Ruta: /creativos o /creativos/creativo.');
+      return Promise.resolve(null);
+    }
+    return c.auth.getUser().then(function(ar) {
+      console.log('[HM] auth.getUser():', ar);
+      var u = ar.data && ar.data.user;
+      if (u) { try { console.log(JSON.stringify(u, null, 2)); } catch (e2) { console.log(u); } }
+      return u;
+    });
+  } catch (err) {
+    console.error('[HM]', err);
+    return Promise.resolve(null);
+  }
+};
 </script>
 <script src="/api/auth-config?v=20260429cfg"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -5124,24 +5142,6 @@ if (supabase) {
   setTimeout(function() { clearInterval(t); }, 8000);
 }
 initCreativosAvatar();
-window.hmDumpAuthUser = function() {
-  try {
-    var c = typeof supabase !== 'undefined' && supabase ? supabase : null;
-    if (!c || !c.auth) {
-      console.warn('[HM] Creativos: supabase no listo — esperá y ejecutá de nuevo: hmDumpAuthUser()');
-      return Promise.resolve(null);
-    }
-    return c.auth.getUser().then(function(ar) {
-      console.log('[HM] auth.getUser() — Creativos:', ar);
-      var u = ar.data && ar.data.user;
-      if (u) { try { console.log(JSON.stringify(u, null, 2)); } catch (e2) { console.log(u); } }
-      return u;
-    });
-  } catch (err) {
-    console.error('[HM]', err);
-    return Promise.resolve(null);
-  }
-};
 function promptUserNameCreativos() {
   var cur = getStoredHolisticUserName() || '';
   var hint = isBadHolisticDisplayName(cur) ? '' : cur;

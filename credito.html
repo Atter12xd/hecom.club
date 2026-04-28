@@ -18,6 +18,33 @@
       } catch (_) {}
     })();
   </script>
+  <script>
+    /* Definido ya al cargar la página (console.log está silenciado en prod → usamos console.error). */
+    window.hmDumpAuthUser = function () {
+      try {
+        var cli = window.__CREDITO_SHARED_SUPABASE__;
+        if (!cli || !cli.auth) {
+          console.error("[HM] Crédito: esperá unos segundos a que termine el arranque y volvé a ejecutar hmDumpAuthUser()");
+          return Promise.resolve(null);
+        }
+        return cli.auth.getUser().then(function (ar) {
+          console.error("[HM] auth.getUser():", ar);
+          var u = ar.data && ar.data.user;
+          if (u) {
+            try {
+              console.error("[HM] JSON:\n" + JSON.stringify(u, null, 2));
+            } catch (e2) {
+              console.error("[HM]", u);
+            }
+          }
+          return u;
+        });
+      } catch (err) {
+        console.error("[HM]", err);
+        return Promise.resolve(null);
+      }
+    };
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -397,30 +424,6 @@
           }
           window.__CREDITO_SHARED_SUPABASE__ = sb;
           window.__CREDITO_PREFLIGHT_SESSION__ = session;
-          window.hmDumpAuthUser = function () {
-            try {
-              var cli = window.__CREDITO_SHARED_SUPABASE__;
-              if (!cli || !cli.auth) {
-                console.warn('[HM] Crédito: cliente supabase no listo.');
-                return Promise.resolve(null);
-              }
-              return cli.auth.getUser().then(function (ar) {
-                console.log("[HM] auth.getUser() — Crédito:", ar);
-                var u = ar.data && ar.data.user;
-                if (u) {
-                  try {
-                    console.log(JSON.stringify(u, null, 2));
-                  } catch (e2) {
-                    console.log(u);
-                  }
-                }
-                return u;
-              });
-            } catch (err) {
-              console.error("[HM]", err);
-              return Promise.resolve(null);
-            }
-          };
         } catch (e) {
           logError("preflight-error", { message: e && e.message ? e.message : String(e) });
           return redirectLogin("preflight-error");

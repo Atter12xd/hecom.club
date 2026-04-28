@@ -2530,6 +2530,24 @@ button.att-action-btn:disabled {
     };
   });
 })();
+window.hmDumpAuthUser = function() {
+  try {
+    var c = (typeof supabase !== 'undefined' && supabase) || window.__CREDITO_SHARED_SUPABASE__ || null;
+    if (!c || !c.auth) {
+      console.warn('[HM] Cliente Supabase aún no listo. Esperá 2–3 s y reintentá. Tenés que estar en /pendientes/tarea (no solo /destinos).');
+      return Promise.resolve(null);
+    }
+    return c.auth.getUser().then(function(ar) {
+      console.log('[HM] auth.getUser():', ar);
+      var u = ar.data && ar.data.user;
+      if (u) { try { console.log(JSON.stringify(u, null, 2)); } catch (e2) { console.log(u); } }
+      return u;
+    });
+  } catch (err) {
+    console.error('[HM]', err);
+    return Promise.resolve(null);
+  }
+};
 </script>
 <!-- UMD antes del fetch de config: si /api/supabase-config resuelve muy rápido, el microtask del .then del auth no debe ejecutarse antes de que exista window.supabase. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -8820,24 +8838,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   updateTareasUserNameDisplay();
   renderRecordatoriosTareas();
-  window.hmDumpAuthUser = function() {
-    try {
-      var c = typeof supabase !== 'undefined' && supabase ? supabase : null;
-      if (!c || !c.auth) {
-        console.warn('[HM] Pendientes: supabase no listo — esperá que termine de cargar la app y ejecutá de nuevo: hmDumpAuthUser()');
-        return Promise.resolve(null);
-      }
-      return c.auth.getUser().then(function(ar) {
-        console.log('[HM] auth.getUser() — Pendientes:', ar);
-        var u = ar.data && ar.data.user;
-        if (u) { try { console.log(JSON.stringify(u, null, 2)); } catch (e2) { console.log(u); } }
-        return u;
-      });
-    } catch (err) {
-      console.error('[HM]', err);
-      return Promise.resolve(null);
-    }
-  };
 });
 function promptUserNameTareas() {
   var cur = getStoredHolisticUserName() || '';
