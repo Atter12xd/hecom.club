@@ -29,18 +29,51 @@ El cache local (`localStorage`) acelera la UI, pero no reemplaza la BD.
 - Bucket de imagenes: `avatars`.
 - Fallback opcional de subida: `window.__MARKETING_STORAGE_API__`.
 
-## Archivos importantes
+## Donde hacer cambios (regla operativa)
+
+Para evitar cambios que luego se pierden:
+
+1. Editar primero en fuente (`marketing/marketing`) cuando exista version editable.
+2. Compilar/build.
+3. Sincronizar artefactos finales a `hecom.club` (y `hecom.club/public`) que es donde vive el deploy real.
+
+Excepcion: si solo hay archivo directo en `hecom.club` (por ejemplo HTML de modulo no compilado), se edita ahi y su copia en `public/`.
+
+## Supabase en este repo (importante)
+
+La carpeta `supabase/` en el repo es referencia historica de scripts/migrations.
+En operacion real, los SQL se ejecutan manualmente en Supabase SQL Editor.
+
+Implicacion para futuras IAs:
+
+- No asumir que correr migrations locales cambiara produccion.
+- Usar `supabase/` para contexto de esquema/politicas.
+- Si se requiere cambio DB real, preparar SQL para ejecutar en el proyecto Supabase activo.
+
+## Archivos clave por modulo
+
+### Credito
 
 - `credito.html`
 - `public/credito-app/credito-app.js`
 - `credito-app/credito-app.js` (copia sincronizada)
+
+Nota: en Credito, el JS suele venir minificado en `hecom.club`. Fuente editable habitual: `marketing/marketing/holistic-app/src/App.jsx`.
+
+### Pendientes
+
 - `pendientes/tarea.html`
+- `public/pendientes/tarea.html` (copia deploy)
+
+### Creativos
+
 - `creativos/creativo.html`
+- `public/creativos/creativo.html` (copia deploy)
+
+### Finanzas
+
 - `finanzas/finanzas.html`
-- Copias deploy:
-  - `public/pendientes/tarea.html`
-  - `public/creativos/creativo.html`
-  - `public/finanzas/finanzas.html`
+- `public/finanzas/finanzas.html` (copia deploy)
 
 ## Flujo correcto de cambio de foto
 
@@ -148,7 +181,8 @@ Nota: `storage` solo dispara entre pestañas del mismo origen.
    - sync de claves locales
    - refresh de estado/UI
 5. Si cambias un archivo en carpeta raiz, evaluar si existe copia en `public/` y sincronizar.
-6. Mantener cache-bust en recursos cuando se parchea bundle (`?v=...`).
+6. En Credito, priorizar cambio en fuente `marketing/marketing/holistic-app/src/` y luego build + sync a `hecom.club`.
+7. Mantener cache-bust en recursos cuando se parchea bundle (`?v=...`) para evitar falso negativo por cache.
 
 ## Checklist rapido al modificar avatar
 
