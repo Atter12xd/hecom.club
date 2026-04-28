@@ -28,8 +28,8 @@
     --border: #ecdcc9;
     --border-strong: #d8c5ac;
     --card: #ffffff;
-    --bg: #fef9f3;
-    --bg-soft: #fdf2e6;
+    --bg: #fffefd;
+    --bg-soft: #fffdf8;
     --radius-sm: 10px;
     --radius-md: 16px;
     --radius-lg: 24px;
@@ -58,10 +58,10 @@ html, body {
 body {
     position: relative;
     background:
-        radial-gradient(1200px 600px at 92% -8%, rgba(251,146,60,.22), transparent 60%),
-        radial-gradient(900px 500px at -8% 110%, rgba(245,158,11,.18), transparent 55%),
-        radial-gradient(700px 420px at 50% 50%, rgba(254,215,170,.18), transparent 70%),
-        linear-gradient(180deg, #fff9f1 0%, #fef5ea 50%, #fdebd6 100%);
+        radial-gradient(1200px 600px at 92% -8%, rgba(251,146,60,.018), transparent 66%),
+        radial-gradient(900px 500px at -8% 110%, rgba(245,158,11,.014), transparent 62%),
+        radial-gradient(700px 420px at 50% 50%, rgba(254,215,170,.008), transparent 76%),
+        linear-gradient(180deg, #ffffff 0%, #ffffff 52%, #fff7ee 100%);
 }
 
 /* Blobs animados (capa decorativa) */
@@ -76,7 +76,7 @@ body {
     position: absolute;
     border-radius: 50%;
     filter: blur(70px);
-    opacity: 0.55;
+    opacity: 0.03;
     will-change: transform;
 }
 .bg-blobs .b1 {
@@ -95,7 +95,7 @@ body {
     width: 360px; height: 360px;
     top: 40%; left: 50%;
     background: radial-gradient(circle, #fdba74, #fb923c 60%, transparent 75%);
-    opacity: .35;
+    opacity: .02;
     transform: translate(-50%, -50%);
     animation: float3 26s ease-in-out infinite;
 }
@@ -219,14 +219,14 @@ a:hover { text-decoration: none; }
     width: 360px; height: 180px;
     left: 50%; top: 50%;
     transform: translate(-50%, -50%);
-    background: radial-gradient(closest-side, rgba(251,146,60,.32), rgba(251,146,60,.0) 70%);
+    background: radial-gradient(closest-side, rgba(251,146,60,.12), rgba(251,146,60,.0) 72%);
     filter: blur(12px);
     z-index: -1;
     animation: pulseGlow 4.5s ease-in-out infinite;
 }
 @keyframes pulseGlow {
-    0%, 100% { opacity: .65; transform: translate(-50%, -50%) scale(1); }
-    50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.06); }
+    0%, 100% { opacity: .28; transform: translate(-50%, -50%) scale(1); }
+    50%      { opacity: .42; transform: translate(-50%, -50%) scale(1.04); }
 }
 .brand-logo img {
     height: auto;
@@ -1076,3 +1076,8 @@ document.getElementById('btnLogout').addEventListener('click', async function ()
 </script>
 </body>
 </html>
+
+
+
+
+
