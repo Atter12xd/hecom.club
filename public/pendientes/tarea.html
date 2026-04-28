@@ -3682,6 +3682,12 @@ function refreshTareasSessionPerms(callback) {
     window.__tareasSessionEmail = em;
     supabase.from('gerentes').select('*').eq('email', em).maybeSingle().then(function(gr) {
       window.__tareasGerentePerms = gr.data || null;
+      try {
+        var au0 = gr.data && gr.data.avatar_url && String(gr.data.avatar_url).trim();
+        if (au0 && (au0.indexOf('http://') === 0 || au0.indexOf('https://') === 0)) {
+          localStorage.setItem('holistic_gerente_avatar_url', au0);
+        }
+      } catch (syncAv) {}
       var uref = u;
       var gdata = gr.data;
       tareasEnsureOwnGerenteDisplayNamePersisted(uref, gdata).then(function(did) {
@@ -3693,7 +3699,15 @@ function refreshTareasSessionPerms(callback) {
         if (did && typeof reloadTareasData === 'function') {
           reloadTareasData(function() {
             supabase.from('gerentes').select('*').eq('email', em).maybeSingle().then(function(gr2) {
-              if (gr2.data) window.__tareasGerentePerms = gr2.data;
+              if (gr2.data) {
+                window.__tareasGerentePerms = gr2.data;
+                try {
+                  var au2 = gr2.data.avatar_url && String(gr2.data.avatar_url).trim();
+                  if (au2 && (au2.indexOf('http://') === 0 || au2.indexOf('https://') === 0)) {
+                    localStorage.setItem('holistic_gerente_avatar_url', au2);
+                  }
+                } catch (syncAv2) {}
+              }
               finishRefresh();
             }).catch(function() { finishRefresh(); });
           });
@@ -3742,11 +3756,44 @@ function hmPrepareSidebarAvatarImg(imgEl, srcBeforeQuery) {
     }
   } catch (e) {}
 }
-/** Foto de perfil: prioridad gerentes.avatar_url (misma que Crédito), luego caché local. */
+/** Foto de perfil: primero holistic (último cambio en cualquier app); luego gerentes en memoria; luego caché / OAuth. */
 function applyTareasSidebarAvatarFromGerente() {
   var imgEl = document.getElementById('tareasUserAvatarImg');
   var iniEl = document.getElementById('tareasUserAvatarIniciales');
   if (!imgEl || !iniEl) return;
+  try {
+    var hz = '';
+    try {
+      hz = localStorage.getItem('holistic_gerente_avatar_url') || '';
+    } catch (ehz) {}
+    if (
+      hz &&
+      (hz.indexOf('http://') === 0 || hz.indexOf('https://') === 0) &&
+      typeof tareasHotlinkAvatarLikelyBlocked === 'function' &&
+      !tareasHotlinkAvatarLikelyBlocked(hz)
+    ) {
+      var bustHz = (hz.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+      imgEl.onerror = function() {
+        imgEl.onerror = null;
+        imgEl.style.display = 'none';
+        iniEl.style.display = '';
+        if (!imgEl.dataset._hmAvatarFallbackHolistic) {
+          imgEl.dataset._hmAvatarFallbackHolistic = '1';
+          tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
+          return;
+        }
+        tareasRefreshPhotoHint();
+      };
+      imgEl.onload = function() {
+        imgEl.style.display = 'block';
+        iniEl.style.display = 'none';
+        tareasRefreshPhotoHint();
+      };
+      hmPrepareSidebarAvatarImg(imgEl, hz);
+      imgEl.src = hz + bustHz;
+      return;
+    }
+  } catch (eHol) {}
   var row = window.__tareasGerentePerms;
   var url = row && row.avatar_url && String(row.avatar_url).trim();
   if (url && typeof tareasHotlinkAvatarLikelyBlocked === 'function' && !tareasHotlinkAvatarLikelyBlocked(url)) {
@@ -8798,6 +8845,11 @@ function initTareasAvatar() {
           window.__tareasGerentePerms.avatar_url = url;
         }
         try { localStorage.setItem(key, url); } catch (e) {}
+        try {
+          localStorage.setItem('holistic_gerente_avatar_url', url);
+          localStorage.setItem('hm_gerente_avatar_url', url);
+          localStorage.setItem('creativos_avatar_url', url);
+        } catch (e2) {}
         imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { tareasRefreshPhotoHint(); } catch (e) {} };
         imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { tareasRefreshPhotoHint(); } catch (e) {} };
         hmPrepareSidebarAvatarImg(imgEl, url);
@@ -8810,6 +8862,15 @@ function initTareasAvatar() {
   if (card) card.addEventListener('click', function() { inp.click(); });
 }
 
+if (!window.__hmHolisticAvatarStorageListener) {
+  window.__hmHolisticAvatarStorageListener = true;
+  window.addEventListener('storage', function(ev) {
+    if (!ev.key || (ev.key !== 'holistic_gerente_avatar_url' && ev.key !== 'hm_gerente_avatar_url')) return;
+    try {
+      applyTareasSidebarAvatarFromGerente();
+    } catch (eSt) {}
+  });
+}
 document.addEventListener('DOMContentLoaded', function() {
   var gBtn = document.getElementById('holisticNameGateSave');
   var gInp = document.getElementById('holisticNameGateInput');

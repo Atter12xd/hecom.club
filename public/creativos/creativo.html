@@ -1893,6 +1893,34 @@ function applyCreativosSidebarAvatarFromGerente() {
   var imgEl = document.getElementById('creativosUserAvatarImg');
   var iniEl = document.getElementById('creativosUserAvatarIniciales');
   if (!imgEl || !iniEl) return;
+  try {
+    var hz = '';
+    try {
+      hz = localStorage.getItem('holistic_gerente_avatar_url') || '';
+    } catch (ehz) {}
+    if (hz && (hz.indexOf('http://') === 0 || hz.indexOf('https://') === 0) && !creativosHotlinkAvatarLikelyBlocked(hz)) {
+      var bustHz = (hz.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+      imgEl.onerror = function() {
+        imgEl.onerror = null;
+        imgEl.style.display = 'none';
+        iniEl.style.display = '';
+        if (!imgEl.dataset._hmAvatarFallbackHolistic) {
+          imgEl.dataset._hmAvatarFallbackHolistic = '1';
+          tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl);
+          return;
+        }
+        creativosRefreshPhotoHint();
+      };
+      imgEl.onload = function() {
+        imgEl.style.display = 'block';
+        iniEl.style.display = 'none';
+        creativosRefreshPhotoHint();
+      };
+      hmPrepareSidebarAvatarImg(imgEl, hz);
+      imgEl.src = hz + bustHz;
+      return;
+    }
+  } catch (eHol) {}
   var row = window.__creativosGerenteSelfRow;
   var url = row && row.avatar_url && String(row.avatar_url).trim();
   if (url && !creativosHotlinkAvatarLikelyBlocked(url)) {
@@ -5057,6 +5085,12 @@ function doCreativosInitialLoad() {
       }
       supabase.from('gerentes').select('nombre, apellido, email, display_name, avatar_url, perm_admin, perm_estandar, perm_gestor_financiero, perm_analista_financiero').eq('email', em).maybeSingle().then(function(gr) {
         window.__creativosGerenteSelfRow = gr.data || null;
+        try {
+          var auc = gr.data && gr.data.avatar_url && String(gr.data.avatar_url).trim();
+          if (auc && (auc.indexOf('http://') === 0 || auc.indexOf('https://') === 0)) {
+            localStorage.setItem('holistic_gerente_avatar_url', auc);
+          }
+        } catch (syncAvC) {}
         if (gr.data) tryApplyHolisticUserNameFromGerenteRow(gr.data);
         initApp();
         updateCreativosUserNameDisplay();
@@ -5114,6 +5148,11 @@ function initCreativosAvatar() {
           window.__creativosGerenteSelfRow.avatar_url = url;
         }
         try { localStorage.setItem(key, url); } catch (e) {}
+        try {
+          localStorage.setItem('holistic_gerente_avatar_url', url);
+          localStorage.setItem('hm_gerente_avatar_url', url);
+          localStorage.setItem('tareas_avatar_url', url);
+        } catch (e2) {}
         imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { creativosRefreshPhotoHint(); } catch (e) {} };
         imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { creativosRefreshPhotoHint(); } catch (e) {} };
         hmPrepareSidebarAvatarImg(imgEl, url);
@@ -5126,6 +5165,15 @@ function initCreativosAvatar() {
   if (block) block.addEventListener('click', function(e) { if (!e.target.closest('.theme-toggle-btn')) inp.click(); });
 }
 
+if (!window.__hmHolisticAvatarStorageListenerCreativos) {
+  window.__hmHolisticAvatarStorageListenerCreativos = true;
+  window.addEventListener('storage', function(ev) {
+    if (!ev.key || (ev.key !== 'holistic_gerente_avatar_url' && ev.key !== 'hm_gerente_avatar_url')) return;
+    try {
+      applyCreativosSidebarAvatarFromGerente();
+    } catch (eSt) {}
+  });
+}
 (function wireHolisticNameGateCreativos() {
   var gBtn = document.getElementById('holisticNameGateSave');
   var gInp = document.getElementById('holisticNameGateInput');

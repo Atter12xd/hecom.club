@@ -997,7 +997,12 @@ function finanzasApplyGerenteProfile(row,email){
   }
   nameEl.textContent=fn||'—';
   if(roleLab) roleLab.textContent=finanzasRolePillText(row);
-  var urlAv=row&&row.avatar_url&&String(row.avatar_url).trim();
+  var urlAv='';
+  try {
+    var hz=localStorage.getItem('holistic_gerente_avatar_url')||'';
+    if(hz&&(hz.indexOf('http://')===0||hz.indexOf('https://')===0)&&!finanzasHotlinkAvatarLikelyBlocked(hz)) urlAv=hz;
+  }catch(eH){}
+  if(!urlAv) urlAv=row&&row.avatar_url&&String(row.avatar_url).trim();
   if(urlAv&&!finanzasHotlinkAvatarLikelyBlocked(urlAv)){
     img.onload=function(){
       img.style.display='block';ini.style.display='none';
@@ -1023,10 +1028,30 @@ async function finanzasLoadGerenteProfile(){
     var u=ur&&ur.data&&ur.data.user;
     var em=u&&u.email?String(u.email).trim().toLowerCase():'';
     if(!em)return;
+    window.__finanzasSessionEmailCache=em;
     var gr=await sb.from('gerentes').select('nombre,apellido,display_name,avatar_url,perm_admin,perm_estandar,perm_gestor_financiero,perm_analista_financiero,email').eq('email',em).maybeSingle();
     if(gr&&gr.error)console.warn('[Finanzas] gerentes',gr.error);
-    finanzasApplyGerenteProfile(gr&&gr.data?gr.data:null,em);
+    var gd=gr&&gr.data?gr.data:null;
+    window.__finanzasGerenteProfileRow=gd;
+    try{
+      if(gd&&gd.avatar_url){
+        var aus=String(gd.avatar_url).trim();
+        if(aus&&(aus.indexOf('http://')===0||aus.indexOf('https://')===0)){
+          localStorage.setItem('holistic_gerente_avatar_url',aus);
+        }
+      }
+    }catch(es){}
+    finanzasApplyGerenteProfile(gd,em);
   }catch(e){console.warn('[Finanzas] perfil gerente',e);}
+}
+if(!window.__hmHolisticAvatarStorageListenerFinanzas){
+  window.__hmHolisticAvatarStorageListenerFinanzas=true;
+  window.addEventListener('storage',function(ev){
+    if(!ev.key||(ev.key!=='holistic_gerente_avatar_url'&&ev.key!=='hm_gerente_avatar_url'))return;
+    try{
+      finanzasApplyGerenteProfile(window.__finanzasGerenteProfileRow||null,window.__finanzasSessionEmailCache||'');
+    }catch(ef){}
+  });
 }
 // ===== INIT SIDEBAR =====
 function renderSidebar(){
