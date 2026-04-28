@@ -2624,15 +2624,15 @@ window.__HECOM_SB_READY__.then(function(){
     if(params.access_token&&params.refresh_token){
       supabase.auth.setSession({access_token:params.access_token,refresh_token:params.refresh_token})
         .then(function(res){ if(res&&res.error) throw res.error; window.history.replaceState(null,'','/pendientes'); })
-        .catch(function(){ window.location.replace('/acceso-pendientes'); });
+        .catch(function(){ window.location.replace('https://www.hecom.club/login'); });
     } else {
-      window.location.replace('/acceso-pendientes');
+      window.location.replace('https://www.hecom.club/login');
     }
     return;
   }
   var gateDone=false;
   function finishGateAllow(){ if(gateDone)return; gateDone=true; }
-  function finishGateDeny(){ if(gateDone)return; gateDone=true; window.location.replace('/acceso-pendientes'); }
+  function finishGateDeny(){ if(gateDone)return; gateDone=true; window.location.replace('https://www.hecom.club/login'); }
   var __authSub;
   __authSub=supabase.auth.onAuthStateChange(function(event,session){
     if(event!=='INITIAL_SESSION')return;
@@ -9051,3 +9051,4 @@ function renderRecordatoriosTareas() {
 
 </body>
 </html>
+

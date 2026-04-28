@@ -357,7 +357,7 @@
           sessionStorage.setItem("hecom_intended_path_after_login", "/credito");
         } catch (_) {}
         var redirect = encodeURIComponent("/credito");
-        window.location.replace("/login?redirect=" + redirect);
+        window.location.replace("https://www.hecom.club/login");
       }
       async function ensurePublicSupabaseConfig() {
         if (window.__SUPABASE_URL__ && window.__SUPABASE_ANON_KEY__) return;
@@ -652,3 +652,5 @@
   <script id="credito-app-script" type="module" crossorigin></script>
 </body>
 </html>
+
+

@@ -118,6 +118,7 @@
           }
           if (!fromHash && !fromStore) {
             send("info", "no-session-found", { hasHash: !!fromHash, hasStorageSession: !!fromStore });
+            window.location.replace("https://www.hecom.club/login");
             return;
           }
           await loadSupabaseUmd();
@@ -158,3 +159,4 @@
   <div id="root"></div>
 </body>
 </html>
+

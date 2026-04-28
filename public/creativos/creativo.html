@@ -1545,7 +1545,7 @@ window.hmDumpAuthUser = function() {
     return;
   }
   supabase.auth.getSession().then(function(r){
-    if(!r.data.session) window.location.replace('/acceso-creativos');
+    if(!r.data.session) window.location.replace('https://www.hecom.club/login');
   });
 })();
 </script>
@@ -5286,3 +5286,4 @@ renderRecordatoriosCreativos();
 </script>
 </body>
 </html>
+
