@@ -4912,6 +4912,8 @@ function reloadTareasData(thenRender) {
     renderers.calendar?.();
     renderers.workload?.();
     renderers.workflows?.();
+    /* Asistencia usa ATTENDANCE_MEMBERS[].photo — sin repintar, las fotos nuevas no se ven hasta F5 */
+    renderers.attendance?.();
     refreshTareasSessionPerms();
     if (thenRender && typeof thenRender === 'function') thenRender();
   }).catch(function(err) {
@@ -8814,7 +8816,7 @@ function initTareasAvatar() {
   inp.onchange = function() {
     var f = this.files && this.files[0];
     if (!f) return;
-    var em = (window.__tareasSessionEmail || '').trim();
+    var em = (window.__tareasSessionEmail || '').trim().toLowerCase();
     if (!supabase || !em) {
       var r = new FileReader();
       r.onload = function() {
@@ -8845,15 +8847,32 @@ function initTareasAvatar() {
         localStorage.setItem('hm_gerente_avatar_url', url);
         localStorage.setItem('creativos_avatar_url', url);
       } catch (e0) {}
-      if (window.__tareasGerentePerms && String(window.__tareasGerentePerms.email || '').toLowerCase().trim() === em) {
-        window.__tareasGerentePerms.avatar_url = url;
+      if (window.__tareasGerentePerms) {
+        var ge = String(window.__tareasGerentePerms.email || '').toLowerCase().trim();
+        if (ge === em) window.__tareasGerentePerms.avatar_url = url;
       }
-      imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { tareasRefreshPhotoHint(); } catch (e) {} };
-      imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { tareasRefreshPhotoHint(); } catch (e) {} };
-      hmPrepareSidebarAvatarImg(imgEl, url);
-      imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+      try {
+        var ami;
+        for (ami = 0; ami < (ATTENDANCE_MEMBERS || []).length; ami++) {
+          if ((ATTENDANCE_MEMBERS[ami].email || '') === em) {
+            ATTENDANCE_MEMBERS[ami].photo = url;
+            break;
+          }
+        }
+      } catch (eAtt) {}
+      try {
+        delete imgEl.dataset._hmAvatarFallback;
+        delete imgEl.dataset._hmAvatarFallbackHolistic;
+      } catch (eDs) {}
+      try {
+        applyTareasSidebarAvatarFromGerente();
+      } catch (eAp) {}
+      try {
+        renderers.attendance?.();
+      } catch (eR) {}
       supabase.from('gerentes').update({ avatar_url: url }).eq('email', em).then(function(up) {
         if (up.error) console.warn('[Pendientes] gerentes avatar_url:', up.error);
+        if (!up || !up.error) reloadTareasData();
       });
     });
     inp.value = '';

@@ -5117,7 +5117,7 @@ function initCreativosAvatar() {
   inp.onchange = function() {
     var f = this.files && this.files[0];
     if (!f) return;
-    var em = (window.__creativosSessionEmail || '').trim();
+    var em = (window.__creativosSessionEmail || '').trim().toLowerCase();
     if (!supabase || !em) {
       var r = new FileReader();
       r.onload = function() {
@@ -5151,12 +5151,18 @@ function initCreativosAvatar() {
       if (window.__creativosGerenteSelfRow && String(window.__creativosGerenteSelfRow.email || '').toLowerCase().trim() === em) {
         window.__creativosGerenteSelfRow.avatar_url = url;
       }
-      imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { creativosRefreshPhotoHint(); } catch (e) {} };
-      imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { creativosRefreshPhotoHint(); } catch (e) {} };
-      hmPrepareSidebarAvatarImg(imgEl, url);
-      imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+      try {
+        delete imgEl.dataset._hmAvatarFallback;
+        delete imgEl.dataset._hmAvatarFallbackHolistic;
+      } catch (eDs) {}
+      try {
+        applyCreativosSidebarAvatarFromGerente();
+      } catch (eAp) {}
       supabase.from('gerentes').update({ avatar_url: url }).eq('email', em).then(function(up) {
         if (up.error) console.warn('[Creativos] gerentes avatar_url:', up.error);
+        try {
+          updateCreativosUserNameDisplay();
+        } catch (eUd) {}
       });
     });
     inp.value = '';
