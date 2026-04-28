@@ -1476,15 +1476,25 @@ body.kanban-pipeline-dragging {
 </style>
 </head>
 <body>
-<script src="/api/auth-config?v=20260428api"></script>
+<script>
+(function(){
+  try {
+    window.__HM_APP_DEBUG__ = (typeof location !== 'undefined' && (location.search || '').indexOf('debug=1') >= 0) ||
+      (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('hm_app_debug') === '1');
+  } catch (e) { window.__HM_APP_DEBUG__ = false; }
+})();
+window._hmDebugLog = function () { if (window.__HM_APP_DEBUG__ && typeof console !== 'undefined' && console.log) console.log.apply(console, arguments); };
+window._hmDebugWarn = function () { if (window.__HM_APP_DEBUG__ && typeof console !== 'undefined' && console.warn) console.warn.apply(console, arguments); };
+</script>
+<script src="/api/auth-config?v=20260429cfg"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
   var url=window.__SUPABASE_URL__;var key=window.__SUPABASE_ANON_KEY__;
-  if(!url||!key){ console.warn('[Creativos] auth: faltan URL o KEY (/api/auth-config · PUBLIC_* en Vercel)'); return; }
+  if(!url||!key){ window._hmDebugWarn('[Creativos] auth: faltan URL o KEY (/api/auth-config · PUBLIC_* en Vercel)'); return; }
   var lib=window.supabase;
   var createClientFn=lib&&(lib.createClient||(lib.default&&(lib.default.createClient||lib.default)));
-  if(!lib||typeof createClientFn!=='function'){ console.warn('[Creativos] auth: createClient no encontrado en window.supabase'); return; }
+  if(!lib||typeof createClientFn!=='function'){ window._hmDebugWarn('[Creativos] auth: createClient no encontrado en window.supabase'); return; }
   var skC=(function(u){try{var r=new URL(u).hostname.split('.')[0];return r?'sb-'+r+'-auth-token':undefined;}catch(e){return undefined;}})(url);
   var authC={persistSession:true,autoRefreshToken:true,storage:localStorage,detectSessionInUrl:true};
   if(skC)authC.storageKey=skC;
@@ -1533,7 +1543,7 @@ body.kanban-pipeline-dragging {
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <a href="#" class="sidebar-brand" onclick="navigateTo('dashboard');return false;">
-      <img class="sidebar-logo-img" src="/credito-app/logo/logoh.png?v=2" alt="Holistic Marketing" width="200" height="48" decoding="async" style="height: 48px; width: 200px; max-width: 100%; object-fit: contain; display: block;" onerror="if(!this.dataset._fb){this.dataset._fb='1';this.src='/logo/logoh.png?v=2';return;}this.style.visibility='hidden';">
+      <img class="sidebar-logo-img" src="/credito-app/logo/logoh.png?v=2" alt="Holistic Marketing" width="200" height="48" decoding="async" style="height: 48px; width: 200px; max-width: 100%; object-fit: contain; display: block;" onerror="this.style.visibility='hidden';">
       <div class="sidebar-logo-text">Creativos <span>Holistic</span></div>
     </a>
     <div class="sidebar-profile">
@@ -1687,11 +1697,11 @@ var supabase = null;
 function tryInitSupabaseCreativos(retryCount) {
   retryCount = retryCount || 0;
   var url = window.__SUPABASE_URL__, key = window.__SUPABASE_ANON_KEY__;
-  if (!url || !key) { console.warn('[Creativos] Faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__.'); return; }
+  if (!url || !key) { window._hmDebugWarn('[Creativos] Faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__.'); return; }
   var lib = window.supabase;
   if (lib == null || typeof lib !== 'object') {
     if (retryCount === 0 && document.querySelector('script[src*="supabase-js"]')) {
-      console.warn('[Creativos] window.supabase es null. Cargando script dinámicamente...');
+      window._hmDebugWarn('[Creativos] window.supabase es null. Cargando script dinámicamente...');
       var s = document.createElement('script');
       s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
       s.onload = function() { tryInitSupabaseCreativos(1); };
@@ -1714,9 +1724,9 @@ function tryInitSupabaseCreativos(retryCount) {
     var authC2 = { persistSession: true, autoRefreshToken: true, storage: localStorage, detectSessionInUrl: true };
     if (sk2) authC2.storageKey = sk2;
     supabase = createClientFn(url, key, { auth: authC2 });
-    console.log('[Creativos] Supabase OK');
+    window._hmDebugLog('[Creativos] Supabase OK');
     if (window.__creativosTriggerLoad) window.__creativosTriggerLoad();
-  } catch (e) { console.warn('[Creativos] Supabase init:', e); }
+  } catch (e) { window._hmDebugWarn('[Creativos] Supabase init:', e); }
 }
 if (typeof window !== 'undefined') tryInitSupabaseCreativos(0);
 
@@ -1855,7 +1865,7 @@ function applyCreativosSidebarAvatarFromGerente() {
   try {
     var ls = localStorage.getItem('creativos_avatar_url');
     if (!ls) {
-      creativosRefreshPhotoHint();
+      tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl);
       return;
     }
     if (ls.indexOf('data:image') === 0) {
@@ -1880,7 +1890,46 @@ function applyCreativosSidebarAvatarFromGerente() {
       return;
     }
   } catch (e) {}
-  creativosRefreshPhotoHint();
+  tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl);
+}
+function tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl) {
+  if (!imgEl || !iniEl) {
+    creativosRefreshPhotoHint();
+    return;
+  }
+  if (!supabase || typeof supabase.auth.getUser !== 'function') {
+    creativosRefreshPhotoHint();
+    return;
+  }
+  supabase.auth.getUser().then(function(ar) {
+    var u = ar.data && ar.data.user;
+    var m = u && u.user_metadata;
+    if (!m) {
+      creativosRefreshPhotoHint();
+      return;
+    }
+    var raw = m.avatar_url || m.picture || m.avatar;
+    var au = raw && String(raw).trim();
+    if (!au || creativosHotlinkAvatarLikelyBlocked(au)) {
+      creativosRefreshPhotoHint();
+      return;
+    }
+    var bust = (au.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+    imgEl.onerror = function() {
+      imgEl.onerror = null;
+      imgEl.style.display = 'none';
+      iniEl.style.display = '';
+      creativosRefreshPhotoHint();
+    };
+    imgEl.onload = function() {
+      imgEl.style.display = 'block';
+      iniEl.style.display = 'none';
+      creativosRefreshPhotoHint();
+    };
+    imgEl.src = au + bust;
+  }).catch(function() {
+    creativosRefreshPhotoHint();
+  });
 }
 function marketingStorageSignReadUrl(bucket, relPath, ttlSeconds) {
   var base = marketingStorageBase();
@@ -2001,7 +2050,7 @@ function backfillEntregaEnteredAtIfMissing() {
     return supabase.from('creativos_proyectos').update({ entrega_entered_at: nowIso }).eq('id', p.id);
   })).then(function(results) {
     var bad = results.some(function(r) { return r.error; });
-    if (bad) console.warn('[Creativos] backfill entrega_entered_at:', results);
+    if (bad) window._hmDebugWarn('[Creativos] backfill entrega_entered_at:', results);
     else need.forEach(function(p) { p.entregaEnteredAt = nowIso; });
   });
 }
@@ -2021,7 +2070,7 @@ function purgeExpiredEntregaProjects() {
     return supabase.from('creativos_proyectos').delete().eq('id', id);
   })).then(function(results) {
     var bad = results.filter(function(r) { return r.error; });
-    if (bad.length) console.warn('[Creativos] purge entrega:', bad);
+    if (bad.length) window._hmDebugWarn('[Creativos] purge entrega:', bad);
     else if (ids.length > 0) {
       showToast('info', 'Se eliminaron automáticamente ' + ids.length + ' proyecto(s) con más de 7 días en Entrega final.');
     }
@@ -2131,8 +2180,8 @@ function loadCreativosData() {
   ]).then(function(ress) {
     var creditoRes = ress[0], cRes = ress[1], pRes = ress[2], eRes = ress[3], projRes = ress[4], gerentesRes = ress[5];
     if (cRes.error || pRes.error || eRes.error || projRes.error) throw new Error(cRes.error?.message || pRes.error?.message || eRes.error?.message || projRes.error?.message);
-    if (gerentesRes.error) console.warn('[Creativos] No se pudo cargar gerentes (asistencia):', gerentesRes.error.message);
-    if (creditoRes.error) console.warn('[Creativos] No se pudo cargar clientes de Crédito (sync):', creditoRes.error.message, '- Se muestran solo clientes de Creativos.');
+    if (gerentesRes.error) window._hmDebugWarn('[Creativos] No se pudo cargar gerentes (asistencia):', gerentesRes.error.message);
+    if (creditoRes.error) window._hmDebugWarn('[Creativos] No se pudo cargar clientes de Crédito (sync):', creditoRes.error.message, '- Se muestran solo clientes de Creativos.');
     var creditoById = {};
     (creditoRes.data || []).forEach(function(c) {
       var firstEmail = (c.emails && (Array.isArray(c.emails) ? c.emails[0] : (typeof c.emails === 'string' ? c.emails : null))) || '';
@@ -2152,7 +2201,7 @@ function loadCreativosData() {
         createdAt: r.created_at
       };
     });
-    console.log('[Creativos] Clientes: Crédito=', (creditoRes.data || []).length, ', creativos_clientes=', (cRes.data || []).length, ', listado final=', clients.length);
+    window._hmDebugLog('[Creativos] Clientes: Crédito=', (creditoRes.data || []).length, ', creativos_clientes=', (cRes.data || []).length, ', listado final=', clients.length);
     var products = (pRes.data || []).map(function(r) { return { id: r.id, name: r.name || '', category: r.category || '', createdAt: r.created_at }; });
     var editors;
     if (gerentesRes.error) {
@@ -3191,7 +3240,7 @@ function getCreativosEntregablesSignedUrl(filePath, ttlSec, cb) {
   });
 }
 function openCreativosFilePreview(fileName, filePath, previewDataUrl, previewKind) {
-  console.log('[Creativos] open preview click:', {
+  window._hmDebugLog('[Creativos] open preview click:', {
     fileName: fileName,
     filePath: filePath,
     hasPreviewDataUrl: !!previewDataUrl,
@@ -3241,7 +3290,7 @@ function openCreativosFilePreview(fileName, filePath, previewDataUrl, previewKin
       openModal('Vista previa · ' + esc(fileName || 'archivo'), body, footer);
       var modalOnline = document.querySelector('#modalOverlay .modal');
       if (modalOnline) modalOnline.classList.add('modal-preview');
-      console.log('[Creativos] preview modal opened:', { fileName: fileName, filePath: filePath });
+      window._hmDebugLog('[Creativos] preview modal opened:', { fileName: fileName, filePath: filePath });
     } catch (e) {
       console.error('[Creativos] preview modal error, fallback to new tab:', e);
       window.open(url, '_blank', 'noopener');
@@ -4928,7 +4977,7 @@ function submitHolisticNameGateCreativos() {
 function doCreativosInitialLoad() {
   if (!supabase) return;
   reloadCreativosData(function() {
-    console.log('[Creativos] Clientes cargados:', (D.clients || []).length);
+    window._hmDebugLog('[Creativos] Clientes cargados:', (D.clients || []).length);
     supabase.auth.getUser().then(function(ar) {
       var u = ar.data && ar.data.user;
       var em = u && u.email ? String(u.email).trim().toLowerCase() : '';

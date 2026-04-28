@@ -2503,6 +2503,16 @@ button.att-action-btn:disabled {
 <body>
 <script>
 (function(){
+  try {
+    window.__HM_APP_DEBUG__ = (typeof location !== 'undefined' && (location.search || '').indexOf('debug=1') >= 0) ||
+      (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('hm_app_debug') === '1');
+  } catch (e) { window.__HM_APP_DEBUG__ = false; }
+})();
+window._hmDebugLog = function () { if (window.__HM_APP_DEBUG__ && typeof console !== 'undefined' && console.log) console.log.apply(console, arguments); };
+window._hmDebugWarn = function () { if (window.__HM_APP_DEBUG__ && typeof console !== 'undefined' && console.warn) console.warn.apply(console, arguments); };
+</script>
+<script>
+(function(){
   window.__HECOM_SB_READY__=(function(){
     if(window.__SUPABASE_URL__&&window.__SUPABASE_ANON_KEY__){
       if(!window.__KNOWN_APP_HOSTS__)window.__KNOWN_APP_HOSTS__=['www.marketingconholistic.com','marketingconholistic.com','www.hecom.club','hecom.club'];
@@ -2561,10 +2571,10 @@ window.__HECOM_SB_READY__.then(function(){
     return;
   }
   var url=window.__SUPABASE_URL__;var key=window.__SUPABASE_ANON_KEY__;
-  if(!url||!key){ console.warn('[Pendientes] auth: URL/KEY vacíos tras ensure'); return; }
+  if(!url||!key){ window._hmDebugWarn('[Pendientes] auth: URL/KEY vacíos tras ensure'); return; }
   var lib=window.supabase;
   var createClientFn=lib&&(lib.createClient||(lib.default&&(lib.default.createClient||lib.default)));
-  if(!lib||typeof createClientFn!=='function'){ console.warn('[Pendientes] auth: createClient no encontrado en window.supabase'); return; }
+  if(!lib||typeof createClientFn!=='function'){ window._hmDebugWarn('[Pendientes] auth: createClient no encontrado en window.supabase'); return; }
   var sk=__holisticSupabaseAuthStorageKey(url);
   var authStorage={persistSession:true,autoRefreshToken:true,storage:localStorage,detectSessionInUrl:true};
   if(sk)authStorage.storageKey=sk;
@@ -2609,7 +2619,7 @@ window.__HECOM_SB_READY__.then(function(){
     }).catch(function(){ finishGateDeny(); });
   },12000);
 }).catch(function(e){
-  console.warn('[Pendientes] auth gate: sin config Supabase.',e&&e.message?e.message:e);
+  window._hmDebugWarn('[Pendientes] auth gate: sin config Supabase.',e&&e.message?e.message:e);
 });
 </script>
 
@@ -3223,11 +3233,11 @@ var __tareasDataBootstrapDone = false;
 /** Encola el bootstrap: si el documento aún carga, espera a DOMContentLoaded (evita carrera con tryInit inmediato). */
 function scheduleTareasAppBootstrap(reason) {
   if (!supabase) {
-    console.log('[Pendientes] boot: schedule omitido (sin supabase) ·', reason || '');
+    window._hmDebugLog('[Pendientes] boot: schedule omitido (sin supabase) ·', reason || '');
     return;
   }
   if (document.readyState === 'loading') {
-    console.log('[Pendientes] boot: schedule · document.loading → espera DOMContentLoaded ·', reason || '');
+    window._hmDebugLog('[Pendientes] boot: schedule · document.loading → espera DOMContentLoaded ·', reason || '');
     var once = function() {
       document.removeEventListener('DOMContentLoaded', once);
       tryRunTareasAppBootstrap('post-DOMContentLoaded');
@@ -3239,15 +3249,15 @@ function scheduleTareasAppBootstrap(reason) {
 }
 function tryRunTareasAppBootstrap(reason) {
   if (__tareasDataBootstrapDone) {
-    console.log('[Pendientes] boot: ya completado, skip ·', reason || '');
+    window._hmDebugLog('[Pendientes] boot: ya completado, skip ·', reason || '');
     return;
   }
   if (!supabase) {
-    console.warn('[Pendientes] boot: sin supabase, skip ·', reason || '');
+    window._hmDebugWarn('[Pendientes] boot: sin supabase, skip ·', reason || '');
     return;
   }
   __tareasDataBootstrapDone = true;
-  console.log('[Pendientes] boot: inicio loadTareasData ·', reason || '', '| readyState:', document.readyState);
+  window._hmDebugLog('[Pendientes] boot: inicio loadTareasData ·', reason || '', '| readyState:', document.readyState);
   showTareasLoading(true);
   loadTareasData().then(function(data) {
     if (data) {
@@ -3258,9 +3268,9 @@ function tryRunTareasAppBootstrap(reason) {
       KT = data.KT;
       tickets = data.tickets;
       calI = data.calI;
-      console.log('[Pendientes] boot: OK — equipos:', (TEAM && TEAM.length) || 0, 'clientes:', (clients && clients.length) || 0, 'tickets:', (tickets && tickets.length) || 0, 'kanban:', (KT && KT.length) || 0);
+      window._hmDebugLog('[Pendientes] boot: OK — equipos:', (TEAM && TEAM.length) || 0, 'clientes:', (clients && clients.length) || 0, 'tickets:', (tickets && tickets.length) || 0, 'kanban:', (KT && KT.length) || 0);
     } else {
-      console.warn('[Pendientes] boot: loadTareasData devolvió null (errores arriba o RLS).');
+      window._hmDebugWarn('[Pendientes] boot: loadTareasData devolvió null (errores arriba o RLS).');
     }
     showTareasLoading(false);
     ensureCurrentSessionMemberActive(function() {
@@ -3269,13 +3279,13 @@ function tryRunTareasAppBootstrap(reason) {
         initTareasAvatar();
         initTareasRealtimeSync();
         attAutoStartHeartbeat();
-        console.log('[Pendientes] boot: initViews + realtime + asistencia OK');
+        window._hmDebugLog('[Pendientes] boot: initViews + realtime + asistencia OK');
       } catch (e) {
         console.error('[Pendientes] boot: error en init post-carga', e);
       }
       refreshTareasSessionPerms(function() {
         try { maybeShowHolisticNameGatePendientes(); } catch (e2) { console.error('[Pendientes] boot: name gate', e2); }
-        console.log('[Pendientes] boot: listo (permisos + name gate).');
+        window._hmDebugLog('[Pendientes] boot: listo (permisos + name gate).');
       });
     });
   }).catch(function(err) {
@@ -3294,7 +3304,7 @@ function tryInitSupabase(retryCount) {
   var url = window.__SUPABASE_URL__;
   var key = window.__SUPABASE_ANON_KEY__;
   var scripts = [].map.call(document.querySelectorAll('script[src]'), function(s) { return s.src; }).filter(function(s) { return s.indexOf('supabase') !== -1; });
-  console.log('[Pendientes] tryInitSupabase (intento ' + (retryCount + 1) + ')', {
+  window._hmDebugLog('[Pendientes] tryInitSupabase (intento ' + (retryCount + 1) + ')', {
     readyState: document.readyState,
     hasUrl: !!url,
     hasKey: !!key,
@@ -3305,22 +3315,22 @@ function tryInitSupabase(retryCount) {
     scriptTagsWithSupabase: scripts
   });
   if (!url || !key) {
-    console.warn('[Pendientes] Supabase: faltan URL/KEY (esperá /api/supabase-config o revisá PUBLIC_* en Vercel).');
+    window._hmDebugWarn('[Pendientes] Supabase: faltan URL/KEY (esperá /api/supabase-config o revisá PUBLIC_* en Vercel).');
     return;
   }
   var lib = window.supabase;
   if (lib == null || typeof lib !== 'object') {
     if (retryCount === 0 && document.querySelector('script[src*="supabase-js"]')) {
-      console.warn('[Pendientes] Supabase: window.supabase es null (el script del head puede no haber cargado). Cargando script dinámicamente...');
+      window._hmDebugWarn('[Pendientes] Supabase: window.supabase es null (el script del head puede no haber cargado). Cargando script dinámicamente...');
       var s = document.createElement('script');
       s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
-      s.onload = function() { console.log('[Pendientes] Script Supabase cargado por fallback.'); tryInitSupabase(1); };
+      s.onload = function() { window._hmDebugLog('[Pendientes] Script Supabase cargado por fallback.'); tryInitSupabase(1); };
       s.onerror = function() { console.error('[Pendientes] Error cargando script Supabase desde CDN.'); };
       document.head.appendChild(s);
       return;
     }
     if (retryCount < 4) {
-      console.warn('[Pendientes] Supabase: window.supabase aún null (intento ' + (retryCount + 1) + '). Reintento en 500ms.');
+      window._hmDebugWarn('[Pendientes] Supabase: window.supabase aún null (intento ' + (retryCount + 1) + '). Reintento en 500ms.');
       setTimeout(function() { tryInitSupabase(retryCount + 1); }, 500);
     } else {
       console.error('[Pendientes] Supabase: no disponible tras reintentos. Comprueba pestaña Network: ¿el script supabase.js devuelve 200?');
@@ -3329,7 +3339,7 @@ function tryInitSupabase(retryCount) {
   }
   var createClientFn = lib.createClient || (lib.default && (lib.default.createClient || lib.default));
   if (typeof createClientFn !== 'function') {
-    console.warn('[Pendientes] Supabase: createClient no encontrado. Keys:', Object.keys(lib));
+    window._hmDebugWarn('[Pendientes] Supabase: createClient no encontrado. Keys:', Object.keys(lib));
     if (retryCount < 3) setTimeout(function() { tryInitSupabase(retryCount + 1); }, 400);
     return;
   }
@@ -3341,23 +3351,23 @@ function tryInitSupabase(retryCount) {
     var authOpt = { persistSession: true, autoRefreshToken: true, storage: localStorage, detectSessionInUrl: true };
     if (skHead) authOpt.storageKey = skHead;
     supabase = createClientFn(url, key, { auth: authOpt });
-    console.log('[Pendientes] Supabase OK. URL:', url.replace(/https?:\/\//, '').split('/')[0]);
+    window._hmDebugLog('[Pendientes] Supabase OK. URL:', url.replace(/https?:\/\//, '').split('/')[0]);
     scheduleTareasAppBootstrap('tryInit post createClient');
     setTimeout(function() {
       if (supabase && !__tareasDataBootstrapDone) {
-        console.warn('[Pendientes] boot: 4s post-Supabase aún no hubo bootstrap; reintento scheduleTareasAppBootstrap');
+        window._hmDebugWarn('[Pendientes] boot: 4s post-Supabase aún no hubo bootstrap; reintento scheduleTareasAppBootstrap');
         scheduleTareasAppBootstrap('watchdog 4s');
       }
     }, 4000);
   } catch (e) {
-    console.warn('[Pendientes] Supabase createClient error:', e);
+    window._hmDebugWarn('[Pendientes] Supabase createClient error:', e);
   }
 }
 if (typeof window !== 'undefined') {
   var _sbReady = window.__HECOM_SB_READY__;
   if (_sbReady && typeof _sbReady.then === 'function') {
     _sbReady.then(function () { tryInitSupabase(0); }).catch(function (e) {
-      console.warn('[Pendientes] tryInitSupabase omitido (config):', e && e.message ? e.message : e);
+      window._hmDebugWarn('[Pendientes] tryInitSupabase omitido (config):', e && e.message ? e.message : e);
     });
   } else {
     tryInitSupabase(0);
@@ -3707,7 +3717,7 @@ function applyTareasSidebarAvatarFromGerente() {
   try {
     var ls = localStorage.getItem('tareas_avatar_url');
     if (!ls) {
-      tareasRefreshPhotoHint();
+      tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
       return;
     }
     if (ls.indexOf('data:image') === 0) {
@@ -3734,7 +3744,47 @@ function applyTareasSidebarAvatarFromGerente() {
       return;
     }
   } catch (e) {}
-  tareasRefreshPhotoHint();
+  tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
+}
+/** Si no hay foto en gerentes ni en localStorage, usa avatar de OAuth (Google, etc.) en user_metadata. */
+function tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl) {
+  if (!imgEl || !iniEl) {
+    tareasRefreshPhotoHint();
+    return;
+  }
+  if (!supabase || typeof supabase.auth.getUser !== 'function') {
+    tareasRefreshPhotoHint();
+    return;
+  }
+  supabase.auth.getUser().then(function(ar) {
+    var u = ar.data && ar.data.user;
+    var m = u && u.user_metadata;
+    if (!m) {
+      tareasRefreshPhotoHint();
+      return;
+    }
+    var raw = m.avatar_url || m.picture || m.avatar;
+    var au = raw && String(raw).trim();
+    if (!au || (typeof tareasHotlinkAvatarLikelyBlocked === 'function' && tareasHotlinkAvatarLikelyBlocked(au))) {
+      tareasRefreshPhotoHint();
+      return;
+    }
+    var bust = (au.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+    imgEl.onerror = function() {
+      imgEl.onerror = null;
+      imgEl.style.display = 'none';
+      iniEl.style.display = '';
+      tareasRefreshPhotoHint();
+    };
+    imgEl.onload = function() {
+      imgEl.style.display = 'block';
+      iniEl.style.display = 'none';
+      tareasRefreshPhotoHint();
+    };
+    imgEl.src = au + bust;
+  }).catch(function() {
+    tareasRefreshPhotoHint();
+  });
 }
 function gerenteEmailSlug(email) {
   return String(email || '').trim().toLowerCase().replace(/@/g, '_at_').replace(/\./g, '_').replace(/[^a-z0-9_]/g, '_');
@@ -4534,7 +4584,7 @@ async function loadTareasData() {
     console.warn('[Pendientes] loadTareasData: supabase es null, no se puede cargar. Revisa los logs de tryInitSupabase.');
     return null;
   }
-  console.log('[Pendientes] loadTareasData: inicio Promise.all tablas (clientes, equipo, kanban, tickets, …)');
+  window._hmDebugLog('[Pendientes] loadTareasData: inicio Promise.all tablas (clientes, equipo, kanban, tickets, …)');
   var now = new Date();
   var mes = now.getMonth() + 1, anio = now.getFullYear();
   try {
@@ -4701,7 +4751,7 @@ async function loadTareasData() {
       return { id: t.codigo, dbId: t.id, title: t.titulo, sub: t.subtitulo || '', client: t.cliente_nombre || '', clientColor: t.cliente_color || '', status: t.status, priority: t.prioridad || 'media', category: t.categoria || '', channel: t.canal || '', assignee: t.asignado_id || '', assigneeEmail: (t.asignado_email && String(t.asignado_email).trim()) || '', assigneeEmails: Array.isArray(t.asignados_emails) ? t.asignados_emails : ((t.asignado_email && String(t.asignado_email).trim()) ? [String(t.asignado_email).trim()] : []), sla: formatSlaMinutesOrHours(t.sla_minutos, t.sla_horas), slaLeft: slaLeft, slaStatus: t.sla_status || 'ok', dueAt: t.sla_vencimiento || null, created: formatTicketWhen(t.created_at), createdAtIso: t.created_at || null, due: formatTicketWhen(t.sla_vencimiento), updatedAt: t.updated_at || null, notes: t.notas || '', timeline: timeline, createdByEmail: t.creado_por_email || '', slaMinutos: t.sla_minutos != null ? Number(t.sla_minutos) : null, solicitudAdjuntos: solAdj, resolucionAdjuntos: resAdj, resolucionDetalle: t.resolucion_detalle || '' };
     });
     var out = { TEAM: TEAM, ATTENDANCE_MEMBERS: ATTENDANCE_MEMBERS, MT: MT, clients: clients, KT: KT, tickets: tickets, calI: calI };
-    console.log('[Pendientes] loadTareasData: fin OK (objeto listo).');
+    window._hmDebugLog('[Pendientes] loadTareasData: fin OK (objeto listo).');
     return out;
   } catch (err) {
     console.error('[Pendientes] loadTareasData: EXCEPCIÓN', (err && err.message) ? err.message : err, err);
@@ -5866,16 +5916,16 @@ function deleteTicketByIdx(idx) {
     return;
   }
   if (!confirm('¿Eliminar el ticket ' + (tk.id || '') + '? Se borrarán los comentarios y, si hay, las imágenes en almacenamiento.')) {
-    console.log('[Pendientes] deleteTicketByIdx: cancelado por el usuario');
+    window._hmDebugLog('[Pendientes] deleteTicketByIdx: cancelado por el usuario');
     return;
   }
-  console.log('[Pendientes] deleteTicketByIdx: inicio', { idx: idx, codigo: tk.id, dbId: tk.dbId, supabase: !!supabase });
+  window._hmDebugLog('[Pendientes] deleteTicketByIdx: inicio', { idx: idx, codigo: tk.id, dbId: tk.dbId, supabase: !!supabase });
   if (supabase && tk.dbId) {
     var paths = collectTicketStoragePaths(tk);
     function doRowDelete() {
-      console.log('[Pendientes] deleteTicketByIdx: DELETE tareas_tickets', tk.dbId);
+      window._hmDebugLog('[Pendientes] deleteTicketByIdx: DELETE tareas_tickets', tk.dbId);
       supabase.from('tareas_tickets').delete().eq('id', tk.dbId).select('id').then(function(r) {
-        console.log('[Pendientes] deleteTicketByIdx: respuesta', r);
+        window._hmDebugLog('[Pendientes] deleteTicketByIdx: respuesta', r);
         if (r.error) {
           console.error('[Pendientes] deleteTicketByIdx error PostgREST', r.error);
           alert(r.error.message || 'No se pudo eliminar');
@@ -5893,7 +5943,7 @@ function deleteTicketByIdx(idx) {
       });
     }
     if (paths.length) {
-      console.log('[Pendientes] deleteTicketByIdx: quitando', paths.length, 'archivos de storage');
+      window._hmDebugLog('[Pendientes] deleteTicketByIdx: quitando', paths.length, 'archivos de storage');
       if (marketingStorageActive()) {
         marketingStorageDeleteObjects('tareas_adjuntos', paths, function() { doRowDelete(); });
       } else {
@@ -5916,7 +5966,7 @@ function deleteTicketByIdx(idx) {
 
 function deleteEntregable(kanbanId) {
   if (!confirm('¿Eliminar este entregable del tablero?')) {
-    console.log('[Pendientes] deleteEntregable: cancelado por el usuario');
+    window._hmDebugLog('[Pendientes] deleteEntregable: cancelado por el usuario');
     return;
   }
   var k = KT.find(function(x) { return String(x.id) === String(kanbanId); });
@@ -5925,10 +5975,10 @@ function deleteEntregable(kanbanId) {
     closeModal();
     return;
   }
-  console.log('[Pendientes] deleteEntregable: inicio', { kanbanId: kanbanId, ticketDbId: k.ticketDbId, supabase: !!supabase });
+  window._hmDebugLog('[Pendientes] deleteEntregable: inicio', { kanbanId: kanbanId, ticketDbId: k.ticketDbId, supabase: !!supabase });
   if (supabase) {
     supabase.from('tareas_kanban').delete().eq('id', kanbanId).select('id').then(function(r) {
-      console.log('[Pendientes] deleteEntregable: respuesta DELETE', r);
+      window._hmDebugLog('[Pendientes] deleteEntregable: respuesta DELETE', r);
       if (r.error) {
         console.error('[Pendientes] deleteEntregable error PostgREST', r.error);
         alert(r.error.message || 'No se pudo eliminar');
@@ -8182,7 +8232,7 @@ function insertEquipoAndFinish(nombre, apellido, email, color) {
   });
 }
 function deleteWorkloadMember(memberId, memberEmail, memberName) {
-  console.log('[Pendientes] deleteWorkloadMember:start', { memberId: memberId, memberEmail: memberEmail, memberName: memberName, hasSupabase: !!supabase });
+  window._hmDebugLog('[Pendientes] deleteWorkloadMember:start', { memberId: memberId, memberEmail: memberEmail, memberName: memberName, hasSupabase: !!supabase });
   if (!tareasEffectivePerms().admin) { alert('Solo administradores pueden eliminar miembros.'); return; }
   var name = memberName || memberEmail || memberId || 'miembro';
   if (!confirm('¿Eliminar miembro "' + name + '" del equipo?\n\nSe desactivará (no se borra definitivamente).')) return;
@@ -8207,7 +8257,7 @@ function deleteWorkloadMember(memberId, memberEmail, memberName) {
     return;
   }
   function finishReload() {
-    console.log('[Pendientes] deleteWorkloadMember: finishReload');
+    window._hmDebugLog('[Pendientes] deleteWorkloadMember: finishReload');
     function autoRecoverIfBlank(stage) {
       setTimeout(function() {
         var main = document.getElementById('main-content');
@@ -8268,7 +8318,7 @@ function deleteWorkloadMember(memberId, memberEmail, memberName) {
       activo: false,
       gerente_email: emailLower
     };
-    console.log('[Pendientes] deleteWorkloadMember: creating fallback deactivated row', rowEq);
+    window._hmDebugLog('[Pendientes] deleteWorkloadMember: creating fallback deactivated row', rowEq);
     supabase.from('tareas_equipo').insert(rowEq).then(function(ins) {
       if (ins.error) console.warn('[Pendientes] fallback deactivated row insert failed:', ins.error.message);
       if (done) done();
@@ -8301,7 +8351,7 @@ function deleteWorkloadMember(memberId, memberEmail, memberName) {
       console.error('[Pendientes] applyLocalHide render failed:', e);
     }
   }
-  console.log('[Pendientes] deleteWorkloadMember: deactivating in tareas_equipo', { em: em, memberId: memberId });
+  window._hmDebugLog('[Pendientes] deleteWorkloadMember: deactivating in tareas_equipo', { em: em, memberId: memberId });
   function deactivateByIdFallback() {
     if (!memberId) return Promise.resolve({ data: [] });
     return supabase.from('tareas_equipo').update({ activo: false }).eq('id', memberId).select('id,gerente_email,activo');
@@ -8310,7 +8360,7 @@ function deleteWorkloadMember(memberId, memberEmail, memberName) {
     ? supabase.from('tareas_equipo').update({ activo: false }).ilike('gerente_email', em).select('id,gerente_email,activo')
     : deactivateByIdFallback();
   Promise.resolve(firstQ).then(function(resp) {
-    console.log('[Pendientes] deleteWorkloadMember: deactivate response', resp);
+    window._hmDebugLog('[Pendientes] deleteWorkloadMember: deactivate response', resp);
     if (resp && resp.error) throw resp.error;
     if (!resp || !resp.data || !resp.data.length) {
       console.warn('[Pendientes] deactivate member: 0 rows on first query, trying id fallback');
