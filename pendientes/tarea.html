@@ -2531,6 +2531,8 @@ button.att-action-btn:disabled {
   });
 })();
 </script>
+<!-- UMD antes del fetch de config: si /api/supabase-config resuelve muy rápido, el microtask del .then del auth no debe ejecutarse antes de que exista window.supabase. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
   window.__HECOM_SB_READY__=(function(){
@@ -2552,7 +2554,6 @@ button.att-action-btn:disabled {
   })();
 })();
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 window.__HECOM_SB_READY__.then(function(){
   function __holisticWebBase(){
@@ -3724,6 +3725,11 @@ function applyTareasSidebarAvatarFromGerente() {
       imgEl.onerror = null;
       imgEl.style.display = 'none';
       iniEl.style.display = '';
+      if (!imgEl.dataset._hmAvatarFallback) {
+        imgEl.dataset._hmAvatarFallback = '1';
+        tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
+        return;
+      }
       tareasRefreshPhotoHint();
     };
     imgEl.onload = function() {
@@ -3766,7 +3772,23 @@ function applyTareasSidebarAvatarFromGerente() {
   } catch (e) {}
   tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl);
 }
-/** Si no hay foto en gerentes ni en localStorage, usa avatar de OAuth (Google, etc.) en user_metadata. */
+/** URL de foto OAuth: user_metadata + identity_data (Google suele exponerla en identities[]). */
+function tareasOAuthAvatarUrlFromUser(u) {
+  if (!u) return '';
+  var m = u.user_metadata || {};
+  var raw = m.avatar_url || m.picture || m.avatar;
+  if (raw && String(raw).trim()) return String(raw).trim();
+  var ids = u.identities;
+  if (!Array.isArray(ids)) return '';
+  for (var i = 0; i < ids.length; i++) {
+    var d = ids[i] && ids[i].identity_data;
+    if (!d) continue;
+    var x = d.avatar_url || d.picture || d.avatar;
+    if (x && String(x).trim()) return String(x).trim();
+  }
+  return '';
+}
+/** Si no hay foto en gerentes ni en localStorage, usa avatar de OAuth (Google, etc.). */
 function tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl) {
   if (!imgEl || !iniEl) {
     tareasRefreshPhotoHint();
@@ -3778,13 +3800,7 @@ function tryTareasSidebarAvatarFromAuthUser(imgEl, iniEl) {
   }
   supabase.auth.getUser().then(function(ar) {
     var u = ar.data && ar.data.user;
-    var m = u && u.user_metadata;
-    if (!m) {
-      tareasRefreshPhotoHint();
-      return;
-    }
-    var raw = m.avatar_url || m.picture || m.avatar;
-    var au = raw && String(raw).trim();
+    var au = tareasOAuthAvatarUrlFromUser(u);
     if (!au || (typeof tareasHotlinkAvatarLikelyBlocked === 'function' && tareasHotlinkAvatarLikelyBlocked(au))) {
       tareasRefreshPhotoHint();
       return;

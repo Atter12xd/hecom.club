@@ -1871,6 +1871,11 @@ function applyCreativosSidebarAvatarFromGerente() {
       imgEl.onerror = null;
       imgEl.style.display = 'none';
       iniEl.style.display = '';
+      if (!imgEl.dataset._hmAvatarFallback) {
+        imgEl.dataset._hmAvatarFallback = '1';
+        tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl);
+        return;
+      }
       creativosRefreshPhotoHint();
     };
     imgEl.onload = function() {
@@ -1911,6 +1916,21 @@ function applyCreativosSidebarAvatarFromGerente() {
   } catch (e) {}
   tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl);
 }
+function creativosOAuthAvatarUrlFromUser(u) {
+  if (!u) return '';
+  var m = u.user_metadata || {};
+  var raw = m.avatar_url || m.picture || m.avatar;
+  if (raw && String(raw).trim()) return String(raw).trim();
+  var ids = u.identities;
+  if (!Array.isArray(ids)) return '';
+  for (var i = 0; i < ids.length; i++) {
+    var d = ids[i] && ids[i].identity_data;
+    if (!d) continue;
+    var x = d.avatar_url || d.picture || d.avatar;
+    if (x && String(x).trim()) return String(x).trim();
+  }
+  return '';
+}
 function tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl) {
   if (!imgEl || !iniEl) {
     creativosRefreshPhotoHint();
@@ -1922,13 +1942,7 @@ function tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl) {
   }
   supabase.auth.getUser().then(function(ar) {
     var u = ar.data && ar.data.user;
-    var m = u && u.user_metadata;
-    if (!m) {
-      creativosRefreshPhotoHint();
-      return;
-    }
-    var raw = m.avatar_url || m.picture || m.avatar;
-    var au = raw && String(raw).trim();
+    var au = creativosOAuthAvatarUrlFromUser(u);
     if (!au || creativosHotlinkAvatarLikelyBlocked(au)) {
       creativosRefreshPhotoHint();
       return;
