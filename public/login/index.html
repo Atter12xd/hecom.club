@@ -761,7 +761,25 @@ async function tryConsumeMagicLinkHash() {
 }
 
 async function init() {
-    debugLog('init-start');
+    debugLog('init-start', {
+        href: typeof location !== 'undefined' ? location.href : '',
+        search: typeof location !== 'undefined' ? (location.search || '') : '',
+        redirectParam: (function () {
+            try {
+                return new URLSearchParams(location.search || '').get('redirect');
+            } catch (_) {
+                return null;
+            }
+        })(),
+        intendedSession: (function () {
+            try {
+                return sessionStorage.getItem(HECOM_INTENDED_PATH_KEY);
+            } catch (_) {
+                return null;
+            }
+        })(),
+        referrer: typeof document !== 'undefined' ? (document.referrer || '') : ''
+    });
     if (await tryConsumeMagicLinkHash()) return;
 
     try {

@@ -7,10 +7,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <title>Credito | Holistic Marketing</title>
-  <script src="/api/auth-config?v=20260428api"></script>
+  <script src="/api/auth-config?v=20260429cfg"></script>
   <script>
     (function () {
-      var VERSION = "credito-preflight-20260427s";
+      var VERSION = "credito-preflight-20260429";
       var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
       var panel = null;
       function ensurePanel() {
@@ -304,6 +304,7 @@
       }
       function redirectLogin(reason) {
         logInfo("redirect-login", { reason: reason, version: VERSION });
+        sendClientLog("warn", "redirect-login", { reason: reason, version: VERSION, href: (typeof location !== "undefined" ? location.href : "") });
         try {
           delete window.__CREDITO_SHARED_SUPABASE__;
         } catch (_) {
@@ -314,6 +315,15 @@
         } catch (_) {}
         var redirect = encodeURIComponent("/credito");
         window.location.replace("/login?redirect=" + redirect);
+      }
+      async function ensurePublicSupabaseConfig() {
+        if (window.__SUPABASE_URL__ && window.__SUPABASE_ANON_KEY__) return;
+        var res = await fetch("/api/supabase-config", { credentials: "same-origin" });
+        if (!res.ok) throw new Error("supabase-config HTTP " + res.status);
+        var cfg = await res.json();
+        if (!cfg.url || !cfg.anonKey) throw new Error("supabase-config incompleto");
+        window.__SUPABASE_URL__ = String(cfg.url).replace(/\/$/, "");
+        window.__SUPABASE_ANON_KEY__ = cfg.anonKey;
       }
       async function preflight() {
         installFetchTrace();
@@ -329,6 +339,13 @@
             logInfo("canonical-route", { from: p, to: canonical });
           }
         } catch (_) {}
+        try {
+          await ensurePublicSupabaseConfig();
+        } catch (e) {
+          logError("config-fetch", { message: e && e.message ? e.message : String(e) });
+          sendClientLog("error", "missing-config-after-fetch", { message: e && e.message ? e.message : String(e), version: VERSION });
+          return redirectLogin("missing-config");
+        }
         if (!window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) return redirectLogin("missing-config");
         var fromHash = parseHashSession();
         logInfo("session-source", { hash: !!fromHash });

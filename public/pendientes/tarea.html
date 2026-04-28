@@ -2440,10 +2440,30 @@ button.att-action-btn:disabled {
 </style>
 </head>
 <body>
-<script src="/api/auth-config?v=20260428api"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
+  window.__HECOM_SB_READY__=(function(){
+    if(window.__SUPABASE_URL__&&window.__SUPABASE_ANON_KEY__){
+      if(!window.__KNOWN_APP_HOSTS__)window.__KNOWN_APP_HOSTS__=['www.marketingconholistic.com','marketingconholistic.com','www.hecom.club','hecom.club'];
+      if(!window.__APP_ORIGIN_FALLBACK__)window.__APP_ORIGIN_FALLBACK__='https://www.hecom.club';
+      return Promise.resolve();
+    }
+    return fetch('/api/supabase-config',{credentials:'same-origin'}).then(function(r){
+      if(!r.ok)throw new Error('supabase-config HTTP '+r.status);
+      return r.json();
+    }).then(function(cfg){
+      if(!cfg.url||!cfg.anonKey)throw new Error('supabase-config incompleto');
+      window.__SUPABASE_URL__=String(cfg.url).replace(/\/$/,'');
+      window.__SUPABASE_ANON_KEY__=cfg.anonKey;
+      if(!window.__KNOWN_APP_HOSTS__)window.__KNOWN_APP_HOSTS__=['www.marketingconholistic.com','marketingconholistic.com','www.hecom.club','hecom.club'];
+      if(!window.__APP_ORIGIN_FALLBACK__)window.__APP_ORIGIN_FALLBACK__='https://www.hecom.club';
+    });
+  })();
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+window.__HECOM_SB_READY__.then(function(){
   function __holisticWebBase(){
     var b=(typeof window.__HOLISTIC_WEB_ORIGIN__==='string'&&window.__HOLISTIC_WEB_ORIGIN__.trim())?String(window.__HOLISTIC_WEB_ORIGIN__).replace(/\/$/,''):'';
     if(b)return b;
@@ -2480,7 +2500,7 @@ button.att-action-btn:disabled {
     return;
   }
   var url=window.__SUPABASE_URL__;var key=window.__SUPABASE_ANON_KEY__;
-  if(!url||!key){ console.warn('[Pendientes] auth: faltan URL o KEY de Supabase (/api/auth-config · PUBLIC_* en Vercel)'); return; }
+  if(!url||!key){ console.warn('[Pendientes] auth: URL/KEY vacíos tras ensure'); return; }
   var lib=window.supabase;
   var createClientFn=lib&&(lib.createClient||(lib.default&&(lib.default.createClient||lib.default)));
   if(!lib||typeof createClientFn!=='function'){ console.warn('[Pendientes] auth: createClient no encontrado en window.supabase'); return; }
@@ -2527,7 +2547,9 @@ button.att-action-btn:disabled {
       }).catch(function(){ finishGateDeny(); });
     }).catch(function(){ finishGateDeny(); });
   },12000);
-})();
+}).catch(function(e){
+  console.warn('[Pendientes] auth gate: sin config Supabase.',e&&e.message?e.message:e);
+});
 </script>
 
 <!-- Skip to content -->
@@ -3220,7 +3242,7 @@ function tryInitSupabase(retryCount) {
     scriptTagsWithSupabase: scripts
   });
   if (!url || !key) {
-    console.warn('[Pendientes] Supabase: faltan __SUPABASE_URL__ o __SUPABASE_ANON_KEY__. ¿Responde GET /api/auth-config y está PUBLIC_* en Vercel?');
+    console.warn('[Pendientes] Supabase: faltan URL/KEY (esperá /api/supabase-config o revisá PUBLIC_* en Vercel).');
     return;
   }
   var lib = window.supabase;
@@ -3269,7 +3291,14 @@ function tryInitSupabase(retryCount) {
   }
 }
 if (typeof window !== 'undefined') {
-  tryInitSupabase(0);
+  var _sbReady = window.__HECOM_SB_READY__;
+  if (_sbReady && typeof _sbReady.then === 'function') {
+    _sbReady.then(function () { tryInitSupabase(0); }).catch(function (e) {
+      console.warn('[Pendientes] tryInitSupabase omitido (config):', e && e.message ? e.message : e);
+    });
+  } else {
+    tryInitSupabase(0);
+  }
 }
 
 function marketingStorageBase() {
