@@ -137,6 +137,14 @@ img,svg{display:block;max-width:100%}
 .sidebar-logo-fallback-wide{display:none;width:100%;max-width:200px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--blue) 0%,#F97316 100%);align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800;letter-spacing:0.02em;box-shadow:var(--shadow-sm)}
 .sidebar-logo-fallback-wide.is-visible{display:flex}
 .sidebar-tagline{margin:0;font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;line-height:1.3;max-width:100%}
+.finanzas-user-card{width:100%;margin-top:12px;padding:12px;border-radius:12px;background:var(--card-bg,#fff);border:1px solid var(--border,#e2e8f0);display:flex;align-items:center;gap:12px;text-align:left}
+.finanzas-user-avatar-wrap{width:52px;height:52px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#fce7f3,#e0e7ff);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.finanzas-user-avatar-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.finanzas-user-avatar-wrap span{font-size:1.125rem;font-weight:700;color:#be123c}
+.finanzas-user-text{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.finanzas-user-hi{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)}
+.finanzas-user-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.finanzas-user-role{font-size:11px;color:var(--text-muted)}
 .sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;color:var(--sidebar-text);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;position:relative;border-left:3px solid transparent;margin-left:-3px}
 .nav-item:hover{background:rgba(59,130,246,0.05);color:var(--text);box-shadow:0 0 0 1px rgba(59,130,246,0.06)}
@@ -381,7 +389,7 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
 }
 @media(max-width:1024px){
   .sidebar{width:60px;min-width:60px}
-  .sidebar-tagline,.nav-item span,.sidebar-footer-item span,.currency-badge,.sidebar-footer-item .toggle-track{display:none}
+  .sidebar-tagline,.finanzas-user-text,.nav-item span,.sidebar-footer-item span,.currency-badge,.sidebar-footer-item .toggle-track{display:none}
   .sidebar-header{justify-content:center;padding:14px 8px 12px}
   .sidebar-logo-wide-wrap{min-height:36px}
   .sidebar-logo-wide{height:34px;max-width:40px}
@@ -514,6 +522,17 @@ select.form-input{appearance:none;background-image:url("data:image/svg+xml,%3Csv
       <div class="sidebar-logo-fallback-wide" id="finanzasSidebarLogoFallback" aria-hidden="true">MH</div>
     </div>
     <p class="sidebar-tagline">Finanzas · Organización</p>
+    <div class="finanzas-user-card" id="finanzasUserCard" hidden>
+      <div class="finanzas-user-avatar-wrap" aria-hidden="true">
+        <img id="finanzasUserAvatarImg" alt="" width="52" height="52" decoding="async" style="display:none"/>
+        <span id="finanzasUserAvatarIni">·</span>
+      </div>
+      <div class="finanzas-user-text">
+        <span class="finanzas-user-hi">Bienvenido</span>
+        <span class="finanzas-user-name" id="finanzasUserDisplayName">—</span>
+        <span class="finanzas-user-role" id="finanzasUserRole"></span>
+      </div>
+    </div>
   </div>
   <nav class="sidebar-nav" id="sidebarNav"></nav>
   <div class="sidebar-footer" id="sidebarFooter"></div>
@@ -931,6 +950,58 @@ function computePanelKpis() {
     sparkDeu: sparkDeu.length ? sparkDeu : [deudaPend, deudaPend, deudaPend, deudaPend, deudaPend, deudaPend],
     sparkCob: cobHist,
   };
+}
+function finanzasHotlinkAvatarLikelyBlocked(url){
+  if(!url||typeof url!=='string')return true;
+  var s=url.trim();if(!s)return true;
+  try{
+    var h=new URL(s,location.href||'https://local/').hostname.toLowerCase();
+    if(h.indexOf('whatsapp')>=0)return true;if(h.indexOf('wa.me')>=0)return true;if(h.indexOf('fbcdn.net')>=0)return true;
+    if(h.indexOf('facebook.com')>=0||h.indexOf('fb.com')>=0)return true;if(h.indexOf('instagram.')>=0)return true;if(h.indexOf('twimg.com')>=0)return true;
+    return false;
+  }catch(e){return true;}
+}
+function finanzasApplyGerenteProfile(row,email){
+  var card=document.getElementById('finanzasUserCard');
+  var nameEl=document.getElementById('finanzasUserDisplayName');
+  var roleEl=document.getElementById('finanzasUserRole');
+  var img=document.getElementById('finanzasUserAvatarImg');
+  var ini=document.getElementById('finanzasUserAvatarIni');
+  if(!card||!nameEl||!roleEl||!img||!ini)return;
+  var fn='';
+  if(row){
+    fn=(row.display_name!=null&&String(row.display_name).trim())||(((row.nombre||'')+' '+(row.apellido||'')).trim());
+  }
+  if(!fn&&email&&email.indexOf('@')>0){
+    var p=email.split('@')[0].replace(/[._]/g,' ');
+    fn=p.length?p.charAt(0).toUpperCase()+p.slice(1):'';
+  }
+  nameEl.textContent=fn||'—';
+  var pa=row&&(row.perm_admin===true||row.perm_admin==='true'||row.perm_admin==='t'||row.perm_admin===1);
+  roleEl.textContent=pa?'Gerente':'';
+  var urlAv=row&&row.avatar_url&&String(row.avatar_url).trim();
+  if(urlAv&&!finanzasHotlinkAvatarLikelyBlocked(urlAv)){
+    img.onload=function(){img.style.display='block';ini.style.display='none';};
+    img.onerror=function(){img.style.display='none';ini.style.display='flex';};
+    img.src=urlAv+(urlAv.indexOf('?')>=0?'&':'?')+'v='+Date.now();
+  }else{
+    img.src='';img.style.display='none';ini.style.display='flex';
+    var L=(fn||'').trim();ini.textContent=L.length?L.charAt(0).toUpperCase():'·';
+  }
+  card.hidden=false;
+}
+async function finanzasLoadGerenteProfile(){
+  var sb=window.finanzasSupabase;
+  if(!sb||typeof sb.auth!=='object')return;
+  try{
+    var ur=await sb.auth.getUser();
+    var u=ur&&ur.data&&ur.data.user;
+    var em=u&&u.email?String(u.email).trim().toLowerCase():'';
+    if(!em)return;
+    var gr=await sb.from('gerentes').select('nombre,apellido,display_name,avatar_url,perm_admin,email').eq('email',em).maybeSingle();
+    if(gr&&gr.error)console.warn('[Finanzas] gerentes',gr.error);
+    finanzasApplyGerenteProfile(gr&&gr.data?gr.data:null,em);
+  }catch(e){console.warn('[Finanzas] perfil gerente',e);}
 }
 // ===== INIT SIDEBAR =====
 function renderSidebar(){
@@ -2255,6 +2326,7 @@ document.getElementById('modalOverlay').addEventListener('click',function(e){
 window.finanzasInitApp = async function finanzasInitApp(){
   document.documentElement.setAttribute('data-theme','light');
   sparkCounter = 0;
+  try { await finanzasLoadGerenteProfile(); } catch (e) {}
   const mc = document.getElementById('mainContent');
   if (mc && window.finanzasSupabase) {
     mc.innerHTML = '<div class="view active" style="padding:48px;text-align:center;color:var(--text-muted);font-size:14px">Cargando desde Supabase…</div>';

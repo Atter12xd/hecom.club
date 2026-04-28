@@ -3478,9 +3478,20 @@ function openHolisticNameGateModalPendientes() {
   document.body.classList.add('holistic-name-gate-open');
 }
 function maybeShowHolisticNameGatePendientes() {
+  if (!supabase) return;
+  tryApplyHolisticUserNameFromGerenteRow(window.__tareasGerentePerms);
   if (!isBadHolisticDisplayName(getStoredHolisticUserName())) {
     updateTareasUserNameDisplay();
     return;
+  }
+  var row = window.__tareasGerentePerms;
+  if (row) {
+    var fn = (row.display_name != null && String(row.display_name).trim()) || ((row.nombre || '') + ' ' + (row.apellido || '')).trim();
+    if (fn && !isBadHolisticDisplayName(fn)) {
+      try { localStorage.setItem('creativos_user_name', fn); } catch (e) {}
+      updateTareasUserNameDisplay();
+      return;
+    }
   }
   if (__holisticNameGateShownPendientes) return;
   __holisticNameGateShownPendientes = true;
@@ -3589,6 +3600,52 @@ function tareasApplyPermissionUi() {
   });
   var hl = document.getElementById('header-nuevo-label');
   if (hl) hl.textContent = p.admin ? 'Nuevo' : 'Nuevo ticket';
+  try { applyTareasSidebarAvatarFromGerente(); } catch (e) {}
+}
+/** Foto de perfil: prioridad gerentes.avatar_url (misma que Crédito), luego caché local. */
+function applyTareasSidebarAvatarFromGerente() {
+  var imgEl = document.getElementById('tareasUserAvatarImg');
+  var iniEl = document.getElementById('tareasUserAvatarIniciales');
+  if (!imgEl || !iniEl) return;
+  var row = window.__tareasGerentePerms;
+  var url = row && row.avatar_url && String(row.avatar_url).trim();
+  if (url && typeof tareasHotlinkAvatarLikelyBlocked === 'function' && !tareasHotlinkAvatarLikelyBlocked(url)) {
+    var bust = (url.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+    imgEl.onerror = function() {
+      imgEl.onerror = null;
+      imgEl.style.display = 'none';
+      iniEl.style.display = '';
+    };
+    imgEl.onload = function() {
+      imgEl.style.display = 'block';
+      iniEl.style.display = 'none';
+    };
+    imgEl.src = url + bust;
+    return;
+  }
+  try {
+    var ls = localStorage.getItem('tareas_avatar_url');
+    if (!ls) return;
+    if (ls.indexOf('data:image') === 0) {
+      imgEl.src = ls;
+      imgEl.style.display = 'block';
+      iniEl.style.display = 'none';
+      return;
+    }
+    if ((ls.indexOf('http://') === 0 || ls.indexOf('https://') === 0) && typeof tareasHotlinkAvatarLikelyBlocked === 'function' && !tareasHotlinkAvatarLikelyBlocked(ls)) {
+      var b2 = (ls.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now();
+      imgEl.onerror = function() {
+        imgEl.onerror = null;
+        imgEl.style.display = 'none';
+        iniEl.style.display = '';
+      };
+      imgEl.onload = function() {
+        imgEl.style.display = 'block';
+        iniEl.style.display = 'none';
+      };
+      imgEl.src = ls + b2;
+    }
+  } catch (e) {}
 }
 function gerenteEmailSlug(email) {
   return String(email || '').trim().toLowerCase().replace(/@/g, '_at_').replace(/\./g, '_').replace(/[^a-z0-9_]/g, '_');
@@ -8497,22 +8554,45 @@ function initTareasAvatar() {
   var iniEl = document.getElementById('tareasUserAvatarIniciales');
   var inp = document.getElementById('tareasAvatarInput');
   if (!inp || !imgEl || !iniEl) return;
-  function applyPhoto(dataUrl) {
-    if (!dataUrl) return;
-    try { localStorage.setItem(key, dataUrl); } catch (e) {}
-    imgEl.src = dataUrl;
-    imgEl.style.display = 'block';
-    iniEl.style.display = 'none';
-  }
-  var stored = localStorage.getItem(key);
-  if (stored) { imgEl.src = stored; imgEl.style.display = 'block'; iniEl.style.display = 'none'; }
+  applyTareasSidebarAvatarFromGerente();
   inp.onchange = function() {
     var f = this.files && this.files[0];
     if (!f) return;
-    var r = new FileReader();
-    r.onload = function() { applyPhoto(r.result); };
-    r.readAsDataURL(f);
-    this.value = '';
+    var em = (window.__tareasSessionEmail || '').trim();
+    if (!supabase || !em) {
+      var r = new FileReader();
+      r.onload = function() {
+        try { localStorage.setItem(key, r.result); } catch (e) {}
+        imgEl.src = r.result;
+        imgEl.style.display = 'block';
+        iniEl.style.display = 'none';
+      };
+      r.readAsDataURL(f);
+      inp.value = '';
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      alert('La imagen no puede superar 5 MB.');
+      inp.value = '';
+      return;
+    }
+    uploadGerenteAvatarForEmail(em, f, function(url) {
+      if (!url) {
+        alert('No se pudo subir la foto. Revisá permisos del bucket avatars en Supabase.');
+        return;
+      }
+      supabase.from('gerentes').update({ avatar_url: url }).eq('email', em).then(function(up) {
+        if (up.error) console.warn('[Pendientes] gerentes avatar_url:', up.error);
+        if (window.__tareasGerentePerms && String(window.__tareasGerentePerms.email || '').toLowerCase().trim() === em) {
+          window.__tareasGerentePerms.avatar_url = url;
+        }
+        try { localStorage.setItem(key, url); } catch (e) {}
+        imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; };
+        imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; };
+        imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
+      });
+    });
+    inp.value = '';
   };
   var card = document.querySelector('.sidebar-footer .user-card-avatar');
   if (card) card.addEventListener('click', function() { inp.click(); });
@@ -8564,6 +8644,7 @@ function promptUserNameTareas() {
   });
 }
 function updateTareasUserNameDisplay() {
+  try { applyTareasSidebarAvatarFromGerente(); } catch (e) {}
   var el = document.getElementById('tareasUserName');
   var name = getCurrentUserNameTareas();
   var titleName = getResolvedHolisticDisplayTitleNamePendientes();
