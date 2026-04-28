@@ -1859,6 +1859,18 @@ function creativosRefreshPhotoHint() {
   }
   hintEl.style.display = show ? '' : 'none';
 }
+/** Misma idea que Pendientes: foto remota puede fallar sin Referrer (403). */
+function hmPrepareSidebarAvatarImg(imgEl, srcBeforeQuery) {
+  if (!imgEl) return;
+  try {
+    var s = srcBeforeQuery != null ? String(srcBeforeQuery) : '';
+    if (s.indexOf('http://') === 0 || s.indexOf('https://') === 0) {
+      imgEl.referrerPolicy = 'no-referrer';
+    } else {
+      try { imgEl.removeAttribute('referrerpolicy'); } catch (e2) {}
+    }
+  } catch (e) {}
+}
 function applyCreativosSidebarAvatarFromGerente() {
   var imgEl = document.getElementById('creativosUserAvatarImg');
   var iniEl = document.getElementById('creativosUserAvatarIniciales');
@@ -1883,6 +1895,7 @@ function applyCreativosSidebarAvatarFromGerente() {
       iniEl.style.display = 'none';
       creativosRefreshPhotoHint();
     };
+    hmPrepareSidebarAvatarImg(imgEl, url);
     imgEl.src = url + bust;
     return;
   }
@@ -1893,6 +1906,7 @@ function applyCreativosSidebarAvatarFromGerente() {
       return;
     }
     if (ls.indexOf('data:image') === 0) {
+      hmPrepareSidebarAvatarImg(imgEl, '');
       imgEl.src = ls;
       imgEl.style.display = 'block';
       iniEl.style.display = 'none';
@@ -1910,6 +1924,7 @@ function applyCreativosSidebarAvatarFromGerente() {
         iniEl.style.display = 'none';
         creativosRefreshPhotoHint();
       };
+      hmPrepareSidebarAvatarImg(imgEl, ls);
       imgEl.src = ls + ((ls.indexOf('?') >= 0 ? '&' : '?') + 'v=' + Date.now());
       return;
     }
@@ -1959,6 +1974,7 @@ function tryCreativosSidebarAvatarFromAuthUser(imgEl, iniEl) {
       iniEl.style.display = 'none';
       creativosRefreshPhotoHint();
     };
+    hmPrepareSidebarAvatarImg(imgEl, au);
     imgEl.src = au + bust;
   }).catch(function() {
     creativosRefreshPhotoHint();
@@ -5054,6 +5070,7 @@ function initCreativosAvatar() {
       var r = new FileReader();
       r.onload = function() {
         try { localStorage.setItem(key, r.result); } catch (e) {}
+        hmPrepareSidebarAvatarImg(imgEl, '');
         imgEl.src = r.result;
         imgEl.style.display = 'block';
         iniEl.style.display = 'none';
@@ -5081,6 +5098,7 @@ function initCreativosAvatar() {
         try { localStorage.setItem(key, url); } catch (e) {}
         imgEl.onerror = function() { imgEl.style.display = 'none'; iniEl.style.display = ''; try { creativosRefreshPhotoHint(); } catch (e) {} };
         imgEl.onload = function() { imgEl.style.display = 'block'; iniEl.style.display = 'none'; try { creativosRefreshPhotoHint(); } catch (e) {} };
+        hmPrepareSidebarAvatarImg(imgEl, url);
         imgEl.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 't=' + Date.now();
       });
     });
@@ -5106,6 +5124,24 @@ if (supabase) {
   setTimeout(function() { clearInterval(t); }, 8000);
 }
 initCreativosAvatar();
+window.hmDumpAuthUser = function() {
+  try {
+    var c = typeof supabase !== 'undefined' && supabase ? supabase : null;
+    if (!c || !c.auth) {
+      console.warn('[HM] Creativos: supabase no listo — esperá y ejecutá de nuevo: hmDumpAuthUser()');
+      return Promise.resolve(null);
+    }
+    return c.auth.getUser().then(function(ar) {
+      console.log('[HM] auth.getUser() — Creativos:', ar);
+      var u = ar.data && ar.data.user;
+      if (u) { try { console.log(JSON.stringify(u, null, 2)); } catch (e2) { console.log(u); } }
+      return u;
+    });
+  } catch (err) {
+    console.error('[HM]', err);
+    return Promise.resolve(null);
+  }
+};
 function promptUserNameCreativos() {
   var cur = getStoredHolisticUserName() || '';
   var hint = isBadHolisticDisplayName(cur) ? '' : cur;

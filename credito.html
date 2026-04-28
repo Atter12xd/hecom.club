@@ -397,6 +397,30 @@
           }
           window.__CREDITO_SHARED_SUPABASE__ = sb;
           window.__CREDITO_PREFLIGHT_SESSION__ = session;
+          window.hmDumpAuthUser = function () {
+            try {
+              var cli = window.__CREDITO_SHARED_SUPABASE__;
+              if (!cli || !cli.auth) {
+                console.warn('[HM] Crédito: cliente supabase no listo.');
+                return Promise.resolve(null);
+              }
+              return cli.auth.getUser().then(function (ar) {
+                console.log("[HM] auth.getUser() — Crédito:", ar);
+                var u = ar.data && ar.data.user;
+                if (u) {
+                  try {
+                    console.log(JSON.stringify(u, null, 2));
+                  } catch (e2) {
+                    console.log(u);
+                  }
+                }
+                return u;
+              });
+            } catch (err) {
+              console.error("[HM]", err);
+              return Promise.resolve(null);
+            }
+          };
         } catch (e) {
           logError("preflight-error", { message: e && e.message ? e.message : String(e) });
           return redirectLogin("preflight-error");
