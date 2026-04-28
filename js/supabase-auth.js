@@ -4,6 +4,15 @@
  */
 var _clientPromise = null;
 
+function storageKeyForSupabaseUrl(url) {
+    try {
+        var ref = new URL(String(url).replace(/\/$/, '')).hostname.split('.')[0];
+        return ref ? 'sb-' + ref + '-auth-token' : undefined;
+    } catch (_) {
+        return undefined;
+    }
+}
+
 export async function getPublicSupabaseConfig() {
     var res = await fetch('/api/supabase-config', { credentials: 'same-origin' });
     if (!res.ok) {
@@ -65,12 +74,15 @@ export function getSupabaseClient() {
             throw new Error('Respuesta de configuración incompleta');
         }
         var mod = await import('https://esm.sh/@supabase/supabase-js@2.49.1');
+        var sk = storageKeyForSupabaseUrl(cfg.url);
+        var authOpts = {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+        };
+        if (sk) authOpts.storageKey = sk;
         return mod.createClient(cfg.url, cfg.anonKey, {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-                detectSessionInUrl: true,
-            },
+            auth: authOpts,
         });
     })();
     return _clientPromise;

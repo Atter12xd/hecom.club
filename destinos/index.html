@@ -390,7 +390,7 @@ var STORAGE_NAME = 'holistic_hub_destino_nombre';
  */
 var USE_URL_SESSION_HANDOFF = true;
 var CANONICAL_HECOM_ORIGIN = 'https://www.hecom.club';
-var PANEL_URL_VERSION = 'v=20260427s';
+var PANEL_URL_VERSION = 'v=20260428h';
 
 /* Rutas de panel (setSession desde hash en cliente). Añadir aquí paths que NUNCA deban llevar tokens. */
 var MARKETING_HANDOFF_DENYLIST = [];
@@ -585,6 +585,24 @@ async function openHolisticPanel(targetUrl, panelName) {
         if (fresh && fresh.access_token && fresh.refresh_token) {
             sessionSnapshot = fresh;
             urlToOpen = buildSessionHandoffUrl(targetUrl, fresh);
+        }
+    }
+    /* window.open(…#access_token=…) largo falla en Chrome: about:blank + replace conserva el hash. */
+    var handoffWithTokens = urlToOpen.indexOf('#') !== -1 && urlToOpen.indexOf('access_token=') !== -1;
+    if (handoffWithTokens) {
+        var ph = window.open('about:blank', '_blank');
+        if (ph) {
+            try {
+                ph.opener = null;
+            } catch (_) {}
+            try {
+                ph.location.replace(urlToOpen);
+                return;
+            } catch (_) {
+                try {
+                    ph.close();
+                } catch (_) {}
+            }
         }
     }
     if (openUrlInNewTabPreservingThisPage(urlToOpen)) {

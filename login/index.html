@@ -627,19 +627,34 @@ a:hover { text-decoration: underline; }
 <script type="module">
 import { getSupabaseClient, invokeMagicLinkLogin } from '/js/supabase-auth.js';
 
+/** Compañero de credito.html redirectLogin: sobrevive a proxies que pierden ?redirect= o URLs largas. */
+var HECOM_INTENDED_PATH_KEY = 'hecom_intended_path_after_login';
+
 /**
- * Después de login o si ya hay sesión: honor ?redirect= (p. ej. /credito desde preflight).
- * Sin esto, /login?redirect=/credito manda siempre a /destinos y parece que «Crédito volvió» al hub.
- * Solo mismo origen; no /login ni /forgot-password.
+ * Después de login o si ya hay sesión: sessionStorage (credito preflight) y luego ?redirect=.
+ * Sin esto, /login manda a /destinos y parece que «Crédito volvió» al hub.
  */
 function getSafePostLoginRedirect() {
+    function allowPath(pathname) {
+        var p = pathname || '';
+        if (!p || p === '/') return false;
+        if (p.indexOf('/login') === 0 || p.indexOf('/forgot-password') === 0) return false;
+        return true;
+    }
     try {
+        var stored = sessionStorage.getItem(HECOM_INTENDED_PATH_KEY);
+        if (stored) {
+            sessionStorage.removeItem(HECOM_INTENDED_PATH_KEY);
+            var u0 = new URL(stored, window.location.origin);
+            if (u0.origin === window.location.origin && allowPath(u0.pathname)) {
+                return u0.pathname + u0.search + u0.hash;
+            }
+        }
         var raw = new URLSearchParams(window.location.search || '').get('redirect');
         if (!raw) return '/destinos';
         var u = new URL(decodeURIComponent(raw), window.location.origin);
         if (u.origin !== window.location.origin) return '/destinos';
-        var p = u.pathname || '';
-        if (p.indexOf('/login') === 0 || p.indexOf('/forgot-password') === 0) return '/destinos';
+        if (!allowPath(u.pathname)) return '/destinos';
         return u.pathname + u.search + u.hash;
     } catch (_) {
         return '/destinos';

@@ -309,6 +309,9 @@
         } catch (_) {
           window.__CREDITO_SHARED_SUPABASE__ = null;
         }
+        try {
+          sessionStorage.setItem("hecom_intended_path_after_login", "/credito");
+        } catch (_) {}
         var redirect = encodeURIComponent("/credito");
         window.location.replace("/login?redirect=" + redirect);
       }
@@ -331,8 +334,11 @@
         logInfo("session-source", { hash: !!fromHash });
         try {
           await loadSupabaseUmd();
+          var skPre = storageKeyForSupabaseUrl(window.__SUPABASE_URL__);
+          var authPre = { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: localStorage };
+          if (skPre) authPre.storageKey = skPre;
           var sb = window.supabase.createClient(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, {
-            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storage: localStorage }
+            auth: authPre
           });
           var currentSession = (await sb.auth.getSession()).data.session;
           logInfo("initial-session", { ok: !!currentSession });

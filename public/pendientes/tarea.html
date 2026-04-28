@@ -4373,7 +4373,9 @@ async function loadTareasData() {
       supabase.from('tareas_calendario').select('*').eq('mes', mes).eq('anio', anio).order('dia'),
       supabase.from('gerentes').select('*').order('email')
     ]);
-    if (creditoRes.error) console.warn('[Pendientes] No se pudo cargar clientes de Crédito (sync):', creditoRes.error.message);
+    if (creditoRes.error) {
+      console.error('[Pendientes] clientes (sync Crédito) falló — revisar RLS/JWT/proyecto:', creditoRes.error.code || '', creditoRes.error.message, creditoRes.error);
+    }
     if (gerentesRes.error) console.warn('[Pendientes] No se pudo cargar gerentes (asistencia):', gerentesRes.error.message);
     if (eqRes.error) throw eqRes.error;
     if (clRes.error) throw clRes.error;
