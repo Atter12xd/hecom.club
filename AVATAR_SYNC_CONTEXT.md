@@ -75,6 +75,17 @@ Nota: en Credito, el JS suele venir minificado en `hecom.club`. Fuente editable 
 - `finanzas/finanzas.html`
 - `public/finanzas/finanzas.html` (copia deploy)
 
+### Copia de seguridad (`/backup-dashboard`)
+
+Deploy real en **`hecom.club`** (Vercel sirve rutas locales; ya no hay proxy externo).
+
+- `backup-dashboard/index.html`
+- `backup-dashboard/scripts/export-from-supabase.js`
+- `backup-dashboard/data/backup.json`
+- `public/backup-dashboard/` mismos archivos (copia deploy, igual que finanzas/creativos).
+
+Fuente editable paralela en `marketing/marketing/backup-dashboard` solo como referencia; tras cambios ahí, sincronizar artefactos a `hecom.club` para no perderlos en deploy.
+
 ## Flujo correcto de cambio de foto
 
 ### 1) Obtener usuario actual

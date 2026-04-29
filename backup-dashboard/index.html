@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copia de seguridad — Holistic Marketing</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233b82f6'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --bg: #0c0e14;
+      --card: #161922;
+      --card-border: #252936;
+      --text: #e8eaef;
+      --text-soft: #9ca3b4;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+    .header .sub {
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    .header .export-info {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header .export-info .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ok);
+    }
+
+    /* Filtro por rango */
+    .filtro-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .filtro-card h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-soft);
+      margin: 0 0 16px;
+    }
+    .filtro-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+    .filtro-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filtro-group label {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+    .filtro-group input[type=date] {
+      padding: 10px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-left: 8px;
+    }
+    .presets button {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      background: var(--card);
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .presets button:hover {
+      background: var(--card-border);
+      color: var(--text);
+    }
+    .filtro-hint {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-top: 12px;
+    }
+
+    /* Resumen */
+    .resumen {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .resumen .chip {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .resumen .chip .n {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .resumen .chip .l {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-top: 4px;
+    }
+    .resumen .chip .total {
+      font-size: 0.85rem;
+      color: var(--ok);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    /* Tablas */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 14px;
+      color: var(--text);
+    }
+    .card table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .card th {
+      text-align: left;
+      padding: 10px 14px;
+      color: var(--text-soft);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .card td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(37, 41, 54, 0.8);
+    }
+    .card tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .card .empty {
+      color: var(--text-soft);
+      padding: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    /* Gate (login) */
+    .gate {
+      max-width: 380px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 40px 28px;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+    }
+    .gate h1 { font-size: 1.4rem; margin: 0 0 8px; }
+    .gate .sub { color: var(--text-soft); font-size: 0.9rem; margin-bottom: 24px; }
+    .gate input {
+      width: 100%;
+      padding: 12px 16px;
+      margin: 8px 0 16px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+    }
+    .gate button {
+      width: 100%;
+      padding: 12px 24px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .gate button:hover { background: var(--accent-hover); }
+    .gate .err { color: #ef4444; font-size: 0.9rem; margin-top: 10px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="gate" class="gate">
+    <h1>Copia de seguridad</h1>
+    <p class="sub">Base de datos Holistic — acceso restringido</p>
+    <input type="password" id="claveIn" placeholder="Clave de acceso" autocomplete="off" />
+    <button type="button" id="btnEntrar">Entrar</button>
+    <p id="gateErr" class="err hidden"></p>
+  </div>
+
+  <div id="app" class="wrap hidden">
+    <header class="header">
+      <h1>Copia de seguridad — Holistic Marketing</h1>
+      <p class="sub">Crédito, Cobranza, Pendientes, Creativos y Finanzas: consultá por día o por rango. Por defecto se muestra <strong>este mes</strong> para no ver pantallas vacías si hoy no hubo movimientos.</p>
+      <div class="export-info" id="metaExport"><span class="dot"></span> Cargando…</div>
+    </header>
+
+    <div class="filtro-card">
+      <h2>Rango de fechas</h2>
+      <div class="filtro-row">
+        <div class="filtro-group">
+          <label for="desde">Desde</label>
+          <input type="date" id="desde" />
+        </div>
+        <div class="filtro-group">
+          <label for="hasta">Hasta</label>
+          <input type="date" id="hasta" />
+        </div>
+        <div class="presets">
+          <button type="button" data-preset="hoy">Hoy</button>
+          <button type="button" data-preset="semana">Esta semana</button>
+          <button type="button" data-preset="mes">Este mes</button>
+        </div>
+      </div>
+      <p class="filtro-hint">Elige un solo día (desde = hasta) o un intervalo. Si ves todo en cero, el snapshot puede ser de otro mes: ampliá «Desde» al mes donde está la última exportación (fecha arriba) o pulsá una fecha amplia tipo 2026-01-01 → hoy.</p>
+    </div>
+
+    <div id="resumen" class="resumen"></div>
+    <div id="panels"></div>
+  </div>
+
+  <script>
+    (function() {
+      var CLAVE_ESPERADA = 'holistic2025';
+      var STORAGE_KEY = 'backup_dashboard_clave';
+      var data = {
+        exportedAt: null,
+        schemaVersion: 0,
+        clientes: [],
+        clientes_acceso: [],
+        gastos: [],
+        cobros: [],
+        garantias: [],
+        manual: [],
+        gerentes: [],
+        cobranza_bandeja: [],
+        cobranza_eventos: [],
+        tareas_equipo: [],
+        tareas_clientes: [],
+        tareas_kanban: [],
+        tareas_tickets: [],
+        tareas_workload: [],
+        tareas_calendario: [],
+        tareas_ticket_comentarios: [],
+        creativos_clientes: [],
+        creativos_productos: [],
+        creativos_editores: [],
+        creativos_proyectos: [],
+        finanzas_app_ingresos: [],
+        finanzas_app_gastos: [],
+        finanzas_app_cuentas_cobrar: [],
+        finanzas_app_deudas: [],
+        finanzas_app_sueldos: [],
+        finanzas_app_impuestos: []
+      };
+
+      function checkClave() {
+        var stored = sessionStorage.getItem(STORAGE_KEY);
+        var urlClave = (new URLSearchParams(window.location.search)).get('clave');
+        if (urlClave && urlClave === CLAVE_ESPERADA) { sessionStorage.setItem(STORAGE_KEY, urlClave); return true; }
+        return stored === CLAVE_ESPERADA;
+      }
+
+      function showGate() {
+        document.getElementById('gate').classList.remove('hidden');
+        document.getElementById('app').classList.add('hidden');
+      }
+      function showApp() {
+        document.getElementById('gate').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+      }
+
+      document.getElementById('btnEntrar').onclick = function() {
+        var v = document.getElementById('claveIn').value.trim();
+        if (v !== CLAVE_ESPERADA) {
+          document.getElementById('gateErr').textContent = 'Clave incorrecta';
+          document.getElementById('gateErr').classList.remove('hidden');
+          return;
+        }
+        sessionStorage.setItem(STORAGE_KEY, v);
+        document.getElementById('gateErr').classList.add('hidden');
+        showApp();
+        loadData();
+      };
+
+      if (checkClave()) {
+        showApp();
+        loadData();
+      } else {
+        showGate();
+      }
+
+      function loadData() {
+        var base = window.location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '') || '.';
+        var debug = new URLSearchParams(window.location.search).get('debug') === '1';
+        var url = base + '/data/backup.json' + (debug ? ('?t=' + Date.now()) : '');
+        fetch(url)
+          .then(function(r) { return r.ok ? r.json() : Promise.reject(new Error('No se pudo cargar backup.json')); })
+          .then(function(json) {
+            data = json;
+            if (data.exportedAt) {
+              var d = new Date(data.exportedAt);
+              var v = data.schemaVersion || 1;
+              document.getElementById('metaExport').innerHTML = '<span class="dot"></span> Última exportación: ' + d.toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) + (v >= 2 ? ' · Snapshot v' + v : ' · <span style="color:#f59e0b">Ejecutá de nuevo el export (npm run export)</span> para incluir Pendientes/Creativos/Cobranza/Finanzas');
+            }
+            if (debug) {
+              console.log('[backup-dashboard]', 'backup.json cargado:', {
+                url: url.replace(/\?.*$/, ''),
+                exportedAt: data.exportedAt,
+                records: {
+                  gerentes: (data.gerentes || []).length,
+                  clientes: (data.clientes || []).length,
+                  gastos: (data.gastos || []).length,
+                  cobros: (data.cobros || []).length,
+                  garantias: (data.garantias || []).length,
+                  cobranza_bandeja: (data.cobranza_bandeja || []).length,
+                  tareas_tickets: (data.tareas_tickets || []).length,
+                  creativos_proyectos: (data.creativos_proyectos || []).length
+                }
+              });
+            }
+            setDefaultRange();
+            render();
+          })
+          .catch(function(e) {
+            document.getElementById('metaExport').textContent = 'Error: ' + e.message;
+            document.getElementById('resumen').innerHTML = '<p class="empty">No hay datos. Ejecute el script de exportación y suba data/backup.json</p>';
+            document.getElementById('panels').innerHTML = '';
+          });
+      }
+
+      function todayStr() { return new Date().toISOString().slice(0, 10); }
+      function dateStr(iso) { return iso ? String(iso).slice(0, 10) : ''; }
+
+      /** Rango inicial: desde el día 1 del mes de la última exportación hasta hoy (así no queda vacío si el JSON es de feb y estamos en abr). */
+      function setDefaultRange() {
+        var desde = document.getElementById('desde');
+        var hasta = document.getElementById('hasta');
+        if (desde.value && hasta.value) return;
+
+        if (data && data.exportedAt) {
+          var e = new Date(data.exportedAt);
+          if (!Number.isNaN(e.getTime())) {
+            var y = e.getFullYear();
+            var mo = e.getMonth();
+            var first = new Date(y, mo, 1);
+            desde.value = first.toISOString().slice(0, 10);
+            hasta.value = todayStr();
+            return;
+          }
+        }
+        var today = new Date();
+        var first = new Date(today.getFullYear(), today.getMonth(), 1);
+        desde.value = first.toISOString().slice(0, 10);
+        hasta.value = todayStr();
+      }
+
+      function getRange() {
+        var desde = document.getElementById('desde').value;
+        var hasta = document.getElementById('hasta').value;
+        if (!desde || !hasta) return null;
+        if (hasta < desde) { var t = hasta; hasta = desde; desde = t; document.getElementById('hasta').value = hasta; document.getElementById('desde').value = desde; }
+        return { desde: desde, hasta: hasta };
+      }
+
+      function filterByDateRange(arr, desde, hasta, dateField) {
+        if (!arr || !arr.length) return [];
+        return arr.filter(function(r) {
+          var d = dateField === 'fecha' ? dateStr(r.fecha) : dateStr(r.created_at);
+          if (!d) return false;
+          return d >= desde && d <= hasta;
+        });
+      }
+
+      /** fecha | created_at | updated_at | tareas_calendario (anio/mes/día) */
+      function filterByFlexibleDate(arr, desde, hasta) {
+        if (!arr || !arr.length) return [];
+        return arr.filter(function(r) {
+          var d = dateStr(r.fecha);
+          if (!d) d = dateStr(r.created_at);
+          if (!d) d = dateStr(r.updated_at);
+          if (!d) d = dateStr(r.prox_pago);
+          if (!d) d = dateStr(r.fecha_emision);
+          if (!d) d = dateStr(r.fecha_pago);
+          if (!d) d = dateStr(r.fecha_vencimiento);
+          if (!d && r.anio != null && r.mes != null && r.dia != null) {
+            d = String(r.anio) + '-' + String(r.mes).padStart(2, '0') + '-' + String(r.dia).padStart(2, '0');
+          }
+          if (!d) return false;
+          return d >= desde && d <= hasta;
+        });
+      }
+
+      function escCell(s) {
+        if (s === null || s === undefined) return '—';
+        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      document.querySelectorAll('.presets button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var today = new Date();
+          var desdeIn = document.getElementById('desde');
+          var hastaIn = document.getElementById('hasta');
+          var preset = this.getAttribute('data-preset');
+          var desde, hasta;
+          if (preset === 'hoy') {
+            desde = hasta = todayStr();
+          } else if (preset === 'semana') {
+            var day = today.getDay();
+            var diff = today.getDate() - day + (day === 0 ? -6 : 1);
+            var lunes = new Date(today);
+            lunes.setDate(diff);
+            desde = lunes.toISOString().slice(0, 10);
+            hasta = todayStr();
+          } else {
+            desde = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-01';
+            hasta = todayStr();
+          }
+          desdeIn.value = desde;
+          hastaIn.value = hasta;
+          render();
+        });
+      });
+
+      document.getElementById('desde').addEventListener('change', render);
+      document.getElementById('hasta').addEventListener('change', render);
+
+      function render() {
+        var range = getRange();
+        if (!range) return;
+
+        var desde = range.desde;
+        var hasta = range.hasta;
+
+        var cobrosList = data.cobros || [];
+        var cobrosRange = filterByDateRange(cobrosList, desde, hasta, 'fecha');
+        if (!cobrosRange.length) cobrosRange = filterByDateRange(cobrosList, desde, hasta, 'created_at');
+        var gastosRange = filterByDateRange(data.gastos || [], desde, hasta, 'created_at');
+        var clientesRange = filterByDateRange(data.clientes || [], desde, hasta, 'created_at');
+        var garantiasRange = filterByDateRange(data.garantias || [], desde, hasta, 'created_at');
+        var manualList = data.manual || [];
+        var manualRange = filterByDateRange(manualList, desde, hasta, 'fecha');
+        if (!manualRange.length) manualRange = filterByDateRange(manualList, desde, hasta, 'created_at');
+        var gerentesRange = filterByDateRange(data.gerentes || [], desde, hasta, 'created_at');
+
+        var cobranzaRange = filterByFlexibleDate(data.cobranza_bandeja || [], desde, hasta);
+        var cobranzaEventosRange = filterByFlexibleDate(data.cobranza_eventos || [], desde, hasta);
+        var tareasTicketsRange = filterByFlexibleDate(data.tareas_tickets || [], desde, hasta);
+        var tareasKanbanRange = filterByFlexibleDate(data.tareas_kanban || [], desde, hasta);
+        var calendarioRange = filterByFlexibleDate(data.tareas_calendario || [], desde, hasta);
+        var ticketComRange = filterByFlexibleDate(data.tareas_ticket_comentarios || [], desde, hasta);
+        var creativosProjRange = filterByFlexibleDate(data.creativos_proyectos || [], desde, hasta);
+
+        var fiIng = filterByFlexibleDate(data.finanzas_app_ingresos || [], desde, hasta);
+        var fiGas = filterByFlexibleDate(data.finanzas_app_gastos || [], desde, hasta);
+        var fiCta = filterByFlexibleDate(data.finanzas_app_cuentas_cobrar || [], desde, hasta);
+        var fiDeu = filterByFlexibleDate(data.finanzas_app_deudas || [], desde, hasta);
+        var fiSue = filterByFlexibleDate(data.finanzas_app_sueldos || [], desde, hasta);
+        var fiImp = filterByFlexibleDate(data.finanzas_app_impuestos || [], desde, hasta);
+
+        var totalCobros = cobrosRange.reduce(function(s, r) { return s + Number(r.monto) || 0; }, 0);
+        var totalGastos = gastosRange.reduce(function(s, r) { return s + Number(r.gasto) || 0; }, 0);
+        var totalGarantias = garantiasRange.reduce(function(s, r) { return s + Number(r.valor) || 0; }, 0);
+        var totalManual = manualRange.reduce(function(s, r) { return s + Number(r.monto) || 0; }, 0);
+
+        var fmt = function(n) { return '$' + Number(n).toLocaleString('es-PE', { minimumFractionDigits: 2 }); };
+
+        document.getElementById('resumen').innerHTML = [
+          { n: cobrosRange.length, l: 'Cobros', total: totalCobros },
+          { n: gastosRange.length, l: 'Gastos', total: totalGastos },
+          { n: clientesRange.length, l: 'Clientes (altas)', total: null },
+          { n: garantiasRange.length, l: 'Garantías', total: totalGarantias },
+          { n: manualRange.length, l: 'Manual', total: totalManual },
+          { n: gerentesRange.length, l: 'Gerentes', total: null },
+          { n: cobranzaRange.length, l: 'Cobranza (borradores)', total: null },
+          { n: cobranzaEventosRange.length, l: 'Cobranza eventos', total: null },
+          { n: tareasTicketsRange.length, l: 'Tickets Pendientes', total: null },
+          { n: tareasKanbanRange.length, l: 'Kanban filas', total: null },
+          { n: creativosProjRange.length, l: 'Proyectos Creativos', total: null },
+          { n: fiIng.length + fiGas.length, l: 'Movs. Finanzas (ing+gasto)', total: null }
+        ].map(function(c) {
+          var totalHtml = c.total != null ? '<div class="total">' + fmt(c.total) + '</div>' : '';
+          return '<div class="chip"><div class="n">' + c.n + '</div><div class="l">' + c.l + '</div>' + totalHtml + '</div>';
+        }).join('');
+
+        var clientesMap = {};
+        (data.clientes || []).forEach(function(c) { clientesMap[c.id] = c.name; });
+        var gastosMap = {};
+        (data.gastos || []).forEach(function(g) { gastosMap[g.id] = g; });
+
+        function tbl(titulo, filas, cols) {
+          if (!filas.length) return '<div class="card"><h2>' + escCell(titulo) + '</h2><p class="empty">Sin movimientos en este rango</p></div>';
+          var th = cols.map(function(c) { return '<th>' + escCell(c.label) + '</th>'; }).join('');
+          var trs = filas.map(function(r) {
+            return '<tr>' + cols.map(function(c) {
+              var cell = c.fn ? c.fn(r) : (r[c.key] ?? '—');
+              return '<td>' + (typeof cell === 'number' ? cell : escCell(cell)) + '</td>';
+            }).join('') + '</tr>';
+          }).join('');
+          return '<div class="card"><h2>' + escCell(titulo) + '</h2><table><thead><tr>' + th + '</tr></thead><tbody>' + trs + '</tbody></table></div>';
+        }
+
+        var rangoLabel = desde === hasta ? 'del ' + desde : 'del ' + desde + ' al ' + hasta;
+
+        function vistaPorCliente() {
+          var creativosCredMap = {};
+          (data.creativos_clientes || []).forEach(function(cc) {
+            if (cc && cc.id != null && cc.credito_client_id) creativosCredMap[String(cc.id)] = String(cc.credito_client_id);
+          });
+          var list = (data.clientes || []).slice().sort(function(a, b) {
+            return (a.name || '').toLocaleLowerCase('es').localeCompare((b.name || '').toLocaleLowerCase('es'), 'es');
+          });
+          if (!list.length) {
+            return '<div class="card"><h2>Por cliente (orden alfabético) — ' + escCell(rangoLabel) + '</h2><p class="empty">No hay clientes en el snapshot. Ejecutá el export incluyendo `clientes`.</p></div>';
+          }
+          function proyectosForCred(cid) {
+            return creativosProjRange.filter(function(p) {
+              if (String(p.credito_client_id || '') === cid) return true;
+              var cr = creativosCredMap[String(p.client_id || '')];
+              return cr === cid;
+            });
+          }
+          var rows = list.map(function(c) {
+            var cid = String(c.id);
+            var gs = gastosRange.filter(function(g) { return String(g.client_id) === cid; });
+            var co = cobrosRange.filter(function(x) {
+              if (String(x.client_id || '') === cid) return true;
+              var gid = x.gasto_id && gastosMap[x.gasto_id];
+              return gid && String(gid.client_id) === cid;
+            });
+            var ga = garantiasRange.filter(function(x) { return String(x.client_id) === cid; });
+            var cob = cobranzaRange.filter(function(x) { return String(x.client_id) === cid; });
+            var tfc = (data.tareas_clientes || []).filter(function(t) {
+              return t.credito_client_id != null && String(t.credito_client_id) === cid;
+            });
+            var tfcR = filterByFlexibleDate(tfc, desde, hasta);
+            var proj = proyectosForCred(cid);
+            var n = gs.length + co.length + ga.length + cob.length + proj.length + tfcR.length;
+            if (n === 0) return null;
+            return '<tr>' +
+              '<td><strong>' + escCell(c.name) + '</strong><br/><span style="color:var(--text-soft);font-size:0.75rem">' + escCell(cid.slice(0, 8)) + '…</span></td>' +
+              '<td>' + gs.length + '</td>' +
+              '<td>' + co.length + '</td>' +
+              '<td>' + ga.length + '</td>' +
+              '<td>' + cob.length + '</td>' +
+              '<td>' + tfcR.length + '/' + tfc.length + '</td>' +
+              '<td>' + proj.length + '</td>' +
+            '</tr>';
+          }).filter(Boolean);
+          if (!rows.length) {
+            return '<div class="card"><h2>Por cliente — ' + escCell(rangoLabel) + '</h2><p class="empty">Ningún cliente tiene movimiento en Pendientes/Gastos/Cobranza/Creativos para este rango. Ampliá fechas o revisá datos.</p></div>';
+          }
+          var thead = '<thead><tr><th>Cliente Crédito</th><th>Gastos Ads</th><th>Cobros</th><th>Garantías</th><th>Cobranza</th><th>Pendientes (ficha en rango / total vínculo)</th><th>Creativos proy.</th></tr></thead>';
+          return '<div class="card"><h2>Por cliente (Crédito, Cobranza, Pendientes, Creativos) — ' + escCell(rangoLabel) + '</h2><table>' + thead + '<tbody>' + rows.join('') + '</tbody></table></div>';
+        }
+
+        document.getElementById('panels').innerHTML =
+          vistaPorCliente() +
+          tbl('Cobros (' + cobrosRange.length + ') — ' + rangoLabel, cobrosRange, [
+            { label: 'Fecha', key: 'fecha' },
+            { label: 'Hora', fn: function(r) { return r.hora ? String(r.hora).slice(0, 5) : '—'; } },
+            { label: 'Cliente', fn: function(r) { var g = gastosMap[r.gasto_id]; return g ? (clientesMap[g.client_id] || '—') : '—'; } },
+            { label: 'Monto', fn: function(r) { return fmt(r.monto); } },
+            { label: 'Método', key: 'metodo' },
+            { label: 'Registrado por', key: 'created_by' },
+            { label: 'Notas', key: 'notas' }
+          ]) +
+          tbl('Gastos (' + gastosRange.length + ') — ' + rangoLabel, gastosRange, [
+            { label: 'Cliente', fn: function(r) { return clientesMap[r.client_id] || '—'; } },
+            { label: 'Mes', key: 'mes' },
+            { label: 'Campaña', key: 'camp' },
+            { label: 'Gasto', fn: function(r) { return fmt(r.gasto); } },
+            { label: 'Fee %', key: 'fee' },
+            { label: 'Notas', key: 'notas' }
+          ]) +
+          tbl('Clientes (altas) (' + clientesRange.length + ') — ' + rangoLabel, clientesRange, [
+            { label: 'Nombre', key: 'name' },
+            { label: 'Instagram', key: 'ig' },
+            { label: 'Negocio', key: 'biz' },
+            { label: 'Notas', key: 'notes' }
+          ]) +
+          tbl('Garantías (' + garantiasRange.length + ') — ' + rangoLabel, garantiasRange, [
+            { label: 'Cliente', fn: function(r) { return clientesMap[r.client_id] || '—'; } },
+            { label: 'Tipo', key: 'tipo' },
+            { label: 'Descripción', key: 'descripcion' },
+            { label: 'Valor', fn: function(r) { return fmt(r.valor); } },
+            { label: 'Estado', key: 'estado' }
+          ]) +
+          tbl('Manual (' + manualRange.length + ') — ' + rangoLabel, manualRange, [
+            { label: 'Fecha', key: 'fecha' },
+            { label: 'Concepto', key: 'conc' },
+            { label: 'Monto', fn: function(r) { return fmt(r.monto); } },
+            { label: 'Tipo', key: 'tipo' },
+            { label: 'Nota', key: 'nota' }
+          ]) +
+          (gerentesRange.length ? tbl('Gerentes (' + gerentesRange.length + ') — ' + rangoLabel, gerentesRange, [
+            { label: 'Email', key: 'email' }
+          ]) : '') +
+          tbl('Cobranza — borradores (' + cobranzaRange.length + ') — ' + rangoLabel, cobranzaRange, [
+            { label: 'Cliente', fn: function(r) { return escCell(clientesMap[r.client_id] || r.cliente_nombre); } },
+            { label: 'Email', key: 'email_destino' },
+            { label: 'Estado', key: 'estado' },
+            { label: 'Monto pend.', fn: function(r) { return fmt(r.monto_pendiente); } },
+            { label: 'Asunto', key: 'asunto' }
+          ]) +
+          tbl('Cobranza — eventos (' + cobranzaEventosRange.length + ') — ' + rangoLabel, cobranzaEventosRange, [
+            { label: 'Evento', key: 'evento' },
+            { label: 'Detalle', key: 'detalle' },
+            { label: 'Actor', key: 'actor_email' },
+            { label: 'Creado', key: 'created_at' }
+          ]) +
+          tbl('Pendientes — tickets (' + tareasTicketsRange.length + ') — ' + rangoLabel, tareasTicketsRange, [
+            { label: 'Código', key: 'codigo' },
+            { label: 'Título', key: 'titulo' },
+            { label: 'Cliente', key: 'cliente_nombre' },
+            { label: 'Estado', key: 'status' },
+            { label: 'Creado', key: 'created_at' }
+          ]) +
+          tbl('Pendientes — Kanban (' + tareasKanbanRange.length + ') — ' + rangoLabel, tareasKanbanRange, [
+            { label: 'Columna', key: 'columna' },
+            { label: 'Título', key: 'titulo' },
+            { label: 'Cliente', key: 'cliente_nombre' },
+            { label: 'Prioridad', key: 'prioridad' },
+            { label: 'Actualizado', key: 'updated_at' }
+          ]) +
+          tbl('Pendientes — comentarios tickets (' + ticketComRange.length + ') — ' + rangoLabel, ticketComRange, [
+            { label: 'Ticket', key: 'ticket_id' },
+            { label: 'Quién', key: 'quien' },
+            { label: 'Qué', key: 'que' },
+            { label: 'Creado', key: 'created_at' }
+          ]) +
+          tbl('Pendientes — calendario (' + calendarioRange.length + ') — ' + rangoLabel, calendarioRange, [
+            { label: 'Año', key: 'anio' },
+            { label: 'Mes', key: 'mes' },
+            { label: 'Día', key: 'dia' },
+            { label: 'Notas', key: 'notas' }
+          ]) +
+          tbl('Creativos — proyectos (' + creativosProjRange.length + ') — ' + rangoLabel, creativosProjRange, [
+            { label: 'Cliente Crédito', fn: function(r) { return escCell(clientesMap[r.credito_client_id] || r.credito_client_id); } },
+            { label: 'Nombre', key: 'name' },
+            { label: 'Creado', key: 'created_at' },
+            { label: 'Publicado', key: 'published' }
+          ]) +
+          tbl('Finanzas — ingresos (' + fiIng.length + ') — ' + rangoLabel, fiIng, [
+            { label: 'Fecha', key: 'fecha' },
+            { label: 'Cliente', key: 'cliente' },
+            { label: 'Concepto', key: 'concepto' },
+            { label: 'USD', fn: function(r) { return fmt(r.monto_usd); } },
+            { label: 'Estado', key: 'estado' }
+          ]) +
+          tbl('Finanzas — gastos (' + fiGas.length + ') — ' + rangoLabel, fiGas, [
+            { label: 'Fecha', key: 'fecha' },
+            { label: 'Categoría', key: 'categoria' },
+            { label: 'Concepto', key: 'concepto' },
+            { label: 'USD', fn: function(r) { return fmt(r.monto_usd); } }
+          ]) +
+          tbl('Finanzas — cuentas por cobrar (' + fiCta.length + ') — ' + rangoLabel, fiCta, [
+            { label: 'Cliente', key: 'cliente' },
+            { label: 'Servicio', key: 'servicio' },
+            { label: 'USD', fn: function(r) { return fmt(r.monto_usd); } },
+            { label: 'Vencimiento', key: 'fecha_vencimiento' }
+          ]) +
+          tbl('Finanzas — deudas (' + fiDeu.length + ') — ' + rangoLabel, fiDeu, [
+            { label: 'Banco', key: 'banco' },
+            { label: 'Concepto', key: 'concepto' },
+            { label: 'Total', fn: function(r) { return fmt(r.monto_total); } },
+            { label: 'Próx. pago', key: 'prox_pago' }
+          ]) +
+          tbl('Finanzas — sueldos (' + fiSue.length + ') — ' + rangoLabel, fiSue, [
+            { label: 'Empleado', key: 'empleado' },
+            { label: 'Bruto USD', fn: function(r) { return fmt(r.bruto_usd); } },
+            { label: 'Fecha pago', key: 'fecha_pago' }
+          ]) +
+          tbl('Finanzas — impuestos (' + fiImp.length + ') — ' + rangoLabel, fiImp, [
+            { label: 'Tipo', key: 'tipo' },
+            { label: 'Período', key: 'periodo' },
+            { label: 'USD', fn: function(r) { return fmt(r.monto_usd); } },
+            { label: 'Venc.', key: 'fecha_vencimiento' }
+          ]);
+      }
+    })();
+  </script>
+</body>
+</html>

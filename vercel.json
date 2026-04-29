@@ -55,8 +55,8 @@
     { "source": "/tareas/:path*", "destination": "https://www.marketingconholistic.com/tareas/:path*" },
     { "source": "/borrador-correo-formal", "destination": "https://www.marketingconholistic.com/borrador-correo-formal" },
     { "source": "/borrador-correo-formal.html", "destination": "https://www.marketingconholistic.com/borrador-correo-formal.html" },
-    { "source": "/backup-dashboard", "destination": "https://www.marketingconholistic.com/backup-dashboard" },
-    { "source": "/backup-dashboard/:path*", "destination": "https://www.marketingconholistic.com/backup-dashboard/:path*" }
+    { "source": "/backup-dashboard", "destination": "/backup-dashboard/index.html" },
+    { "source": "/backup-dashboard/:path*", "destination": "/backup-dashboard/:path*" }
   ],
   "headers": [
     {
@@ -121,6 +121,18 @@
     },
     {
       "source": "/finanzas",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/backup-dashboard",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/backup-dashboard/:path*",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
       ]
