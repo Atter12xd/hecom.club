@@ -92,7 +92,7 @@ async function run() {
   ] = await Promise.all([
     loadTable('gerentes', (q) => q.order('created_at', { ascending: false })),
     loadTable('clientes', (q) => q.order('name', { ascending: true })),
-    loadTable('clientes_acceso', (q) => q.order('id', { ascending: true })),
+    loadTable('clientes_acceso', (q) => q.order('email', { ascending: true })),
     loadTable('gastos', (q) => q.order('mes', { ascending: false })),
     loadTable('cobros', (q) => q.order('created_at', { ascending: false })),
     loadTable('garantias', (q) => q.order('created_at', { ascending: false })),

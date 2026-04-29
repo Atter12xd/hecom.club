@@ -57,7 +57,7 @@
     return Promise.all([
       loadTable(supabase, 'gerentes', function (q) { return q.order('created_at', { ascending: false }); }, w),
       loadTable(supabase, 'clientes', function (q) { return q.order('name', { ascending: true }); }, w),
-      loadTable(supabase, 'clientes_acceso', function (q) { return q.order('id', { ascending: true }); }, w),
+      loadTable(supabase, 'clientes_acceso', function (q) { return q.order('email', { ascending: true }); }, w),
       loadTable(supabase, 'gastos', function (q) { return q.order('mes', { ascending: false }); }, w),
       loadTable(supabase, 'cobros', function (q) { return q.order('created_at', { ascending: false }); }, w),
       loadTable(supabase, 'garantias', function (q) { return q.order('created_at', { ascending: false }); }, w),
