@@ -110,6 +110,13 @@ Antes o independientemente del `update` en BD, persistir URL en:
 
 Esto evita que la UI "espere F5" cuando BD tarda o si un PATCH falla.
 
+Para el **nombre visible** del gerente, mantener alineadas (como referencia Creativos):
+
+- `holistic_gerente_nombre`
+- `creativos_user_name`
+
+Tras cargar fila `gerentes`, conviene escribir ambas si hay `display_name` o `nombre` + `apellido`.
+
 ### 5) Persistir en Supabase (fuente de verdad)
 
 Ejecutar:
@@ -144,8 +151,8 @@ Esto evita mostrar foto vieja cuando el objeto en memoria aun no se refresco.
 - `credito.html` instala bridge global:
   - `window.__holisticCommitGerenteAvatarFile(file, done)`
   - `window.__holisticPersistGerenteAvatarLocal(url)`
-- `public/credito-app/credito-app.js` llama al bridge desde el input de foto.
-- Se sincroniza copia en `credito-app/credito-app.js`.
+- En fuente React (`marketing/marketing/holistic-app/src/App.jsx`), el input de foto del gerente debe usar ese bridge cuando exista; al guardar nombre/foto, escribir las mismas claves `localStorage` que Creativos (avatar + nombre).
+- Tras `npm run build`, sincronizar `dist/credito-app.*` a `credito-app/` y `public/credito-app/`; subir `?v=` en `credito.html` / `public/credito.html`.
 
 ### Pendientes
 
@@ -170,6 +177,18 @@ Se usa listener `window.addEventListener('storage', ...)` para refrescar avatar 
 
 Nota: `storage` solo dispara entre pestañas del mismo origen.
 
+Varios modulos tambien refrescan perfil al volver a la pestaña (`focus` / `visibilitychange`) para alinear con BD si `storage` no aplicó.
+
+## Login entre modulos
+
+Los modulos internos deben mandar a **`https://www.hecom.club/login`** si no hay sesion valida (sin pantallas de login alternas por ruta). El usuario entra por Destinos / login unificado.
+
+## Seguridad y logs (evitar regresiones)
+
+- **`/api/client-log`** (`api/client-log.js`): antes de loguear, sanea `detail` y cabeceras tipo `Referer` (sin tokens en query/hash, sin campos tipo `access_token` / `refresh_token`, URLs acotadas).
+- **`credito.html`**: los envios a client-log usan path saneado; helpers tipo `hmDumpAuthUser` solo con **`?debug=1`** (o equivalente); en prod la consola suele estar silenciada salvo errores.
+- **No volver a agregar** `console.info` con email completo o datos de sesion para “debug de sync” en produccion; si hace falta diagnostico, usar `?debug=1` o logs backend ya sanitizados.
+
 ## Reglas para no romper sincronizacion
 
 1. No usar solo `FileReader + dataURL` como flujo principal.
@@ -191,6 +210,7 @@ Nota: `storage` solo dispara entre pestañas del mismo origen.
 - [ ] Abre Creativos sin F5 duro -> se ve foto nueva.
 - [ ] En Pendientes/Asistencia tambien cambia la foto.
 - [ ] En BD `gerentes.avatar_url` quedo con URL nueva.
+- [ ] Nombre en sidebar consistente con `gerentes.display_name` / nombre guardado.
 - [ ] No hay dependencia de un dominio distinto (`www` vs apex).
 
 ## Problemas comunes

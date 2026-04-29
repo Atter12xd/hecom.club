@@ -22,6 +22,10 @@
     /* Definido ya al cargar la página (console.log está silenciado en prod → usamos console.error). */
     window.hmDumpAuthUser = function () {
       try {
+        var dbg =
+          (typeof location !== "undefined" && (location.search || "").indexOf("debug=1") >= 0) ||
+          (typeof sessionStorage !== "undefined" && sessionStorage.getItem("credito_console_debug") === "1");
+        if (!dbg) return Promise.resolve(null);
         var cli = window.__CREDITO_SHARED_SUPABASE__;
         if (!cli || !cli.auth) {
           console.error("[HM] Crédito: esperá unos segundos a que termine el arranque y volvé a ejecutar hmDumpAuthUser()");
@@ -72,6 +76,18 @@
           if (panel) panel.textContent += line + "\n";
           console.log(line);
         } catch (_) {}
+      }
+      function hmSafeHrefForClientLog() {
+        try {
+          var u = new URL(location.href);
+          u.hash = "";
+          ["access_token", "refresh_token", "token", "code", "provider_token", "provider_refresh_token"].forEach(function (k) {
+            u.searchParams.delete(k);
+          });
+          return u.pathname + (u.search || "");
+        } catch (_) {
+          return "";
+        }
       }
       function sendClientLog(level, event, detail) {
         try {
@@ -193,11 +209,12 @@
           if (!key) return;
           var val = localStorage.getItem(key);
           if (!val) return;
+          var _safePath = hmSafeHrefForClientLog();
           window.dispatchEvent(new StorageEvent("storage", {
             key: key,
             newValue: val,
             oldValue: null,
-            url: window.location.href,
+            url: _safePath ? location.origin + _safePath : "",
             storageArea: localStorage
           }));
         } catch (_) {}
@@ -347,7 +364,7 @@
       }
       function redirectLogin(reason) {
         logInfo("redirect-login", { reason: reason, version: VERSION });
-        sendClientLog("warn", "redirect-login", { reason: reason, version: VERSION, href: (typeof location !== "undefined" ? location.href : "") });
+        sendClientLog("warn", "redirect-login", { reason: reason, version: VERSION, path: hmSafeHrefForClientLog() });
         try {
           delete window.__CREDITO_SHARED_SUPABASE__;
         } catch (_) {
@@ -442,13 +459,10 @@
                     try { localStorage.setItem("tareas_avatar_url", av0); } catch (_) {}
                     try { localStorage.setItem("creativos_avatar_url", av0); } catch (_) {}
                   }
-                  console.info("[Holistic Sync][Credito] gerente synced", { email: em0, hasName: !!dn0, hasAvatar: !!av0 });
                 }
               }
             }
-          } catch (syncErr) {
-            console.warn("[Holistic Sync][Credito] preflight sync failed", syncErr);
-          }
+          } catch (syncErr) {}
           window.__CREDITO_SHARED_SUPABASE__ = sb;
           window.__CREDITO_PREFLIGHT_SESSION__ = session;
           (function installHolisticGerenteAvatarBridge() {
@@ -535,7 +549,6 @@
                           console.error('[Credito] gerentes.avatar_url (la foto igual quedó en Storage/local):', up.error.message || up.error);
                         } catch (_) {}
                         sendClientLog('error', 'avatar-db-update', {
-                          email: em,
                           message: up.error.message || String(up.error),
                           code: up.error.code || null,
                         });
@@ -545,7 +558,7 @@
                         } catch (_) {}
                         return;
                       }
-                      sendClientLog('info', 'avatar-db-update-ok', { email: em });
+                      sendClientLog('info', 'avatar-db-update-ok', { ok: true });
                       try {
                         window.__hmLastAvatarCommit.dbSaved = true;
                       } catch (_) {}
@@ -555,7 +568,6 @@
                         console.error('[Credito] gerentes.avatar_url excepción:', e && e.message ? e.message : e);
                       } catch (_) {}
                       sendClientLog('error', 'avatar-db-exception', {
-                        email: em,
                         message: e && e.message ? e.message : String(e),
                       });
                     });
@@ -643,7 +655,7 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260428syncbycreativos1";
+          var appSrc = "/credito-app/credito-app.js?v=20260428securebundle1";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -670,7 +682,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260428syncbycreativos1" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260428securebundle1" />
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
