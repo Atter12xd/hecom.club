@@ -10,33 +10,41 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0d14;
-      --bg-soft: #0f131c;
-      --bg-2: #11151f;
-      --card: #161b27;
-      --card-2: #1c2230;
-      --card-border: #232a3a;
-      --card-border-2: #2c344a;
-      --text: #f0f3fa;
-      --text-soft: #9aa4bd;
-      --text-faint: #5f6a85;
-      --accent: #3b82f6;
-      --accent-2: #60a5fa;
+      --bg: #060912;
+      --bg-soft: #0a0e18;
+      --bg-2: #0d1220;
+      --bg-3: #111727;
+      --card: rgba(22, 28, 44, 0.72);
+      --card-2: #1a2034;
+      --card-3: #232b44;
+      --card-border: rgba(99, 116, 156, 0.18);
+      --card-border-2: rgba(124, 142, 184, 0.32);
+      --card-glow: rgba(96, 165, 250, 0.18);
+      --text: #f4f6fc;
+      --text-soft: #a4afcc;
+      --text-faint: #6b7896;
+      --accent: #4f8cf2;
+      --accent-2: #80b3ff;
+      --accent-glow: 0 0 0 4px rgba(79, 140, 242, 0.18);
       --accent-hover: #2563eb;
-      --ok: #10b981;
-      --ok-soft: rgba(16, 185, 129, 0.14);
-      --warn: #f59e0b;
-      --warn-soft: rgba(245, 158, 11, 0.14);
-      --danger: #ef4444;
-      --danger-soft: rgba(239, 68, 68, 0.14);
-      --violet: #a78bfa;
+      --ok: #22c55e;
+      --ok-2: #4ade80;
+      --ok-soft: rgba(34, 197, 94, 0.14);
+      --warn: #fbbf24;
+      --warn-soft: rgba(251, 191, 36, 0.14);
+      --danger: #f87171;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --violet: #b394ff;
       --pink: #f472b6;
-      --cyan: #22d3ee;
-      --radius-lg: 16px;
+      --cyan: #38d4ee;
+      --orange: #fb923c;
+      --radius-lg: 18px;
       --radius: 12px;
       --radius-sm: 8px;
-      --shadow-card: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.18);
-      --shadow-pop: 0 12px 36px rgba(0,0,0,0.45);
+      --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 28px rgba(0,0,0,0.35);
+      --shadow-pop: 0 16px 50px rgba(0,0,0,0.55);
+      --sidebar-w: 264px;
+      --topbar-h: 64px;
     }
     * { box-sizing: border-box; }
     html, body { background: var(--bg); }
@@ -46,67 +54,224 @@
       margin: 0;
       min-height: 100vh;
       line-height: 1.55;
-      font-feature-settings: "cv02","cv03","cv04","cv11";
+      font-feature-settings: "cv02","cv03","cv04","cv11","ss01";
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       background:
-        radial-gradient(ellipse at 12% -10%, rgba(59,130,246,0.12), transparent 40%),
-        radial-gradient(ellipse at 90% 0%, rgba(167,139,250,0.10), transparent 45%),
+        radial-gradient(1200px 600px at 8% -8%, rgba(79,140,242,0.18), transparent 60%),
+        radial-gradient(1000px 500px at 95% 0%, rgba(180,140,255,0.16), transparent 55%),
+        radial-gradient(800px 500px at 50% 100%, rgba(34,197,94,0.10), transparent 60%),
         var(--bg);
+      background-attachment: fixed;
     }
-    .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 80px; }
 
-    /* Topbar */
-    .topbar {
+    /* App shell */
+    #app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+    .sidebar {
       position: sticky;
       top: 0;
-      z-index: 50;
-      backdrop-filter: blur(14px);
-      background: rgba(10,13,20,0.78);
-      border-bottom: 1px solid var(--card-border);
-      padding: 14px 24px;
+      align-self: start;
+      height: 100vh;
+      width: var(--sidebar-w);
+      padding: 20px 16px 24px;
       display: flex;
-      align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-    .topbar-inner {
-      max-width: 1240px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 1px solid var(--card-border);
+      background:
+        linear-gradient(180deg, rgba(10,14,24,0.6) 0%, rgba(8,12,22,0.85) 100%);
+      backdrop-filter: blur(16px);
+      z-index: 30;
     }
     .brand {
       display: flex;
       align-items: center;
       gap: 12px;
+      padding: 6px 8px 18px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 14px;
     }
     .brand-mark {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, var(--accent), var(--violet));
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: conic-gradient(from 210deg, var(--accent), var(--violet), var(--cyan), var(--accent));
       color: #fff;
       font-weight: 800;
       display: grid;
       place-items: center;
       font-size: 18px;
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 8px 22px rgba(79,140,242,0.32), inset 0 1px 0 rgba(255,255,255,0.25);
       letter-spacing: -0.02em;
+      position: relative;
+    }
+    .brand-mark::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 10px;
+      background: rgba(10,14,24,0.7);
+      display: grid;
+      place-items: center;
+    }
+    .brand-mark span {
+      position: relative;
+      z-index: 2;
+      background: linear-gradient(135deg, var(--accent-2), var(--violet));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
     }
     .brand-title {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       letter-spacing: -0.01em;
       line-height: 1.1;
+      color: var(--text);
     }
     .brand-sub {
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       color: var(--text-soft);
-      margin-top: 2px;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-label {
+      font-size: 0.66rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      padding: 12px 10px 6px;
+      font-weight: 700;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      color: var(--text-soft);
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: background 0.14s, color 0.14s, border-color 0.14s;
+      position: relative;
+    }
+    .nav-link:hover { background: rgba(79,140,242,0.05); color: var(--text); }
+    .nav-link.is-active {
+      background: linear-gradient(90deg, rgba(79,140,242,0.18), rgba(79,140,242,0.04));
+      color: var(--text);
+      border-color: rgba(79,140,242,0.35);
+    }
+    .nav-link.is-active::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--accent), var(--violet));
+    }
+    .nav-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.04);
+    }
+    .nav-icon svg { width: 16px; height: 16px; }
+    .nav-link .nav-count {
+      margin-left: auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-faint);
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .nav-link.is-active .nav-count { color: var(--accent-2); background: rgba(79,140,242,0.16); }
+    .nav-credito .nav-icon { background: rgba(79,140,242,0.14); color: var(--accent-2); }
+    .nav-cobranza .nav-icon { background: rgba(56,212,238,0.14); color: var(--cyan); }
+    .nav-pendientes .nav-icon { background: rgba(179,148,255,0.14); color: var(--violet); }
+    .nav-creativos .nav-icon { background: rgba(244,114,182,0.14); color: var(--pink); }
+    .nav-finanzas .nav-icon { background: rgba(34,197,94,0.14); color: var(--ok-2); }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px 10px 0;
+      border-top: 1px solid var(--card-border);
+      font-size: 0.72rem;
+      color: var(--text-faint);
+      line-height: 1.45;
+    }
+    .sidebar-footer code {
+      color: var(--text-soft);
+      background: rgba(255,255,255,0.05);
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: 0.85em;
+    }
+
+    /* Main */
+    .main { min-width: 0; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      backdrop-filter: blur(18px);
+      background: rgba(6,9,18,0.7);
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: var(--topbar-h);
+    }
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-soft);
+      min-width: 0;
+    }
+    .crumbs .c-current { color: var(--text); font-weight: 600; }
+    .crumbs .sep { color: var(--text-faint); }
+    .top-search {
+      flex: 1;
+      max-width: 380px;
+      margin-left: 18px;
+      position: relative;
+    }
+    .top-search input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      background: rgba(10,14,24,0.6);
+      color: var(--text);
+      font-size: 0.85rem;
+      font-family: inherit;
+      transition: border-color 0.14s, box-shadow 0.14s;
+    }
+    .top-search input:focus { outline: none; border-color: rgba(79,140,242,0.55); box-shadow: var(--accent-glow); }
+    .top-search svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: var(--text-faint);
     }
     .topbar-actions {
       margin-left: auto;
@@ -125,8 +290,8 @@
       color: var(--ok);
       font-size: 0.78rem;
       font-weight: 600;
-      border: 1px solid rgba(16,185,129,0.25);
-      max-width: 60vw;
+      border: 1px solid rgba(34,197,94,0.28);
+      max-width: 260px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -136,13 +301,18 @@
       height: 8px;
       border-radius: 50%;
       background: var(--ok);
-      box-shadow: 0 0 8px rgba(16,185,129,0.7);
+      box-shadow: 0 0 8px rgba(34,197,94,0.7);
       flex-shrink: 0;
+      animation: liveDot 2.4s infinite;
     }
-    .status-pill.is-warn { background: var(--warn-soft); color: var(--warn); border-color: rgba(245,158,11,0.3); }
-    .status-pill.is-warn .dot { background: var(--warn); box-shadow: 0 0 8px rgba(245,158,11,0.6); }
-    .status-pill.is-error { background: var(--danger-soft); color: var(--danger); border-color: rgba(239,68,68,0.3); }
-    .status-pill.is-error .dot { background: var(--danger); box-shadow: 0 0 8px rgba(239,68,68,0.6); }
+    @keyframes liveDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.7); opacity: 0.55; }
+    }
+    .status-pill.is-warn { background: var(--warn-soft); color: var(--warn); border-color: rgba(251,191,36,0.32); }
+    .status-pill.is-warn .dot { background: var(--warn); box-shadow: 0 0 8px rgba(251,191,36,0.6); }
+    .status-pill.is-error { background: var(--danger-soft); color: var(--danger); border-color: rgba(248,113,113,0.32); }
+    .status-pill.is-error .dot { background: var(--danger); box-shadow: 0 0 8px rgba(248,113,113,0.6); }
 
     .btn {
       display: inline-flex;
@@ -154,7 +324,7 @@
       border-radius: 10px;
       border: 1px solid transparent;
       cursor: pointer;
-      transition: transform 0.05s ease, background 0.15s, border-color 0.15s, color 0.15s;
+      transition: transform 0.05s ease, background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
       font-family: inherit;
       white-space: nowrap;
     }
@@ -163,39 +333,75 @@
     .btn-primary {
       background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
       color: #fff;
-      box-shadow: 0 8px 22px rgba(21,128,61,0.32), inset 0 1px 0 rgba(255,255,255,0.18);
+      box-shadow: 0 10px 26px rgba(21,128,61,0.36), inset 0 1px 0 rgba(255,255,255,0.18);
     }
-    .btn-primary:hover { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+    .btn-primary:hover { background: linear-gradient(135deg, #22c55e 0%, #15a043 100%); box-shadow: 0 12px 32px rgba(34,197,94,0.4); }
     .btn-ghost {
-      background: var(--card);
+      background: rgba(22,28,44,0.7);
       color: var(--text);
       border-color: var(--card-border);
     }
     .btn-ghost:hover { border-color: var(--card-border-2); background: var(--card-2); }
-    .btn-icon {
-      width: 18px; height: 18px;
-      flex-shrink: 0;
-    }
+    .btn-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* Content area */
+    .content { padding: 28px 28px 80px; max-width: 1280px; }
 
     /* Hero */
     .hero {
-      margin: 28px 0 24px;
-      padding: 28px;
+      position: relative;
+      margin: 0 0 24px;
+      padding: 28px 32px;
       border-radius: var(--radius-lg);
       background:
-        radial-gradient(ellipse at 80% 0%, rgba(59,130,246,0.20), transparent 50%),
-        linear-gradient(135deg, rgba(28,34,48,0.9) 0%, rgba(20,25,38,0.9) 100%);
+        radial-gradient(450px 220px at 90% 10%, rgba(79,140,242,0.20), transparent 70%),
+        radial-gradient(380px 200px at 0% 90%, rgba(180,140,255,0.18), transparent 70%),
+        linear-gradient(135deg, rgba(28,34,55,0.95) 0%, rgba(16,21,38,0.95) 100%);
       border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 4px);
+      pointer-events: none;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,0.5), transparent 60%);
+    }
+    .hero-grid {
+      position: relative;
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
+      grid-template-columns: 1.4fr 1.1fr;
       gap: 28px;
       align-items: center;
     }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      background: rgba(79,140,242,0.12);
+      border: 1px solid rgba(79,140,242,0.28);
+      padding: 5px 11px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
     .hero h1 {
-      margin: 0 0 8px;
-      font-size: 1.75rem;
+      margin: 0 0 10px;
+      font-size: 2rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #fff, #b9c4e0 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
     .hero p {
       margin: 0;
@@ -209,19 +415,60 @@
       gap: 12px;
     }
     .hero-stat {
-      background: rgba(10,13,20,0.5);
+      position: relative;
+      background: linear-gradient(145deg, rgba(10,14,24,0.7), rgba(16,22,38,0.5));
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 14px 16px;
+      padding: 16px 18px;
+      overflow: hidden;
+      transition: border-color 0.18s, transform 0.18s;
     }
-    .hero-stat .l { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-soft); font-weight: 600; }
-    .hero-stat .n { font-size: 1.5rem; font-weight: 800; margin-top: 4px; font-variant-numeric: tabular-nums; }
-    .hero-stat .n.accent { color: var(--accent-2); }
-    .hero-stat .n.ok { color: var(--ok); }
-    .hero-stat .n.violet { color: var(--violet); }
-    .hero-stat .n.cyan { color: var(--cyan); }
-    @media (max-width: 920px) {
-      .hero { grid-template-columns: 1fr; padding: 22px; }
+    .hero-stat:hover { border-color: var(--card-border-2); transform: translateY(-2px); }
+    .hero-stat::after {
+      content: '';
+      position: absolute;
+      inset: -1px auto auto -1px;
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg, currentColor, transparent);
+      opacity: 0.7;
+    }
+    .hero-stat.accent::after { color: var(--accent-2); }
+    .hero-stat.violet::after { color: var(--violet); }
+    .hero-stat.ok::after { color: var(--ok-2); }
+    .hero-stat.cyan::after { color: var(--cyan); }
+    .hero-stat .ico { position: absolute; right: 14px; top: 14px; opacity: 0.35; }
+    .hero-stat .ico svg { width: 22px; height: 22px; }
+    .hero-stat .l { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); font-weight: 700; }
+    .hero-stat .n { font-size: 1.55rem; font-weight: 800; margin-top: 6px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+    .hero-stat.accent .n { color: var(--accent-2); }
+    .hero-stat.ok .n { color: var(--ok-2); }
+    .hero-stat.violet .n { color: var(--violet); }
+    .hero-stat.cyan .n { color: var(--cyan); }
+    .hero-stat .sub { font-size: 0.72rem; color: var(--text-faint); margin-top: 4px; }
+
+    @media (max-width: 1080px) {
+      :root { --sidebar-w: 220px; }
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 880px) {
+      #app { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; transform: translateX(-100%); transition: transform 0.25s ease; box-shadow: 16px 0 40px rgba(0,0,0,0.6); }
+      .sidebar.is-open { transform: translateX(0); }
+      .sidebar-toggle { display: inline-flex !important; }
+      .top-search { display: none; }
+    }
+
+    .sidebar-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      background: rgba(22,28,44,0.6);
+      color: var(--text);
+      cursor: pointer;
     }
 
     /* Filtro */
@@ -232,15 +479,20 @@
       padding: 18px 22px;
       margin-bottom: 22px;
       box-shadow: var(--shadow-card);
+      backdrop-filter: blur(14px);
     }
     .filtro-card h2 {
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.13em;
       color: var(--text-soft);
       margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+    .filtro-card h2 svg { width: 14px; height: 14px; color: var(--text-faint); }
     .filtro-row {
       display: flex;
       flex-wrap: wrap;
@@ -260,17 +512,18 @@
     }
     .filtro-group input[type=date] {
       padding: 9px 12px;
-      border: 1px solid var(--card-border-2);
+      border: 1px solid var(--card-border);
       border-radius: 9px;
-      background: var(--bg-soft);
+      background: rgba(10,14,24,0.7);
       color: var(--text);
       font-size: 0.88rem;
       font-family: inherit;
+      transition: border-color 0.14s, box-shadow 0.14s;
     }
     .filtro-group input[type=date]:focus {
       outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
+      border-color: rgba(79,140,242,0.55);
+      box-shadow: var(--accent-glow);
     }
     .presets {
       display: flex;
@@ -282,9 +535,9 @@
       padding: 7px 12px;
       font-size: 0.8rem;
       font-weight: 500;
-      border: 1px solid var(--card-border-2);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      background: var(--bg-soft);
+      background: rgba(10,14,24,0.5);
       color: var(--text-soft);
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
@@ -293,7 +546,7 @@
     .presets button:hover {
       background: var(--card-2);
       color: var(--text);
-      border-color: var(--accent);
+      border-color: rgba(79,140,242,0.45);
     }
     .filtro-hint {
       font-size: 0.78rem;
@@ -301,39 +554,10 @@
       margin-top: 10px;
     }
 
-    /* Tabs / nav módulos */
-    .module-nav {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin: 22px 0 16px;
-      padding: 6px;
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      width: fit-content;
-      max-width: 100%;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .module-nav::-webkit-scrollbar { display: none; }
-    .module-nav a {
-      padding: 8px 14px;
-      font-size: 0.83rem;
-      font-weight: 600;
-      color: var(--text-soft);
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: background 0.15s, color 0.15s;
-    }
-    .module-nav a:hover { background: var(--card-2); color: var(--text); }
-
     /* Resumen chips */
     .resumen {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 12px;
       margin-bottom: 28px;
     }
@@ -342,11 +566,15 @@
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
       padding: 16px 18px;
-      transition: border-color 0.15s, transform 0.15s;
+      transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
     .resumen .chip:hover {
-      border-color: var(--card-border-2);
-      transform: translateY(-1px);
+      border-color: rgba(79,140,242,0.32);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.32);
     }
     .resumen .chip .n {
       font-size: 1.45rem;
@@ -356,63 +584,96 @@
       letter-spacing: -0.02em;
     }
     .resumen .chip .l {
-      font-size: 0.74rem;
+      font-size: 0.7rem;
       color: var(--text-soft);
       margin-top: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 600;
+      letter-spacing: 0.08em;
+      font-weight: 700;
     }
     .resumen .chip .total {
       font-size: 0.82rem;
-      color: var(--ok);
+      color: var(--ok-2);
       margin-top: 6px;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
     }
 
     /* Sección de módulo */
-    .module-section { margin-top: 36px; }
+    .module-section {
+      margin-top: 40px;
+      animation: secIn 0.35s ease both;
+    }
+    @keyframes secIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .module-section .module-head {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 12px;
-      margin-bottom: 12px;
-      padding-left: 4px;
+      margin-bottom: 14px;
+      padding: 10px 16px 14px;
+      border-bottom: 1px solid var(--card-border);
+      position: relative;
     }
-    .module-head h3 {
-      font-size: 0.78rem;
+    .module-head::before {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -1px;
+      height: 2px;
+      width: 56px;
+      background: var(--module-color, var(--accent));
+      border-radius: 2px;
+    }
+    .module-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: var(--module-bg, rgba(79,140,242,0.14));
+      color: var(--module-color, var(--accent-2));
+      flex-shrink: 0;
+    }
+    .module-icon svg { width: 18px; height: 18px; }
+    .module-head .module-title {
+      font-size: 1.05rem;
       font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-soft);
+      letter-spacing: -0.01em;
       margin: 0;
     }
+    .module-head .module-desc {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 2px;
+    }
     .module-head .badge {
+      margin-left: auto;
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: 999px;
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      color: var(--text-soft);
+      background: var(--module-bg, rgba(79,140,242,0.12));
+      color: var(--module-color, var(--accent-2));
+      border: 1px solid var(--module-border, rgba(79,140,242,0.32));
     }
-    .module-head .badge.credito { color: var(--accent-2); border-color: rgba(96,165,250,0.4); }
-    .module-head .badge.cobranza { color: var(--cyan); border-color: rgba(34,211,238,0.4); }
-    .module-head .badge.pendientes { color: var(--violet); border-color: rgba(167,139,250,0.4); }
-    .module-head .badge.creativos { color: var(--pink); border-color: rgba(244,114,182,0.4); }
-    .module-head .badge.finanzas { color: var(--ok); border-color: rgba(16,185,129,0.4); }
+    .module-credito { --module-color: var(--accent-2); --module-bg: rgba(79,140,242,0.14); --module-border: rgba(79,140,242,0.32); }
+    .module-cobranza { --module-color: var(--cyan); --module-bg: rgba(56,212,238,0.14); --module-border: rgba(56,212,238,0.32); }
+    .module-pendientes { --module-color: var(--violet); --module-bg: rgba(179,148,255,0.14); --module-border: rgba(179,148,255,0.32); }
+    .module-creativos { --module-color: var(--pink); --module-bg: rgba(244,114,182,0.14); --module-border: rgba(244,114,182,0.32); }
+    .module-finanzas { --module-color: var(--ok-2); --module-bg: rgba(34,197,94,0.14); --module-border: rgba(34,197,94,0.32); }
 
     /* Tablas */
     .card {
       background: var(--card);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 20px 22px;
-      margin-bottom: 16px;
+      padding: 18px 22px;
+      margin-bottom: 14px;
       overflow: hidden;
       box-shadow: var(--shadow-card);
+      backdrop-filter: blur(10px);
+      transition: border-color 0.15s;
     }
+    .card:hover { border-color: var(--card-border-2); }
     .card-h {
       display: flex;
       align-items: center;
@@ -429,14 +690,14 @@
     .card-h .count {
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 2px 8px;
+      padding: 2px 9px;
       border-radius: 999px;
-      background: var(--bg-soft);
-      color: var(--text-soft);
+      background: rgba(79,140,242,0.14);
+      color: var(--accent-2);
     }
     .card-h .rango {
       margin-left: auto;
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       color: var(--text-faint);
       font-variant-numeric: tabular-nums;
     }
@@ -444,6 +705,7 @@
       overflow-x: auto;
       border-radius: 10px;
       border: 1px solid var(--card-border);
+      background: rgba(8,11,20,0.4);
     }
     .card table {
       width: 100%;
@@ -456,26 +718,27 @@
       color: var(--text-soft);
       font-weight: 600;
       text-transform: uppercase;
-      font-size: 0.68rem;
-      letter-spacing: 0.07em;
-      background: var(--bg-soft);
+      font-size: 0.66rem;
+      letter-spacing: 0.08em;
+      background: rgba(15,21,36,0.85);
       border-bottom: 1px solid var(--card-border);
       position: sticky;
       top: 0;
     }
     .card td {
       padding: 10px 14px;
-      border-bottom: 1px solid rgba(35, 42, 58, 0.65);
+      border-bottom: 1px solid rgba(99,116,156,0.12);
       vertical-align: top;
     }
+    .card tbody tr:nth-child(even) td { background: rgba(255,255,255,0.012); }
     .card tbody tr:last-child td { border-bottom: none; }
-    .card tr:hover td { background: rgba(255, 255, 255, 0.025); }
+    .card tr:hover td { background: rgba(79,140,242,0.05) !important; }
     .card .empty {
       color: var(--text-soft);
       padding: 28px;
       text-align: center;
       font-size: 0.88rem;
-      background: var(--bg-soft);
+      background: rgba(10,14,24,0.5);
       border-radius: 10px;
       border: 1px dashed var(--card-border-2);
     }
@@ -485,15 +748,30 @@
       border-radius: 999px;
       font-size: 0.72rem;
       font-weight: 600;
-      background: var(--bg-soft);
+      background: rgba(255,255,255,0.04);
       border: 1px solid var(--card-border);
       color: var(--text-soft);
     }
-    .pill.ok { color: var(--ok); border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.08); }
-    .pill.warn { color: var(--warn); border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.08); }
-    .pill.danger { color: var(--danger); border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.08); }
+    .pill.ok { color: var(--ok-2); border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.08); }
+    .pill.warn { color: var(--warn); border-color: rgba(251,191,36,0.35); background: rgba(251,191,36,0.08); }
+    .pill.danger { color: var(--danger); border-color: rgba(248,113,113,0.35); background: rgba(248,113,113,0.08); }
     .num { font-variant-numeric: tabular-nums; }
     .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-size: 0.82em; color: var(--text-soft); }
+
+    /* Avatar inicial cliente */
+    .avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--violet));
+      color: #fff;
+      display: inline-grid;
+      place-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    }
+    .cell-client { display: inline-flex; align-items: center; gap: 9px; }
 
     /* Toast */
     .toast {
@@ -510,12 +788,13 @@
       z-index: 200;
       max-width: 360px;
       animation: toastIn 0.25s ease;
+      backdrop-filter: blur(10px);
     }
-    .toast.is-ok { border-color: rgba(16,185,129,0.5); }
-    .toast.is-error { border-color: rgba(239,68,68,0.55); }
+    .toast.is-ok { border-color: rgba(34,197,94,0.55); }
+    .toast.is-error { border-color: rgba(248,113,113,0.55); }
     @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Gate (login offline) */
+    /* Gate (offline) */
     .gate {
       max-width: 420px;
       margin: 80px auto;
@@ -525,6 +804,7 @@
       border-radius: var(--radius-lg);
       border: 1px solid var(--card-border);
       box-shadow: var(--shadow-card);
+      backdrop-filter: blur(14px);
     }
     .gate h1 { font-size: 1.4rem; margin: 0 0 8px; letter-spacing: -0.02em; }
     .gate .sub { color: var(--text-soft); font-size: 0.9rem; margin-bottom: 24px; }
@@ -532,9 +812,9 @@
       width: 100%;
       padding: 12px 16px;
       margin: 8px 0 16px;
-      border: 1px solid var(--card-border-2);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
-      background: var(--bg-soft);
+      background: rgba(10,14,24,0.7);
       color: var(--text);
       font-size: 1rem;
       font-family: inherit;
@@ -569,11 +849,18 @@
     }
     body.backup-mode-json-only #backupAuthGate { display: none !important; }
 
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(124,142,184,0.18); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(124,142,184,0.32); border: 2px solid transparent; background-clip: content-box; }
+
     @media (max-width: 720px) {
-      .topbar { padding: 10px 16px; }
-      .wrap { padding: 0 16px 60px; }
-      .hero h1 { font-size: 1.4rem; }
-      .brand-sub { display: none; }
+      .topbar { padding: 12px 18px; }
+      .content { padding: 22px 18px 60px; }
+      .hero { padding: 22px; }
+      .hero h1 { font-size: 1.5rem; }
+      .crumbs { font-size: 0.78rem; }
     }
   </style>
 </head>
@@ -589,20 +876,73 @@
   </div>
 
   <div id="app" class="hidden">
-    <div class="topbar">
-      <div class="topbar-inner">
-        <div class="brand">
-          <div class="brand-mark" aria-hidden="true">H</div>
-          <div>
-            <div class="brand-title">Backup · Holistic Marketing</div>
-            <div class="brand-sub">Crédito · Cobranza · Pendientes · Creativos · Finanzas</div>
-          </div>
+    <aside class="sidebar" id="sidebar" aria-label="Navegación">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><span>H</span></div>
+        <div class="brand-meta">
+          <div class="brand-title">Holistic · Backup</div>
+          <div class="brand-sub">Base de datos viva</div>
+        </div>
+      </div>
+
+      <div class="nav-label">Resumen</div>
+      <a class="nav-link is-active" href="#sec-overview" data-anchor="sec-overview">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span>
+        <span>Resumen</span>
+        <span class="nav-count" data-nav-count="overview">·</span>
+      </a>
+
+      <div class="nav-label">Módulos</div>
+      <a class="nav-link nav-credito" href="#sec-credito" data-anchor="sec-credito">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span>Crédito</span>
+        <span class="nav-count" data-nav-count="credito">0</span>
+      </a>
+      <a class="nav-link nav-cobranza" href="#sec-cobranza" data-anchor="sec-cobranza">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="M4 6l8 7 8-7"/></svg></span>
+        <span>Cobranza</span>
+        <span class="nav-count" data-nav-count="cobranza">0</span>
+      </a>
+      <a class="nav-link nav-pendientes" href="#sec-pendientes" data-anchor="sec-pendientes">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        <span>Pendientes</span>
+        <span class="nav-count" data-nav-count="pendientes">0</span>
+      </a>
+      <a class="nav-link nav-creativos" href="#sec-creativos" data-anchor="sec-creativos">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7H12v-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></span>
+        <span>Creativos</span>
+        <span class="nav-count" data-nav-count="creativos">0</span>
+      </a>
+      <a class="nav-link nav-finanzas" href="#sec-finanzas" data-anchor="sec-finanzas">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+        <span>Finanzas</span>
+        <span class="nav-count" data-nav-count="finanzas">0</span>
+      </a>
+
+      <div class="sidebar-footer">
+        Datos en vivo desde Supabase. Para guardar copia local usá <code>Descargar Excel completo</code> arriba a la derecha.
+      </div>
+    </aside>
+
+    <div class="main">
+      <div class="topbar">
+        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Abrir menú">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="crumbs">
+          <span>Holistic</span>
+          <span class="sep">›</span>
+          <span class="c-current">Copia de seguridad</span>
+        </div>
+        <div class="top-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="globalSearch" placeholder="Buscar cliente, monto, ticket, email…" autocomplete="off" />
         </div>
         <div class="topbar-actions">
           <span class="status-pill" id="metaExport"><span class="dot"></span> Cargando…</span>
           <button type="button" class="btn btn-primary" id="btnDescargarExcel" title="Descarga TODA la base en un Excel (una hoja por tabla, sin filtrar fechas).">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Descargar Excel completo
+            <span class="btn-text">Descargar Excel</span>
           </button>
           <button type="button" class="btn btn-ghost" id="btnDescargarJson" title="Descarga el backup completo como backup.json (todas las tablas).">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -610,52 +950,60 @@
           </button>
         </div>
       </div>
-    </div>
 
-    <div class="wrap">
-      <section class="hero">
-        <div>
-          <h1>Copia viva de la base de datos</h1>
-          <p>Lee directo desde Supabase con tu sesión del Club (igual que Finanzas / Crédito): cada cambio que hagas en los módulos se ve aquí. Para conservar los datos aunque la base falle, usá <strong>«Descargar Excel completo»</strong> y guardá el archivo donde quieras.</p>
-        </div>
-        <div class="hero-stats" id="heroStats"></div>
-      </section>
+      <div class="content" id="sec-overview">
+        <section class="hero">
+          <div class="hero-grid">
+            <div>
+              <span class="hero-eyebrow">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+                En vivo · Supabase
+              </span>
+              <h1>La copia siempre encendida de tu base.</h1>
+              <p>Crédito, Cobranza, Pendientes, Creativos y Finanzas en un solo lugar. Descargá el Excel completo cuando quieras y tendrás un respaldo intocable.</p>
+            </div>
+            <div class="hero-stats" id="heroStats"></div>
+          </div>
+        </section>
 
-      <div class="filtro-card">
-        <h2>Filtro por fechas (solo afecta a las tablas, no al Excel)</h2>
-        <div class="filtro-row">
-          <div class="filtro-group">
-            <label for="desde">Desde</label>
-            <input type="date" id="desde" />
+        <div class="filtro-card">
+          <h2>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Rango de fechas (afecta solo a las tablas)
+          </h2>
+          <div class="filtro-row">
+            <div class="filtro-group">
+              <label for="desde">Desde</label>
+              <input type="date" id="desde" />
+            </div>
+            <div class="filtro-group">
+              <label for="hasta">Hasta</label>
+              <input type="date" id="hasta" />
+            </div>
+            <div class="presets">
+              <button type="button" data-preset="hoy">Hoy</button>
+              <button type="button" data-preset="semana">Esta semana</button>
+              <button type="button" data-preset="mes">Este mes</button>
+              <button type="button" data-preset="archivo" title="Mín y máx detectados en los datos.">Según archivo</button>
+              <button type="button" data-preset="todo">Todo</button>
+            </div>
           </div>
-          <div class="filtro-group">
-            <label for="hasta">Hasta</label>
-            <input type="date" id="hasta" />
-          </div>
-          <div class="presets">
-            <button type="button" data-preset="hoy">Hoy</button>
-            <button type="button" data-preset="semana">Esta semana</button>
-            <button type="button" data-preset="mes">Este mes</button>
-            <button type="button" data-preset="archivo" title="Desde/Hasta con las fechas mínimas y máximas detectadas en los datos.">Según archivo</button>
-            <button type="button" data-preset="todo" title="Rango muy amplio para ver todo lo que hay.">Todo</button>
-          </div>
+          <p class="filtro-hint">Si una tabla aparece vacía, ampliá el rango. El botón <strong>«Descargar Excel»</strong> baja todo independientemente del filtro.</p>
+          <p id="filtro-archivo-info" class="filtro-hint" style="margin-top:8px;color:var(--ok-2)"></p>
         </div>
-        <p class="filtro-hint">Si las tablas se ven vacías, suele ser porque el rango no abarca el mes donde hay registros. El botón <strong>«Descargar Excel completo»</strong> ignora estos filtros y baja absolutamente todo.</p>
-        <p id="filtro-archivo-info" class="filtro-hint" style="margin-top:8px;color:var(--ok)"></p>
+
+        <div id="resumen" class="resumen"></div>
+        <div id="panels"></div>
       </div>
-
-      <div id="moduleNav" class="module-nav" aria-label="Atajo entre módulos"></div>
-      <div id="resumen" class="resumen"></div>
-      <div id="panels"></div>
     </div>
   </div>
 
   <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
-  <script src="/api/auth-config?v=backupLive1"></script>
+  <script src="/api/auth-config?v=backupLive2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="/backup-dashboard/scripts/live-fetch.js?v=5"></script>
+  <script src="/backup-dashboard/scripts/live-fetch.js?v=6"></script>
   <script>
   (function () {
     function holisticWebBase() {
@@ -869,12 +1217,38 @@
         var nCobros = (data.cobros || []).length;
         var totalCobros = (data.cobros || []).reduce(function(s, r) { return s + (Number(r.monto) || 0); }, 0);
         var totalFinanzas = (data.finanzas_app_ingresos || []).reduce(function(s, r) { return s + (Number(r.monto_usd) || 0); }, 0);
+        var totalGastos = (data.gastos || []).reduce(function(s, r) { return s + (Number(r.gasto) || 0); }, 0);
         function fmtMoney(n) { return '$' + Number(n).toLocaleString('es-PE', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+        var icoUsers = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+        var icoAds   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8v18l-18-8z"/><path d="M11 11.5v3"/></svg>';
+        var icoCash  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 10h.01M18 14h.01"/></svg>';
+        var icoTrend = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>';
         el.innerHTML =
-          '<div class="hero-stat"><div class="l">Clientes</div><div class="n accent">' + nClientes + '</div></div>' +
-          '<div class="hero-stat"><div class="l">Gastos Ads</div><div class="n violet">' + nGastos + '</div></div>' +
-          '<div class="hero-stat"><div class="l">Cobros · Total</div><div class="n ok">' + fmtMoney(totalCobros) + '</div></div>' +
-          '<div class="hero-stat"><div class="l">Finanzas · Ingresos</div><div class="n cyan">' + fmtMoney(totalFinanzas) + '</div></div>';
+          '<div class="hero-stat accent"><span class="ico">' + icoUsers + '</span><div class="l">Clientes Crédito</div><div class="n">' + nClientes + '</div><div class="sub">altas totales</div></div>' +
+          '<div class="hero-stat violet"><span class="ico">' + icoAds + '</span><div class="l">Inversión Ads</div><div class="n">' + fmtMoney(totalGastos) + '</div><div class="sub">' + nGastos + ' gastos</div></div>' +
+          '<div class="hero-stat ok"><span class="ico">' + icoCash + '</span><div class="l">Cobros Crédito</div><div class="n">' + fmtMoney(totalCobros) + '</div><div class="sub">' + nCobros + ' cobros</div></div>' +
+          '<div class="hero-stat cyan"><span class="ico">' + icoTrend + '</span><div class="l">Ingresos Finanzas</div><div class="n">' + fmtMoney(totalFinanzas) + '</div><div class="sub">app finanzas</div></div>';
+
+        updateSidebarCounts();
+      }
+
+      function updateSidebarCounts() {
+        function setCount(key, val) {
+          var n = document.querySelector('[data-nav-count="' + key + '"]');
+          if (n) n.textContent = String(val);
+        }
+        var creditoTotal = (data.cobros || []).length + (data.gastos || []).length + (data.clientes || []).length + (data.garantias || []).length + (data.manual || []).length + (data.gerentes || []).length;
+        var cobranzaTotal = (data.cobranza_bandeja || []).length + (data.cobranza_eventos || []).length;
+        var pendientesTotal = (data.tareas_tickets || []).length + (data.tareas_kanban || []).length + (data.tareas_calendario || []).length + (data.tareas_ticket_comentarios || []).length;
+        var creativosTotal = (data.creativos_proyectos || []).length + (data.creativos_clientes || []).length + (data.creativos_productos || []).length + (data.creativos_editores || []).length;
+        var finanzasTotal = (data.finanzas_app_ingresos || []).length + (data.finanzas_app_gastos || []).length + (data.finanzas_app_cuentas_cobrar || []).length + (data.finanzas_app_deudas || []).length + (data.finanzas_app_sueldos || []).length + (data.finanzas_app_impuestos || []).length;
+        var overviewTotal = creditoTotal + cobranzaTotal + pendientesTotal + creativosTotal + finanzasTotal;
+        setCount('overview', overviewTotal.toLocaleString('es-PE'));
+        setCount('credito', creditoTotal.toLocaleString('es-PE'));
+        setCount('cobranza', cobranzaTotal.toLocaleString('es-PE'));
+        setCount('pendientes', pendientesTotal.toLocaleString('es-PE'));
+        setCount('creativos', creativosTotal.toLocaleString('es-PE'));
+        setCount('finanzas', finanzasTotal.toLocaleString('es-PE'));
       }
 
       window.__backupBootstrapMain = function(sb) {
@@ -1375,11 +1749,24 @@
           return '<div class="card">' + head + '<div class="table-scroll"><table><thead><tr>' + th + '</tr></thead><tbody>' + trs + '</tbody></table></div></div>';
         }
 
-        function moduleHeader(id, label, badge, count) {
-          return '<div class="module-section" id="' + id + '">' +
+        var MODULE_META = {
+          credito:    { desc: 'Holistic Marketing · cobros, gastos, garantías y manual', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="11" y2="15"/></svg>' },
+          cobranza:   { desc: 'Bandeja de cobranza y eventos', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="M4 6l8 7 8-7"/></svg>' },
+          pendientes: { desc: 'Tickets, kanban, comentarios y calendario', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' },
+          creativos:  { desc: 'Proyectos creativos vinculados a clientes', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7H12v-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18z"/><circle cx="11" cy="11" r="2"/></svg>' },
+          finanzas:   { desc: 'App finanzas: ingresos, gastos, cuentas, deudas, sueldos e impuestos', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' }
+        };
+
+        function moduleHeader(id, label, key, count) {
+          var meta = MODULE_META[key] || { desc: '', icon: '' };
+          return '<div class="module-section module-' + key + '" id="' + id + '">' +
             '<div class="module-head">' +
-              '<h3>' + escCell(label) + '</h3>' +
-              '<span class="badge ' + badge + '">' + count + ' filas</span>' +
+              '<div class="module-icon">' + meta.icon + '</div>' +
+              '<div>' +
+                '<div class="module-title">' + escCell(label) + '</div>' +
+                '<div class="module-desc">' + escCell(meta.desc) + '</div>' +
+              '</div>' +
+              '<span class="badge">' + count + ' filas en rango</span>' +
             '</div>';
         }
         function moduleClose() { return '</div>'; }
@@ -1430,21 +1817,29 @@
             var proj = proyectosForCred(cid);
             var n = gs.length + co.length + ga.length + cob.length + proj.length + tfcR.length;
             if (n === 0) return null;
+            var inicial = (c.name || '?').trim().charAt(0).toUpperCase();
             return '<tr>' +
-              '<td><strong>' + escCell(c.name) + '</strong><br/><span style="color:var(--text-soft);font-size:0.75rem">' + escCell(cid.slice(0, 8)) + '…</span></td>' +
-              '<td>' + gs.length + '</td>' +
-              '<td>' + co.length + '</td>' +
-              '<td>' + ga.length + '</td>' +
-              '<td>' + cob.length + '</td>' +
-              '<td>' + tfcR.length + '/' + tfc.length + '</td>' +
-              '<td>' + proj.length + '</td>' +
+              '<td><span class="cell-client"><span class="avatar">' + escCell(inicial) + '</span><span><strong>' + escCell(c.name) + '</strong><br/><span class="mono">' + escCell(cid.slice(0, 8)) + '…</span></span></span></td>' +
+              '<td class="num">' + gs.length + '</td>' +
+              '<td class="num">' + co.length + '</td>' +
+              '<td class="num">' + ga.length + '</td>' +
+              '<td class="num">' + cob.length + '</td>' +
+              '<td class="num">' + tfcR.length + ' <span style="color:var(--text-faint)">/ ' + tfc.length + '</span></td>' +
+              '<td class="num">' + proj.length + '</td>' +
             '</tr>';
           }).filter(Boolean);
+          var titulo = 'Resumen por cliente';
+          var headCard =
+            '<div class="card-h">' +
+              '<h2>' + titulo + '</h2>' +
+              '<span class="count num">' + rows.length + '</span>' +
+              '<span class="rango">' + escCell(rangoLabel) + '</span>' +
+            '</div>';
           if (!rows.length) {
-            return '<div class="card"><h2>Por cliente — ' + escCell(rangoLabel) + '</h2><p class="empty">Ningún cliente tiene movimiento en Pendientes/Gastos/Cobranza/Creativos para este rango. Ampliá fechas o revisá datos.</p></div>';
+            return '<div class="card">' + headCard + '<p class="empty">Ningún cliente con movimiento en este rango. Ampliá las fechas o pulsá <strong>Todo</strong>.</p></div>';
           }
-          var thead = '<thead><tr><th>Cliente Crédito</th><th>Gastos Ads</th><th>Cobros</th><th>Garantías</th><th>Cobranza</th><th>Pendientes (ficha en rango / total vínculo)</th><th>Creativos proy.</th></tr></thead>';
-          return '<div class="card"><h2>Por cliente (Crédito, Cobranza, Pendientes, Creativos) — ' + escCell(rangoLabel) + '</h2><table>' + thead + '<tbody>' + rows.join('') + '</tbody></table></div>';
+          var thead = '<thead><tr><th>Cliente</th><th>Gastos Ads</th><th>Cobros</th><th>Garantías</th><th>Cobranza</th><th>Pendientes</th><th>Creativos</th></tr></thead>';
+          return '<div class="card">' + headCard + '<div class="table-scroll"><table>' + thead + '<tbody>' + rows.join('') + '</tbody></table></div></div>';
         }
 
         var creditoCount = cobrosRange.length + gastosRange.length + clientesRange.length + garantiasRange.length + manualRange.length + gerentesRange.length;
@@ -1452,17 +1847,6 @@
         var pendientesCount = tareasTicketsRange.length + tareasKanbanRange.length + calendarioRange.length + ticketComRange.length;
         var creativosCount = creativosProjRange.length;
         var finanzasCount = fiIng.length + fiGas.length + fiCta.length + fiDeu.length + fiSue.length + fiImp.length;
-
-        var navHtml = [
-          { id: 'sec-credito', label: 'Crédito', n: creditoCount },
-          { id: 'sec-cobranza', label: 'Cobranza', n: cobranzaCount },
-          { id: 'sec-pendientes', label: 'Pendientes', n: pendientesCount },
-          { id: 'sec-creativos', label: 'Creativos', n: creativosCount },
-          { id: 'sec-finanzas', label: 'Finanzas', n: finanzasCount }
-        ].map(function(s) {
-          return '<a href="#' + s.id + '">' + escCell(s.label) + ' · <span class="num">' + s.n + '</span></a>';
-        }).join('');
-        document.getElementById('moduleNav').innerHTML = navHtml;
 
         var html = '';
 
@@ -1609,6 +1993,83 @@
         html += moduleClose();
 
         document.getElementById('panels').innerHTML = html;
+        applyGlobalSearch();
+        attachScrollSpy();
+      }
+
+      var sidebarEl = document.getElementById('sidebar');
+      var sidebarToggle = document.getElementById('sidebarToggle');
+      if (sidebarToggle && sidebarEl) {
+        sidebarToggle.addEventListener('click', function() { sidebarEl.classList.toggle('is-open'); });
+      }
+      document.addEventListener('click', function(e) {
+        if (!sidebarEl) return;
+        var t = e.target;
+        if (t && t.closest && t.closest('.nav-link')) {
+          sidebarEl.classList.remove('is-open');
+        }
+      });
+
+      var scrollObserver = null;
+      function attachScrollSpy() {
+        if (scrollObserver) { try { scrollObserver.disconnect(); } catch (e) {} }
+        if (typeof IntersectionObserver !== 'function') return;
+        var navLinks = document.querySelectorAll('.nav-link');
+        var sections = ['sec-overview', 'sec-credito', 'sec-cobranza', 'sec-pendientes', 'sec-creativos', 'sec-finanzas']
+          .map(function(id) { return document.getElementById(id); })
+          .filter(Boolean);
+        function setActive(id) {
+          navLinks.forEach(function(a) {
+            if (a.getAttribute('data-anchor') === id) a.classList.add('is-active');
+            else a.classList.remove('is-active');
+          });
+        }
+        scrollObserver = new IntersectionObserver(function(entries) {
+          var visible = entries.filter(function(e) { return e.isIntersecting; });
+          if (!visible.length) return;
+          visible.sort(function(a, b) { return b.intersectionRatio - a.intersectionRatio; });
+          if (visible[0].target.id) setActive(visible[0].target.id);
+        }, { rootMargin: '-30% 0px -55% 0px', threshold: [0, 0.2, 0.5, 1] });
+        sections.forEach(function(s) { scrollObserver.observe(s); });
+      }
+
+      var searchInput = document.getElementById('globalSearch');
+      var searchTerm = '';
+      function applyGlobalSearch() {
+        var term = (searchTerm || '').trim().toLowerCase();
+        var cards = document.querySelectorAll('#panels .card');
+        cards.forEach(function(card) {
+          var rows = card.querySelectorAll('tbody tr');
+          if (!rows.length) return;
+          var visibleCount = 0;
+          rows.forEach(function(tr) {
+            if (!term) { tr.style.display = ''; visibleCount++; return; }
+            var match = tr.textContent.toLowerCase().indexOf(term) !== -1;
+            tr.style.display = match ? '' : 'none';
+            if (match) visibleCount++;
+          });
+          var emptyMsg = card.querySelector('.search-empty');
+          if (term && visibleCount === 0 && rows.length > 0) {
+            if (!emptyMsg) {
+              emptyMsg = document.createElement('p');
+              emptyMsg.className = 'empty search-empty';
+              emptyMsg.style.marginTop = '12px';
+              card.appendChild(emptyMsg);
+            }
+            emptyMsg.textContent = 'Sin coincidencias para «' + term + '»';
+            emptyMsg.style.display = '';
+          } else if (emptyMsg) {
+            emptyMsg.style.display = 'none';
+          }
+        });
+      }
+      if (searchInput) {
+        var searchTm = null;
+        searchInput.addEventListener('input', function() {
+          searchTerm = searchInput.value;
+          if (searchTm) clearTimeout(searchTm);
+          searchTm = setTimeout(applyGlobalSearch, 90);
+        });
       }
     })();
   </script>
