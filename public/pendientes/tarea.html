@@ -4722,7 +4722,7 @@ function getTareasClientSelectOptionsHtml() {
     var id = String(c.id || '').replace(/"/g, '&quot;');
     var base = escTareas(c.n || 'Sin nombre');
     var k = (c.n || '').trim().toLowerCase();
-    var lab = (nameCount[k] > 1 && c.email) ? base + ' · ' + escTareas(c.email) : base;
+    var lab = (nameCount[k] > 1 && c.email) ? base + ' · ' + escTareas(tareasFormatEmailsDisplay(c.email)) : base;
     return '<option value="' + id + '">' + lab + '</option>';
   }).join('');
 }
@@ -4782,6 +4782,32 @@ function initTareasRealtimeSync() {
   }
 }
 
+/** Varios correos en `tareas_clientes.email`: texto con uno por línea o separados por coma/punto y coma (parse antes de `loadTareasData`). */
+function tareasParseEmailListFromString(raw) {
+  if (raw == null || raw === '') return [];
+  var parts = String(raw).split(/[\r\n,;]+/);
+  var out = [];
+  var seen = {};
+  var i;
+  for (i = 0; i < parts.length; i++) {
+    var t = parts[i].trim();
+    if (!t) continue;
+    var low = t.toLowerCase();
+    if (seen[low]) continue;
+    seen[low] = true;
+    out.push(t);
+  }
+  return out;
+}
+function tareasEmailsStorageFromList(arr) {
+  return arr.join('\n');
+}
+function tareasFormatEmailsDisplay(str) {
+  var list = tareasParseEmailListFromString(str);
+  if (!list.length) return '';
+  return list.join(' · ');
+}
+
 async function loadTareasData() {
   if (!supabase) {
     console.warn('[Pendientes] loadTareasData: supabase es null, no se puede cargar. Revisa los logs de tryInitSupabase.');
@@ -4813,12 +4839,21 @@ async function loadTareasData() {
     if (calRes.error) throw calRes.error;
     var creditoById = {};
     (creditoRes.data || []).forEach(function(c) {
-      var firstEmail = (c.emails && (Array.isArray(c.emails) ? c.emails[0] : (typeof c.emails === 'string' ? c.emails : null))) || '';
+      var emailArr = [];
+      if (c.emails != null) {
+        if (Array.isArray(c.emails)) {
+          emailArr = c.emails.map(function(e) { return String(e || '').trim(); }).filter(Boolean);
+        } else if (typeof c.emails === 'string') {
+          emailArr = tareasParseEmailListFromString(c.emails);
+        }
+      }
+      var emailsJoined = emailArr.length ? tareasEmailsStorageFromList(emailArr) : '';
+      var firstEmail = emailArr[0] || '';
       var firstPhone = (c.phones && (Array.isArray(c.phones) ? c.phones[0] : (typeof c.phones === 'string' ? c.phones : null))) || '';
       creditoById[c.id] = {
         nombre: c.name || '',
         contacto_nombre: c.name || '',
-        email: firstEmail,
+        email: emailsJoined || firstEmail,
         telefono: firstPhone,
         avatar_url: (c.avatar_url && String(c.avatar_url).trim()) || ''
       };
@@ -5248,7 +5283,7 @@ renderers.clients = function() {
         </div>
       </div>
       <div class="client-table-cell client-table-cell--muted">${c.contact || '—'}</div>
-      <div class="client-table-cell client-table-cell--muted">${c.email || '—'}</div>
+      <div class="client-table-cell client-table-cell--muted">${c.email ? escTareas(tareasFormatEmailsDisplay(c.email)) : '—'}</div>
       <div class="client-table-cell client-table-cell--muted">${c.phone || '—'}</div>
       <div class="client-table-cell" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${svcHtml}</div>
       <div class="client-table-cell">${statusPill}</div>
@@ -7408,10 +7443,8 @@ function openModal(type) {
       <div class="form-group"><label for="cl-name">Nombre / Empresa <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="Ej: Luna Beauty" id="cl-name" autocomplete="organization"></div>
       <div class="form-group"><label for="cl-ind">Tienda <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="Nombre de la tienda" id="cl-ind" autocomplete="off"></div>
       <div class="form-group"><label for="cl-tienda-url">URL de tienda (Shopify u online) <span style="color:#b91c1c">*</span></label><input class="form-input" required id="cl-tienda-url" placeholder="https://tu-tienda.myshopify.com" inputmode="url" autocomplete="url"><p class="form-file-hint" style="margin:6px 0 0">Pegá la URL completa. Si falta https://, se agrega al guardar.</p></div>
-      <div class="form-row">
-        <div class="form-group"><label for="cl-email">Email <span style="color:#b91c1c">*</span></label><input class="form-input" type="email" required placeholder="email@empresa.com" id="cl-email" autocomplete="email"></div>
-        <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="+51 987 654 321" id="cl-phone" autocomplete="tel"></div>
-      </div>
+      <div class="form-group"><label for="cl-emails">Correos <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-emails" rows="3" placeholder="uno@empresa.com&#10;otro@empresa.com" autocomplete="email"></textarea><p class="form-file-hint" style="margin:6px 0 0">Varios correos: uno por línea o separados por coma.</p></div>
+      <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="+51 987 654 321" id="cl-phone" autocomplete="tel"></div>
       <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
       <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
@@ -7588,7 +7621,7 @@ function openClientDetail(idx) {
   var detailSubParts = [];
   if (c.tp && String(c.tp).trim()) detailSubParts.push(escTareas(c.tp));
   if (c.contact && String(c.contact).trim()) detailSubParts.push(escTareas(c.contact));
-  if (c.email && String(c.email).trim()) detailSubParts.push(escTareas(c.email));
+  if (c.email && String(c.email).trim()) detailSubParts.push(escTareas(tareasFormatEmailsDisplay(c.email)));
   var detailSubLine = detailSubParts.join(' · ');
   document.getElementById('modalBody').innerHTML = `
     <div style="display:flex;align-items:center;gap:var(--sp-4);margin-bottom:var(--sp-5)">
@@ -7719,10 +7752,8 @@ function openEditClient(id) {
     <div class="form-group"><label for="cl-name">Nombre / Empresa <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.n||'').replace(/"/g,'&quot;')}" id="cl-name" autocomplete="organization"></div>
     <div class="form-group"><label for="cl-ind">Tienda <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.tp||'').replace(/"/g,'&quot;')}" id="cl-ind" placeholder="Nombre de la tienda" autocomplete="off"></div>
     <div class="form-group"><label for="cl-tienda-url">URL de tienda (Shopify u online) <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${shopVal}" id="cl-tienda-url" placeholder="https://tu-tienda.myshopify.com" inputmode="url" autocomplete="url"><p class="form-file-hint" style="margin:6px 0 0">Pegá la URL completa. Si no tiene https://, se agrega al guardar.</p></div>
-    <div class="form-row">
-      <div class="form-group"><label for="cl-email">Email <span style="color:#b91c1c">*</span></label><input class="form-input" type="email" required value="${(c.email||'').replace(/"/g,'&quot;')}" id="cl-email" autocomplete="email"></div>
-      <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.phone||'').replace(/"/g,'&quot;')}" id="cl-phone" placeholder="+51 987 654 321" autocomplete="tel"></div>
-    </div>
+    <div class="form-group"><label for="cl-emails">Correos <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-emails" rows="3" placeholder="uno@empresa.com&#10;otro@empresa.com" autocomplete="email">${(c.email||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea><p class="form-file-hint" style="margin:6px 0 0">Podés poner <strong>varios correos</strong>: uno por línea o separados por coma.</p></div>
+    <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.phone||'').replace(/"/g,'&quot;')}" id="cl-phone" placeholder="+51 987 654 321" autocomplete="tel"></div>
     <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
     <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
@@ -7814,16 +7845,16 @@ function tareasNormalizeTiendaUrl(raw) {
 function tareasValidatePendientesClientForm() {
   var nameEl = document.getElementById('cl-name');
   var tiendaEl = document.getElementById('cl-ind');
-  var emailEl = document.getElementById('cl-email');
+  var emailsEl = document.getElementById('cl-emails');
   var phoneEl = document.getElementById('cl-phone');
   var urlEl = document.getElementById('cl-tienda-url');
   var statusEl = document.getElementById('cl-status');
   var cumpleEl = document.getElementById('cl-cumple');
   var notesEl = document.getElementById('cl-notes');
-  if (!nameEl || !tiendaEl || !emailEl || !phoneEl || !urlEl || !notesEl) return false;
+  if (!nameEl || !tiendaEl || !emailsEl || !phoneEl || !urlEl || !notesEl) return false;
   var name = nameEl.value.trim();
   var tienda = tiendaEl.value.trim();
-  var email = emailEl.value.trim();
+  var emails = tareasParseEmailListFromString(emailsEl.value);
   var phone = phoneEl.value.trim().replace(/\s+/g, ' ');
   var urlRaw = urlEl.value.trim();
   var notes = notesEl.value.trim();
@@ -7838,9 +7869,16 @@ function tareasValidatePendientesClientForm() {
     alert('Completá el nombre de la tienda.');
     return false;
   }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    alert('Ingresá un email válido.');
+  if (!emails.length) {
+    alert('Ingresá al menos un correo.');
     return false;
+  }
+  var reMail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  for (var ei = 0; ei < emails.length; ei++) {
+    if (!reMail.test(emails[ei])) {
+      alert('Correo no válido: ' + emails[ei]);
+      return false;
+    }
   }
   var digits = phone.replace(/\D/g, '');
   if (!phone || digits.length < 8) {
@@ -7884,7 +7922,7 @@ function updateClient() {
       tipo: document.getElementById('cl-ind').value.trim(),
       url_tienda: tareasNormalizeTiendaUrl(document.getElementById('cl-tienda-url').value),
       contacto_nombre: cPrev ? (cPrev.contact || '') : '',
-      email: document.getElementById('cl-email').value.trim(),
+      email: tareasEmailsStorageFromList(tareasParseEmailListFromString(document.getElementById('cl-emails').value)),
       telefono: document.getElementById('cl-phone').value.trim().replace(/\s+/g, ' '),
       status: document.getElementById('cl-status').value || 'activo',
       servicios: cPrev && Array.isArray(cPrev.svcs) ? cPrev.svcs : [],
@@ -7916,7 +7954,7 @@ function updateClient() {
       var credUp = {
         name: row.nombre,
         biz: row.tipo || null,
-        emails: row.email ? [row.email] : [],
+        emails: tareasParseEmailListFromString(row.email),
         phones: row.telefono ? [row.telefono] : [],
         notes: row.notes || null
       };
@@ -8307,7 +8345,7 @@ function addClient() {
     presupuesto: null,
     gastado: '$0',
     contacto_nombre: null,
-    email: document.getElementById('cl-email').value.trim(),
+    email: tareasEmailsStorageFromList(tareasParseEmailListFromString(document.getElementById('cl-emails').value)),
     telefono: document.getElementById('cl-phone').value.trim().replace(/\s+/g, ' '),
     proxima_accion: 'Agendar kickoff meeting',
     contrato_inicio: null,
