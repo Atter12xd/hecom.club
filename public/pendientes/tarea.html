@@ -2000,6 +2000,7 @@ body.holistic-name-gate-open { overflow: hidden; }
   font-size: 1rem;
 }
 .modal-close:hover { background: var(--red-bg); color: var(--red); }
+.modal--backdrop-lock .modal-close { display: none !important; }
 .modal-body { padding: var(--sp-5) var(--sp-6); }
 .modal-footer {
   padding: var(--sp-4) var(--sp-6);
@@ -7099,9 +7100,12 @@ function openModal(type) {
   const body    = document.getElementById('modalBody');
   const footer  = document.getElementById('modalFooter');
   const modalEl = document.querySelector('#modalOverlay .modal');
+  var ovClear = document.getElementById('modalOverlay');
+  if (ovClear) ovClear.removeAttribute('data-tareas-backdrop-lock');
   if (modalEl) {
     modalEl.classList.remove('modal-compact');
     modalEl.classList.remove('modal-calendar-event');
+    modalEl.classList.remove('modal--backdrop-lock');
   }
 
   if (type === 'task') {
@@ -7180,7 +7184,7 @@ function openModal(type) {
         <div class="form-group"><label for="cl-email">Email <span style="color:#b91c1c">*</span></label><input class="form-input" type="email" required placeholder="email@empresa.com" id="cl-email" autocomplete="email"></div>
         <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="+51 987 654 321" id="cl-phone" autocomplete="tel"></div>
       </div>
-      <p class="form-file-hint" style="margin:-4px 0 12px">En Supabase: <code style="font-size:0.85em">tareas_clientes.telefono</code> (texto). Perú: <strong>+51</strong> + 9 dígitos móvil. Crédito: mismo valor en <code style="font-size:0.85em">clientes.phones[0]</code>.</p>
+      <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
       <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
       <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required placeholder="Objetivos, expectativas..." id="cl-notes"></textarea></div>
@@ -7198,7 +7202,7 @@ function openModal(type) {
           </button>
         </div>
       </div>`;
-    footer.innerHTML = `<button class="btn-secondary" onclick="closeModal()">Cancelar</button><button class="btn-primary" onclick="addClient()">Crear Cliente</button>`;
+    footer.innerHTML = `<button class="btn-secondary" onclick="closeModal(null,true)">Cancelar</button><button class="btn-primary" onclick="addClient()">Crear Cliente</button>`;
     setTimeout(function() {
       var finp = document.getElementById('cl-new-avatar-file');
       var pick = document.getElementById('cl-new-avatar-pick');
@@ -7288,6 +7292,13 @@ function openModal(type) {
     }, 30);
   }
 
+  if (type === 'client') {
+    var ovCl = document.getElementById('modalOverlay');
+    if (ovCl) ovCl.setAttribute('data-tareas-backdrop-lock', '1');
+    var mCl = document.querySelector('#modalOverlay .modal');
+    if (mCl) mCl.classList.add('modal--backdrop-lock');
+  }
+
   showModalOverlay();
   // Focus first input (skip file input)
   setTimeout(function() {
@@ -7312,15 +7323,23 @@ function tareasFormatCumpleanosDisplay(iso) {
   } catch (e) { return s; }
 }
 
-function closeModal(e) {
+function closeModal(e, forceClose) {
   var overlay = document.getElementById('modalOverlay');
   if (!overlay) return;
+  var locked = overlay.getAttribute('data-tareas-backdrop-lock') === '1';
+  if (locked && !forceClose) {
+    if (!e) return;
+    if (e.target === overlay) return;
+    return;
+  }
   if (e && e.target !== overlay) return;
+  overlay.removeAttribute('data-tareas-backdrop-lock');
   tareasCleanupClientAvatarModalsOnClose();
   var modalEl = document.querySelector('#modalOverlay .modal');
   if (modalEl) {
     modalEl.classList.remove('modal-compact');
     modalEl.classList.remove('modal-calendar-event');
+    modalEl.classList.remove('modal--backdrop-lock');
   }
   hideModalOverlay();
 }
@@ -7476,7 +7495,7 @@ function openEditClient(id) {
       <div class="form-group"><label for="cl-email">Email <span style="color:#b91c1c">*</span></label><input class="form-input" type="email" required value="${(c.email||'').replace(/"/g,'&quot;')}" id="cl-email" autocomplete="email"></div>
       <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.phone||'').replace(/"/g,'&quot;')}" id="cl-phone" placeholder="+51 987 654 321" autocomplete="tel"></div>
     </div>
-    <p class="form-file-hint" style="margin:-4px 0 12px">En Supabase va en <code style="font-size:0.85em">tareas_clientes.telefono</code> (texto). Incluí código de país: Perú <strong>+51</strong> y 9 dígitos móvil (ej. <code style="font-size:0.85em">+51 987 654321</code>). Si sincroniza con Crédito, el mismo valor va a <code style="font-size:0.85em">clientes.phones[0]</code>.</p>
+    <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
     <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
     <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-notes">${(c.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></div>
@@ -7494,7 +7513,11 @@ function openEditClient(id) {
         </button>
       </div>
     </div>`;
-  footer.innerHTML = `<button class="btn-secondary" onclick="closeModal();_editingClientId=null">Cancelar</button><button class="btn-primary" onclick="updateClient()">Guardar</button>`;
+  footer.innerHTML = `<button class="btn-secondary" onclick="closeModal(null,true);_editingClientId=null">Cancelar</button><button class="btn-primary" onclick="updateClient()">Guardar</button>`;
+  var ovEdit = document.getElementById('modalOverlay');
+  if (ovEdit) ovEdit.setAttribute('data-tareas-backdrop-lock', '1');
+  var modalEdit = document.querySelector('#modalOverlay .modal');
+  if (modalEdit) modalEdit.classList.add('modal--backdrop-lock');
   showModalOverlay();
   setTimeout(function() {
     var cRow = clients.find(function(x) { return x.id === _editingClientId; });
@@ -7558,8 +7581,7 @@ function tareasNormalizeTiendaUrl(raw) {
 
 /**
  * Validación formulario Nuevo / Editar cliente (campos obligatorios).
- * Teléfono: en BD es texto (tareas_clientes.telefono); en Crédito sync va a clientes.phones[0].
- * Recomendación Perú: código país +51 y móvil 9 dígitos, ej. +51 987 654321 o +51987654321.
+ * Teléfono: texto libre; recomendado Perú +51 + 9 dígitos móvil.
  */
 function tareasValidatePendientesClientForm() {
   var nameEl = document.getElementById('cl-name');
@@ -7657,7 +7679,7 @@ function updateClient() {
       }
       function finishOk() {
         _editingClientId = null;
-        reloadTareasData(function() { closeModal(); });
+        reloadTareasData(function() { closeModal(null, true); });
       }
       if (!linkedCreditoId) {
         finishOk();
@@ -7719,7 +7741,7 @@ function updateClient() {
     if (c) { c.n = row.nombre; c.tp = row.tipo; c.shopUrl = row.url_tienda || ''; c.email = row.email; c.phone = row.telefono; c.status = row.status; c.notes = row.notes; c.birthday = row.cumpleanos ? String(row.cumpleanos).slice(0, 10) : ''; c.photo = row.avatar_url || c.photo || ''; }
     _editingClientId = null;
     renderers.clients(); updateBadges();
-    closeModal();
+    closeModal(null, true);
   }
 }
 function deleteClient(id) {
@@ -8081,7 +8103,7 @@ function addClient() {
       var row0 = r.data && r.data[0];
       var newId = row0 && row0.id;
       function doneOk() {
-        reloadTareasData(function() { closeModal(); });
+        reloadTareasData(function() { closeModal(null, true); });
       }
       if (newId && pendingAvatar) {
         var fakeRow = { id: newId, creditoClientId: null };
@@ -8118,7 +8140,7 @@ function addClient() {
       birthday: row.cumpleanos ? String(row.cumpleanos).slice(0, 10) : '',
       photo: ''
     });
-    renderers.clients(); updateBadges(); closeModal();
+    renderers.clients(); updateBadges(); closeModal(null, true);
   }
 }
 
@@ -8863,7 +8885,13 @@ document.addEventListener('keydown', e => {
       return;
     }
     var mo = document.getElementById('modalOverlay');
-    if (mo && mo.classList.contains('show')) closeModal();
+    if (mo && mo.classList.contains('show')) {
+      if (mo.getAttribute('data-tareas-backdrop-lock') === '1') {
+        e.preventDefault();
+        return;
+      }
+      closeModal();
+    }
   }
 });
 
