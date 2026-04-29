@@ -240,10 +240,26 @@
     .gate button:hover { background: var(--accent-hover); }
     .gate .err { color: #ef4444; font-size: 0.9rem; margin-top: 10px; }
     .hidden { display: none !important; }
+
+    body.backup-auth-pending:not(.backup-mode-json-only) #app { visibility: hidden; }
+    #backupAuthGate {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--text-soft);
+      font-size: 15px;
+    }
+    body.backup-mode-json-only #backupAuthGate { display: none !important; }
   </style>
 </head>
-<body>
-  <div id="gate" class="gate">
+<body class="backup-auth-pending">
+  <div id="backupAuthGate" aria-live="polite">Comprobando sesión…</div>
+
+  <div id="gate" class="gate hidden hidden-gate-init">
     <h1>Copia de seguridad</h1>
     <p class="sub">Base de datos Holistic — acceso restringido</p>
     <input type="password" id="claveIn" placeholder="Clave de acceso" autocomplete="off" />
@@ -254,7 +270,7 @@
   <div id="app" class="wrap hidden">
     <header class="header">
       <h1>Copia de seguridad — Holistic Marketing</h1>
-      <p class="sub">Crédito, Cobranza, Pendientes, Creativos y Finanzas: consultá por día o por rango. Por defecto se muestra <strong>este mes</strong> para no ver pantallas vacías si hoy no hubo movimientos.</p>
+      <p class="sub" id="backupSubtitulo">Igual que Finanzas: con sesión en el Club los datos salen <strong>en vivo desde Supabase</strong> (mismas tablas que exporta npm run export). Modo offline: <code>?offline=1</code> solo lee backup.json.</p>
       <div class="export-info" id="metaExport"><span class="dot"></span> Cargando…</div>
     </header>
 
@@ -273,14 +289,144 @@
           <button type="button" data-preset="hoy">Hoy</button>
           <button type="button" data-preset="semana">Esta semana</button>
           <button type="button" data-preset="mes">Este mes</button>
+          <button type="button" data-preset="archivo" title="Desde/Hasta con las fechas mínimas y máximas que vienen en esta copia de backup.json">Según archivo</button>
         </div>
       </div>
-      <p class="filtro-hint">Elige un solo día (desde = hasta) o un intervalo. Si ves todo en cero, el snapshot puede ser de otro mes: ampliá «Desde» al mes donde está la última exportación (fecha arriba) o pulsá una fecha amplia tipo 2026-01-01 → hoy.</p>
+      <p class="filtro-hint">Elige un solo día (desde = hasta) o un intervalo. Si ves todo en cero, ampliá el rango al mes donde hay datos o pulsá «Según archivo».</p>
+      <p id="filtro-archivo-info" class="filtro-hint" style="margin-top:8px;color:var(--ok)"></p>
     </div>
 
     <div id="resumen" class="resumen"></div>
     <div id="panels"></div>
   </div>
+
+  <script src="/api/auth-config?v=backupLive1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="scripts/live-fetch.js?v=2"></script>
+  <script>
+  (function () {
+    function holisticWebBase() {
+      var b = (typeof window.__HOLISTIC_WEB_ORIGIN__ === 'string' && window.__HOLISTIC_WEB_ORIGIN__.trim()) ? String(window.__HOLISTIC_WEB_ORIGIN__).replace(/\/$/, '') : '';
+      if (b) return b;
+      var h = window.location.hostname;
+      if (h === 'localhost' || h === '127.0.0.1') return window.location.origin;
+      var known = window.__KNOWN_APP_HOSTS__;
+      if (!known || !Array.isArray(known)) {
+        known = ['www.marketingconholistic.com', 'marketingconholistic.com', 'www.hecom.club', 'hecom.club'];
+      }
+      var i;
+      for (i = 0; i < known.length; i++) { if (known[i] === h) return window.location.origin; }
+      var fb = (typeof window.__APP_ORIGIN_FALLBACK__ === 'string' && window.__APP_ORIGIN_FALLBACK__.trim())
+        ? String(window.__APP_ORIGIN_FALLBACK__).replace(/\/$/, '') : 'https://www.hecom.club';
+      return fb;
+    }
+    function isKnownAppHost(hostname) {
+      var hn = hostname || '';
+      if (hn === 'localhost' || hn === '127.0.0.1') return true;
+      var known = window.__KNOWN_APP_HOSTS__;
+      if (!known || !Array.isArray(known)) {
+        known = ['www.marketingconholistic.com', 'marketingconholistic.com', 'www.hecom.club', 'hecom.club'];
+      }
+      var j;
+      for (j = 0; j < known.length; j++) { if (known[j] === hn) return true; }
+      return false;
+    }
+    var qp = new URLSearchParams(window.location.search || '');
+    var forceOffline = qp.get('offline') === '1' || qp.get('snapshot') === '1';
+    window.__BACKUP_FORCE_OFFLINE__ = !!forceOffline;
+    window.__BACKUP_SB__ = null;
+
+    function allowLegacyJsonOnly() {
+      document.body.classList.add('backup-mode-json-only');
+      document.body.classList.remove('backup-auth-pending');
+      var ga = document.getElementById('backupAuthGate');
+      if (ga) ga.style.display = 'none';
+      var gg = document.getElementById('gate');
+      if (gg) { gg.classList.remove('hidden'); }
+    }
+
+    function allowLive() {
+      document.body.classList.remove('backup-auth-pending');
+      var ga = document.getElementById('backupAuthGate');
+      if (ga) ga.style.display = 'none';
+      if (typeof window.__backupBootstrapMain === 'function') {
+        window.__backupBootstrapMain(window.__BACKUP_SB__);
+      }
+    }
+
+    function deny() {
+      window.location.replace(holisticWebBase() + '/login');
+    }
+
+    if (forceOffline || !window.__SUPABASE_URL__ || !window.__SUPABASE_ANON_KEY__) {
+      allowLegacyJsonOnly();
+      return;
+    }
+
+    var hashEarly = window.location.hash || '';
+    var hostEarly = window.location.hostname;
+    var isLocalEarly = hostEarly === 'localhost' || hostEarly === '127.0.0.1';
+    var isHolisticHostEarly = isKnownAppHost(hostEarly);
+    if (hashEarly.indexOf('access_token') !== -1 && !isLocalEarly && !isHolisticHostEarly) {
+      window.location.replace(holisticWebBase() + '/backup-dashboard' + hashEarly);
+      return;
+    }
+
+    var lib = window.supabase;
+    var createClientFn = lib && (lib.createClient || (lib.default && (lib.default.createClient || lib.default)));
+    if (!lib || typeof createClientFn !== 'function') {
+      console.warn('[backup-dashboard] Supabase JS no cargó; modo offline JSON');
+      allowLegacyJsonOnly();
+      return;
+    }
+
+    var authStorage = { persistSession: true, autoRefreshToken: true, storage: localStorage, detectSessionInUrl: true };
+    var sb = createClientFn(window.__SUPABASE_URL__, window.__SUPABASE_ANON_KEY__, { auth: authStorage });
+    window.__BACKUP_SB__ = sb;
+
+    var hash = window.location.hash || '';
+    if (hash.indexOf('access_token') !== -1) {
+      var params = {};
+      hash.slice(1).split('&').forEach(function (p) {
+        var kv = p.split('=');
+        if (kv[0] && kv[1]) params[kv[0]] = decodeURIComponent(kv[1]);
+      });
+      if (params.access_token && params.refresh_token) {
+        sb.auth.setSession({ access_token: params.access_token, refresh_token: params.refresh_token }).then(function (res) {
+          if (res && res.error) throw res.error;
+          try {
+            var stripPath = window.location.pathname || '/backup-dashboard';
+            window.history.replaceState(null, '', stripPath);
+          } catch (eHist) {}
+          allowLive();
+        }).catch(function () { deny(); });
+        return;
+      }
+      deny();
+      return;
+    }
+
+    var maxAttempts = 12;
+    var delayMs = 90;
+    var attempt = 0;
+    function trySession() {
+      sb.auth.getSession().then(function (r) {
+        if (r.data && r.data.session) { allowLive(); return; }
+        attempt++;
+        if (attempt < maxAttempts) { setTimeout(trySession, delayMs); return; }
+        sb.auth.getUser().then(function (ur) {
+          if (ur.data && ur.data.user) { allowLive(); return; }
+          deny();
+        }).catch(function () { deny(); });
+      }).catch(function () {
+        attempt++;
+        if (attempt < maxAttempts) { setTimeout(trySession, delayMs); return; }
+        deny();
+      });
+    }
+    trySession();
+  })();
+  </script>
 
   <script>
     (function() {
@@ -346,11 +492,50 @@
         loadData();
       };
 
-      if (checkClave()) {
-        showApp();
-        loadData();
-      } else {
-        showGate();
+      function updateMetaStrip() {
+        if (!data || !data.exportedAt) return;
+        var d = new Date(data.exportedAt);
+        var v = data.schemaVersion || 1;
+        var modo = data.dataSource === 'live'
+          ? 'En vivo (Supabase) · mismo origen que Finanzas / Crédito · '
+          : 'Copia estática · ';
+        document.getElementById('metaExport').innerHTML = '<span class="dot"></span> ' + modo + d.toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) + (v >= 2 ? ' · Snapshot v' + v : ' · <span style="color:#f59e0b">Schema antiguo o sin tablas nuevas</span>');
+      }
+
+      window.__backupBootstrapMain = function(sb) {
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('gate').classList.add('hidden');
+        document.getElementById('metaExport').innerHTML = '<span class="dot"></span> Cargando tablas desde la base…';
+        if (!window.backupDashboardFetchLive) {
+          document.getElementById('metaExport').textContent = 'Falta scripts/live-fetch.js';
+          return;
+        }
+        backupDashboardFetchLive(sb).then(function(payload) {
+          Object.assign(data, payload);
+          data.dataSource = 'live';
+          updateMetaStrip();
+          setDefaultRange();
+          refreshArchivoHint();
+          render();
+        }).catch(function(err) {
+          console.warn('[backup-dashboard] vivo:', err);
+          document.getElementById('metaExport').innerHTML = '<span style="color:#f59e0b">No se pudo leer en vivo (' + (err && err.message ? err.message : err) + '). Probá <a href="' + escAttr(window.location.pathname + '?offline=1') + '" style="color:inherit">modo offline</a> con backup.json.</span>';
+          document.getElementById('resumen').innerHTML = '';
+          document.getElementById('panels').innerHTML = '';
+        });
+      };
+
+      function escAttr(s) {
+        return String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      }
+
+      if (document.body.classList.contains('backup-mode-json-only')) {
+        if (checkClave()) {
+          showApp();
+          loadData();
+        } else {
+          showGate();
+        }
       }
 
       function loadData() {
@@ -360,12 +545,9 @@
         fetch(url)
           .then(function(r) { return r.ok ? r.json() : Promise.reject(new Error('No se pudo cargar backup.json')); })
           .then(function(json) {
-            data = json;
-            if (data.exportedAt) {
-              var d = new Date(data.exportedAt);
-              var v = data.schemaVersion || 1;
-              document.getElementById('metaExport').innerHTML = '<span class="dot"></span> Última exportación: ' + d.toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' }) + (v >= 2 ? ' · Snapshot v' + v : ' · <span style="color:#f59e0b">Ejecutá de nuevo el export (npm run export)</span> para incluir Pendientes/Creativos/Cobranza/Finanzas');
-            }
+            Object.assign(data, json || {});
+            data.dataSource = 'json';
+            updateMetaStrip();
             if (debug) {
               console.log('[backup-dashboard]', 'backup.json cargado:', {
                 url: url.replace(/\?.*$/, ''),
@@ -383,6 +565,7 @@
               });
             }
             setDefaultRange();
+            refreshArchivoHint();
             render();
           })
           .catch(function(e) {
@@ -394,6 +577,103 @@
 
       function todayStr() { return new Date().toISOString().slice(0, 10); }
       function dateStr(iso) { return iso ? String(iso).slice(0, 10) : ''; }
+
+      /** Fechas día (YYYY-MM-DD) detectables por fila, misma idea que filtros pero para min/max global. */
+      function isoDayCandidatesFromRow(r) {
+        if (!r || typeof r !== 'object') return [];
+        var days = [];
+        function push(s) {
+          if (typeof s !== 'string' || s.length < 10) return;
+          s = s.slice(0, 10);
+          if (/^\d{4}-\d{2}-\d{2}$/.test(s)) days.push(s);
+        }
+        push(dateStr(r.fecha));
+        push(dateStr(r.created_at));
+        push(dateStr(r.updated_at));
+        push(dateStr(r.prox_pago));
+        push(dateStr(r.fecha_emision));
+        push(dateStr(r.fecha_pago));
+        push(dateStr(r.fecha_vencimiento));
+        if (r.anio != null && r.mes != null && r.dia != null) {
+          push(String(r.anio) + '-' + String(r.mes).padStart(2, '0') + '-' + String(r.dia).padStart(2, '0'));
+        }
+        var m = r.mes;
+        if (m != null && /^\d{4}-\d{2}$/.test(String(m).trim())) {
+          push(String(m).trim() + '-01');
+        }
+        return days;
+      }
+
+      function getSnapshotDateBounds(dt) {
+        var all = [];
+        function scan(name) {
+          (dt[name] || []).forEach(function(r) {
+            isoDayCandidatesFromRow(r).forEach(function(d) { all.push(d); });
+          });
+        }
+        scan('cobros');
+        scan('gastos');
+        scan('clientes');
+        scan('garantias');
+        scan('manual');
+        scan('gerentes');
+        scan('cobranza_bandeja');
+        scan('cobranza_eventos');
+        scan('tareas_equipo');
+        scan('tareas_clientes');
+        scan('tareas_kanban');
+        scan('tareas_tickets');
+        scan('tareas_workload');
+        scan('tareas_calendario');
+        scan('tareas_ticket_comentarios');
+        scan('creativos_clientes');
+        scan('creativos_productos');
+        scan('creativos_editores');
+        scan('creativos_proyectos');
+        scan('finanzas_app_ingresos');
+        scan('finanzas_app_gastos');
+        scan('finanzas_app_cuentas_cobrar');
+        scan('finanzas_app_deudas');
+        scan('finanzas_app_sueldos');
+        scan('finanzas_app_impuestos');
+        scan('clientes_acceso');
+
+        var exp = dateStr(dt.exportedAt);
+        if (exp) all.push(exp);
+
+        if (!all.length) return { min: null, max: null };
+        all.sort();
+        return { min: all[0], max: all[all.length - 1] };
+      }
+
+      function refreshArchivoHint() {
+        var el = document.getElementById('filtro-archivo-info');
+        if (!el || !data) return;
+        if (data.dataSource === 'live') {
+          var bLive = getSnapshotDateBounds(data);
+          el.textContent =
+            bLive.min && bLive.max
+              ? 'Vista en vivo: registros cargados desde ' +
+                bLive.min +
+                ' hasta ' +
+                bLive.max +
+                ' según filtros aplicables. Si ves vacíos en algunos paneles revisá políticas RLS de cada tabla.'
+              : 'Consulta activa desde Supabase (sesión iniciada como en Finanzas).';
+          return;
+        }
+        var b = getSnapshotDateBounds(data);
+        if (b.min && b.max) {
+          el.textContent =
+            'Copia offline: registros desde ' +
+            b.min +
+            ' hasta ' +
+            b.max +
+            '. Si solo ves meses viejos, subí un backup.json nuevo tras npm run export en el servidor.';
+        } else {
+          el.textContent =
+            'No pudimos inferir límites de fecha en esta copia. Revisá data/backup.json o ejecutá de nuevo npm run export.';
+        }
+      }
 
       /** Rango inicial: desde el día 1 del mes de la última exportación hasta hoy (así no queda vacío si el JSON es de feb y estamos en abr). */
       function setDefaultRange() {
@@ -475,9 +755,24 @@
             lunes.setDate(diff);
             desde = lunes.toISOString().slice(0, 10);
             hasta = todayStr();
-          } else {
+          } else if (preset === 'archivo') {
+            var bounds = getSnapshotDateBounds(data);
+            if (bounds.min && bounds.max) {
+              desdeIn.value = bounds.min;
+              hastaIn.value = bounds.max;
+            } else if (data && data.exportedAt) {
+              var xd = dateStr(data.exportedAt);
+              desdeIn.value = xd || todayStr();
+              hastaIn.value = xd || todayStr();
+            }
+            refreshArchivoHint();
+            render();
+            return;
+          } else if (preset === 'mes') {
             desde = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-01';
             hasta = todayStr();
+          } else {
+            return;
           }
           desdeIn.value = desde;
           hastaIn.value = hasta;

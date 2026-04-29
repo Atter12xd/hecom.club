@@ -79,8 +79,10 @@ Nota: en Credito, el JS suele venir minificado en `hecom.club`. Fuente editable 
 
 Deploy real en **`hecom.club`** (Vercel sirve rutas locales; ya no hay proxy externo).
 
+- **En vivo**: con sesión del Club (misma inyección que Finanzas vía `/api/auth-config`), el dashboard usa `scripts/live-fetch.js` y los mismos `select` que el export CLI; sin sesión redirige a `/login`; `?offline=1` fuerza sólo lectura del JSON guardado (`data/backup.json`) más clave.
 - `backup-dashboard/index.html`
-- `backup-dashboard/scripts/export-from-supabase.js`
+- `backup-dashboard/scripts/export-from-supabase.js` (CLI snapshots)
+- `backup-dashboard/scripts/live-fetch.js`
 - `backup-dashboard/data/backup.json`
 - `public/backup-dashboard/` mismos archivos (copia deploy, igual que finanzas/creativos).
 

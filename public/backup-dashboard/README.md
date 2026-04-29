@@ -1,17 +1,17 @@
 # Copia de seguridad — Dashboard base de datos Holistic
 
-Dashboard separado que muestra una **copia de la base de datos** por fecha. Si la base principal (Supabase) cae o hay un incidente, los datos siguen disponibles aquí a partir de la última exportación diaria.
+En **hecom.club** esta pantalla muestra datos **directamente desde Supabase** con sesión del Club (igual que Finanzas): `/api/auth-config` + mismo anon que el resto de módulos. La exportación CLI sigue disponible como respaldo cuando la BD no esté accesible.
 
 ## Qué hace
 
-- **Exportación diaria**: El script (`npm run export` / `scripts/export-from-supabase.js`) descarga un snapshot **schema v2** de Crédito (clientes, gastos, cobros, garantías, manual, cobranza), Pendientes (`tareas_*`), Creativos (`creativos_*`), Finanzas internas (`finanzas_app_*`), gerentes y `clientes_acceso`. Salida: `data/backup.json`.
-- **Dashboard**: Lee ese JSON **estático** (no llama a Supabase en el navegador). Filtra por rango de fechas; por defecto abre **el mes en curso** para reducir listas vacías al elegir solo «hoy» sin movimiento. Primera tabla: **Por cliente** (orden alfabético) con enlaces Gastos Ads / Cobros / Cobranza / Pendientes / Creativos. Debajo siguen los listados completos por módulo.
+- **Dashboard en vivo (por defecto)**: Igual tablas que `scripts/export-from-supabase.js`, cargadas con el cliente Supabase tras login en `www.hecom.club` (anon + JWT). Scripts: `live-fetch.js` + `scripts/export-from-supabase.js` mantienen mismas vistas.
+- **Modo offline / incidente**: `?offline=1` o sin variables `PUBLIC_*` fuerza sólo lectura de `data/backup.json` con clave en pantalla (`CLAVE_ESPERADA` en `index.html`).
+- **CLI exportación**: `npm run export` genera snapshot **schema v2** para subir como JSON estático o cron en VPS.
 
 ## Acceso
 
-- URL (en producción): `https://www.marketingconholistic.com/backup-dashboard/`
-- **Clave por defecto**: `holistic2025` (cámbiala en `index.html`, busca `CLAVE_ESPERADA`).
-- También puedes entrar con: `?clave=holistic2025` en la URL.
+- Producción principal: `https://www.hecom.club/backup-dashboard` (logueo igual que Credito / Finanzas).
+- Offline: `?offline=1` + clave (por defecto `holistic2025`) o URL `?clave=…`.
 
 ---
 
