@@ -276,6 +276,9 @@ img,svg{display:block;max-width:100%}
 .badge-pink{background:var(--pink-light);color:var(--pink)}
 .badge-orange{background:var(--orange-light);color:var(--orange)}
 .badge-gray{background:var(--bg-secondary);color:var(--text-muted)}
+.badge-credito{background:rgba(6,182,212,0.15);color:#0891b2}
+.fz-comp-cell{min-width:120px;max-width:220px;vertical-align:middle}
+.fz-comp-cell a img{vertical-align:middle}
 .badge-tipo{padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em}
 
 /* ===== STATUS BADGES — Dot style ===== */
@@ -736,15 +739,19 @@ function drawSparkline(canvasId, dataPoints, colorKey) {
   ctx.fill();
 }
 
-// ===== DATOS (Supabase: finanzas_app_* — un solo libro para Marketing Holistic; separado de Crédito) =====
+// ===== DATOS: finanzas_app_* (manual) + lectura Crédito (cobros, gastos, garantías, clientes) =====
 let ingresos = [];
 let gastos = [];
 let deudas = [];
 let cuentasCobrar = [];
 let sueldos = [];
 let impuestos = [];
+/** Cobros Crédito para calendario / próximos (fecha ISO yyyy-mm-dd, montos en USD nominal). */
+let creditoCalendarCobros = [];
+let creditoSyncWarn = '';
 let finanzasLoadError = '';
 let finanzasDataLoadedAt = null;
+let finanzasLastLoadMs = 0;
 let finanzasAnalytics = { monthKeys: [], monthLabels: [], ing: [], gas: [], balance: [] };
 
 function parseNumFin(n) {
@@ -811,10 +818,300 @@ function mapDate(v) {
   return s;
 }
 
+/** Rutas en bucket comprobantes (cobros/.../archivo) tal como guarda Crédito. */
+function normalizeComprobantePaths(raw) {
+  if (raw == null) return [];
+  if (Array.isArray(raw)) return raw.map(String).filter(Boolean);
+  if (typeof raw === 'string') {
+    const t = raw.trim();
+    if (!t) return [];
+    if (t.charAt(0) === '[') {
+      try {
+        const j = JSON.parse(t);
+        return Array.isArray(j) ? j.map(String).filter(Boolean) : [t];
+      } catch (e) { return [t]; }
+    }
+    return [t];
+  }
+  if (typeof raw === 'object') {
+    const v = Object.values(raw);
+    return v.map(String).filter(Boolean);
+  }
+  return [];
+}
+
+function isComprobanteImagePath(path) {
+  if (!path || typeof path !== 'string') return false;
+  return /\.(jpe?g|png|gif|webp)$/i.test(path);
+}
+
+/**
+ * Rellena miniaturas / enlaces PDF usando URLs firmadas del bucket `comprobantes` (igual que Crédito).
+ */
+async function finanzasHydrateIngresoComprobantes(root) {
+  var sb = window.finanzasSupabase;
+  var scope = root || document;
+  var cells = scope.querySelectorAll('[data-fz-comp-paths]');
+  for (var i = 0; i < cells.length; i++) {
+    var el = cells[i];
+    var paths = [];
+    try {
+      paths = JSON.parse(decodeURIComponent(el.getAttribute('data-fz-comp-paths') || '[]'));
+    } catch (e1) { paths = []; }
+    if (!paths.length) {
+      el.innerHTML = '<span style="font-size:12px;color:var(--text-muted)">—</span>';
+      continue;
+    }
+    if (!sb || !sb.storage) {
+      el.innerHTML = '<span style="font-size:11px;color:var(--text-muted)">' + paths.length + ' archivo(s)</span>';
+      continue;
+    }
+    var parts = [];
+    var max = Math.min(paths.length, 6);
+    for (var j = 0; j < max; j++) {
+      var p = paths[j];
+      if (!p) continue;
+      var r = await sb.storage.from('comprobantes').createSignedUrl(p, 3600);
+      var url = r && r.data && r.data.signedUrl;
+      if (!url) continue;
+      if (isComprobanteImagePath(p)) {
+        parts.push('<a href="' + url + '" target="_blank" rel="noopener" title="Ver comprobante"><img src="' + url + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--sidebar-border, #e2e4e9)"/></a>');
+      } else {
+        parts.push('<a href="' + url + '" target="_blank" rel="noopener" class="badge badge-blue" style="text-decoration:none;margin-right:4px">PDF / doc</a>');
+      }
+    }
+    var more = paths.length > max ? ' <span style="font-size:10px;color:var(--text-muted)">+' + (paths.length - max) + '</span>' : '';
+    el.innerHTML = parts.length
+      ? '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">' + parts.join('') + more + '</div>'
+      : '<span style="font-size:12px;color:var(--text-muted)">—</span>';
+  }
+}
+
+/** Recarga datos y repinta (Realtime + atajos). */
+async function finanzasRefreshAll() {
+  try {
+    await finanzasLoadAll();
+    if (typeof renderSidebar === 'function') renderSidebar();
+    if (typeof renderFilterBar === 'function') renderFilterBar();
+    if (typeof renderView === 'function') renderView();
+    if (typeof updateLastUpdated === 'function') updateLastUpdated();
+  } catch (e) {
+    console.warn('[Finanzas] finanzasRefreshAll', e);
+  }
+}
+
+var finanzasRealtimeDebounce = null;
+function finanzasScheduleRefresh() {
+  if (finanzasRealtimeDebounce) clearTimeout(finanzasRealtimeDebounce);
+  finanzasRealtimeDebounce = setTimeout(function () {
+    finanzasRealtimeDebounce = null;
+    finanzasRefreshAll();
+  }, 450);
+}
+
+/**
+ * Sincronización en vivo: cambios en Crédito o en tablas finanzas_app_* refrescan el panel.
+ * Requiere Realtime activado en el proyecto Supabase para las tablas indicadas.
+ */
+function finanzasSubscribeDataRealtime() {
+  var sb = window.finanzasSupabase;
+  if (!sb || typeof sb.channel !== 'function') return;
+  try {
+    if (window.__finanzasDataCh && typeof sb.removeChannel === 'function') {
+      sb.removeChannel(window.__finanzasDataCh);
+    }
+  } catch (eR) {}
+  var ch = sb
+    .channel('finanzas-auto-sync')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'cobros' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'gastos' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'garantias' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'clientes' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'finanzas_app_ingresos' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'finanzas_app_gastos' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'finanzas_app_cuentas_cobrar' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'finanzas_app_deudas' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'finanzas_app_sueldos' }, finanzasScheduleRefresh)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'finanzas_app_impuestos' }, finanzasScheduleRefresh)
+    .subscribe(function (status) {
+      if (status === 'CHANNEL_ERROR') {
+        console.warn('[Finanzas] Realtime: no se pudo suscribir. Activá Realtime en Supabase para las tablas o usá otra pestaña y volvé (resync al foco).');
+      }
+    });
+  window.__finanzasDataCh = ch;
+}
+
+if (!window.__finanzasVisibilityResync) {
+  window.__finanzasVisibilityResync = true;
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible' || !window.finanzasSupabase) return;
+    if (Date.now() - finanzasLastLoadMs < 90000) return;
+    finanzasScheduleRefresh();
+  });
+}
+
+function creditoGastoLineTotal(g) {
+  const gasto = parseNumFin(g.gasto);
+  const feePct = parseNumFin(g.fee);
+  return gasto + gasto * (feePct / 100);
+}
+
+/**
+ * Incorpora cobros, líneas de gasto (Ads+fee), cuentas por cobrar (deuda neta) y eventos de calendario desde las tablas de Crédito.
+ * No modifica deudas bancarias ni tablas solo-finanzas.
+ */
+async function finanzasMergeCreditoData(sb, baseIngresos, baseGastos, baseCuentasCobrar) {
+  creditoSyncWarn = '';
+  creditoCalendarCobros = [];
+  try {
+    const [clRes, gRes, coRes, garRes] = await Promise.all([
+      sb.from('clientes').select('id,name').order('name'),
+      sb.from('gastos').select('id,client_id,gasto,fee,fecha_movimiento,mes,camp,codigo'),
+      sb.from('cobros').select('id,fecha,monto,gasto_id,client_id,metodo,codigo,comprobante_urls'),
+      sb.from('garantias').select('client_id,valor,estado'),
+    ]);
+    const err = clRes.error || gRes.error || coRes.error || garRes.error;
+    if (err) {
+      creditoSyncWarn = 'Crédito (solo lectura): ' + (err.message || 'no se pudieron leer gastos/cobros/clientes.');
+      return { ingresos: baseIngresos, gastos: baseGastos, cuentasCobrar: baseCuentasCobrar };
+    }
+    const clients = clRes.data || [];
+    const gastosRows = gRes.data || [];
+    const cobrosRows = coRes.data || [];
+    const garRows = (garRes.data || []).filter((r) => String(r.estado || '').toLowerCase() === 'vigente');
+    const nameById = {};
+    clients.forEach((c) => { nameById[c.id] = c.name || 'Cliente'; });
+
+    const ingCredito = cobrosRows.map((co) => {
+      let cid = co.client_id;
+      if (!cid && co.gasto_id) {
+        const gr = gastosRows.find((x) => x.id === co.gasto_id);
+        if (gr) cid = gr.client_id;
+      }
+      const nom = cid ? (nameById[cid] || 'Cliente') : 'Cliente';
+      const urls = co.comprobante_urls;
+      let nComp = 0;
+      if (Array.isArray(urls)) nComp = urls.length;
+      else if (urls && typeof urls === 'object') nComp = Object.keys(urls).length;
+      else if (urls) nComp = 1;
+      const bits = ['Cobro Crédito'];
+      if (co.metodo) bits.push(String(co.metodo));
+      if (co.codigo) bits.push(String(co.codigo));
+      if (nComp) bits.push(nComp + ' comprob.');
+      const pathList = normalizeComprobantePaths(co.comprobante_urls);
+      return {
+        id: 'credito-cobro-' + co.id,
+        fecha: mapDate(co.fecha),
+        cliente: nom,
+        concepto: bits.join(' · '),
+        montoUSD: parseNumFin(co.monto),
+        moneda: 'USD',
+        fechaPago: mapDate(co.fecha),
+        estado: 'Pagado',
+        _credito: true,
+        comprobantePaths: pathList,
+      };
+    });
+
+    const gasCredito = gastosRows.map((g) => {
+      const nom = nameById[g.client_id] || 'Cliente';
+      const fecha = mapDate(g.fecha_movimiento) || (g.mes ? String(g.mes).slice(0, 7) + '-15' : '');
+      const camp = (g.camp || '').trim();
+      return {
+        id: 'credito-gasto-' + g.id,
+        fecha,
+        categoria: 'Crédito · Gastos Ads',
+        concepto: (camp ? camp + ' · ' : '') + nom + (g.codigo ? ' · ' + g.codigo : ''),
+        proveedor: 'Crédito',
+        montoUSD: creditoGastoLineTotal(g),
+        moneda: 'USD',
+        fechaPago: fecha,
+        estado: 'Pagado',
+        _credito: true,
+      };
+    });
+
+    const agg = {};
+    gastosRows.forEach((g) => {
+      const cid = g.client_id;
+      if (!cid) return;
+      if (!agg[cid]) agg[cid] = { name: nameById[cid] || 'Cliente', tGasto: 0, cobrado: 0, gar: 0 };
+      agg[cid].tGasto += creditoGastoLineTotal(g);
+    });
+    cobrosRows.forEach((co) => {
+      const m = parseNumFin(co.monto);
+      let cid = co.client_id;
+      if (!cid && co.gasto_id) {
+        const gr = gastosRows.find((x) => x.id === co.gasto_id);
+        if (gr) cid = gr.client_id;
+      }
+      if (cid && agg[cid]) agg[cid].cobrado += m;
+    });
+    garRows.forEach((gr) => {
+      const cid = gr.client_id;
+      if (cid && agg[cid]) agg[cid].gar += parseNumFin(gr.valor);
+    });
+
+    const dueStr = (() => {
+      const d = new Date();
+      d.setDate(d.getDate() + 45);
+      return d.toISOString().slice(0, 10);
+    })();
+    const ccCredito = [];
+    Object.keys(agg).forEach((cid) => {
+      const x = agg[cid];
+      const gross = Math.max(0, x.tGasto - x.cobrado);
+      const net = Math.max(0, gross - x.gar);
+      if (net > 0.009) {
+        ccCredito.push({
+          id: 'credito-cc-' + cid,
+          cliente: x.name,
+          servicio: 'Por cobrar (Crédito · deuda neta)',
+          montoUSD: net,
+          moneda: 'USD',
+          fechaEmision: finanzasTodayYmd(),
+          fechaVencimiento: dueStr,
+          estado: 'Por vencer',
+          _credito: true,
+        });
+      }
+    });
+
+    cobrosRows.forEach((co) => {
+      let cid = co.client_id;
+      if (!cid && co.gasto_id) {
+        const gr = gastosRows.find((x) => x.id === co.gasto_id);
+        if (gr) cid = gr.client_id;
+      }
+      const nom = cid ? (nameById[cid] || 'Cliente') : 'Cliente';
+      const fd = mapDate(co.fecha);
+      if (fd) {
+        creditoCalendarCobros.push({
+          date: fd,
+          label: nom + ' · Cobro',
+          montoUsd: parseNumFin(co.monto),
+          cliente: nom,
+        });
+      }
+    });
+
+    return {
+      ingresos: baseIngresos.concat(ingCredito),
+      gastos: baseGastos.concat(gasCredito),
+      cuentasCobrar: baseCuentasCobrar.concat(ccCredito),
+    };
+  } catch (e) {
+    creditoSyncWarn = 'Crédito: ' + ((e && e.message) ? e.message : String(e));
+    return { ingresos: baseIngresos, gastos: baseGastos, cuentasCobrar: baseCuentasCobrar };
+  }
+}
+
 async function finanzasLoadAll() {
   finanzasLoadError = '';
   const sb = window.finanzasSupabase;
   if (!sb) {
+    creditoCalendarCobros = [];
+    creditoSyncWarn = '';
     ingresos = [];
     gastos = [];
     deudas = [];
@@ -823,11 +1120,14 @@ async function finanzasLoadAll() {
     impuestos = [];
     finanzasRebuildAnalytics();
     finanzasDataLoadedAt = new Date().toISOString();
+    finanzasLastLoadMs = Date.now();
     return;
   }
   const { data: sess } = await sb.auth.getSession();
   if (!sess || !sess.session) {
     finanzasLoadError = 'No hay sesión activa.';
+    creditoCalendarCobros = [];
+    creditoSyncWarn = '';
     ingresos = [];
     gastos = [];
     deudas = [];
@@ -836,6 +1136,7 @@ async function finanzasLoadAll() {
     impuestos = [];
     finanzasRebuildAnalytics();
     finanzasDataLoadedAt = new Date().toISOString();
+    finanzasLastLoadMs = Date.now();
     return;
   }
   const [iRes, gRes, cRes, dRes, sRes, imRes] = await Promise.all([
@@ -862,6 +1163,7 @@ async function finanzasLoadAll() {
     moneda: normMoneda(row.moneda),
     fechaPago: mapDate(row.fecha_pago),
     estado: row.estado || 'Pagado',
+    comprobantePaths: [],
   }));
   gastos = (gRes.data || []).map((row) => ({
     id: row.id,
@@ -920,8 +1222,13 @@ async function finanzasLoadAll() {
     fechaVencimiento: mapDate(row.fecha_vencimiento),
     estado: row.estado || 'Pendiente',
   }));
+  const merged = await finanzasMergeCreditoData(sb, ingresos, gastos, cuentasCobrar);
+  ingresos = merged.ingresos;
+  gastos = merged.gastos;
+  cuentasCobrar = merged.cuentasCobrar;
   finanzasRebuildAnalytics();
   finanzasDataLoadedAt = new Date().toISOString();
+  finanzasLastLoadMs = Date.now();
 }
 
 function computePanelKpis() {
@@ -1282,6 +1589,7 @@ function renderPanel(el){
   el.innerHTML = `
     <div class="view active" id="viewPanel">
       ${finanzasLoadError ? `<div class="card" style="margin-bottom:16px;border-color:var(--red);background:var(--red-light);color:var(--red);padding:12px 16px;font-size:13px">${finanzasLoadError}</div>` : ''}
+      ${creditoSyncWarn ? `<div class="card" style="margin-bottom:16px;border-color:var(--amber);background:rgba(245,158,11,0.08);color:var(--amber);padding:12px 16px;font-size:13px">${creditoSyncWarn}</div>` : ''}
       <div class="kpi-row cols-5">
         ${kpiCardPremium('Ingresos del período',k.ingPeriod,null,'neutral','ingresos',k.sparkIng)}
         ${kpiCardPremium('Gastos del período',k.gasPeriod,null,'neutral','gastos',k.sparkGas)}
@@ -1475,7 +1783,8 @@ function recentActivity(){
   ].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).slice(0,8);
   return all.map(r=>{
     const badge = r.tipo==='Ingreso'?'badge-green':'badge-red';
-    const desc = r.concepto || r.conc || '—';
+    const clip = (r.tipo==='Ingreso' && r.comprobantePaths && r.comprobantePaths.length) ? ' <span style="font-size:11px;opacity:.8" title="Comprobantes adjuntos">📎' + r.comprobantePaths.length + '</span>' : '';
+    const desc = (r.concepto || r.conc || '—') + clip;
     return `<tr>
       <td>${fmtDate(r.fecha)}</td>
       <td><span class="badge badge-tipo ${badge}">${r.tipo}</span></td>
@@ -1499,7 +1808,7 @@ function renderIngresos(el){
 
   el.innerHTML = `
     <div class="view active">
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px">Ingresos compartidos por la organización en Supabase (<strong>finanzas_app_ingresos</strong>), independientes de Crédito.</p>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px">Ingresos manuales (<strong>finanzas_app_ingresos</strong>) más <strong>cobros de Crédito</strong> (mismo período; montos en USD como en la app de gestión).</p>
       <div class="section-header">
         <div></div>
         <button class="btn btn-primary" onclick="openModal('ingreso')">
@@ -1524,15 +1833,17 @@ function renderIngresos(el){
         <div class="card-header"><h3>Detalle de Ingresos</h3></div>
         <div class="card-body no-pad">
           <table class="data-table">
-            <thead><tr><th>Fecha</th><th>Cliente</th><th>Concepto</th><th class="right">Monto ${primaryCurrency==='USD'?'USD':'PEN'}</th><th class="right">Monto ${primaryCurrency==='USD'?'PEN':'USD'}</th><th>Fecha de Pago</th><th>Estado</th></tr></thead>
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Concepto</th><th class="right">Monto ${primaryCurrency==='USD'?'USD':'PEN'}</th><th class="right">Monto ${primaryCurrency==='USD'?'PEN':'USD'}</th><th>Fecha de Pago</th><th>Vouchers</th><th>Estado</th></tr></thead>
             <tbody>${data.map(r=>{
+              var pathsAttr = encodeURIComponent(JSON.stringify(r.comprobantePaths || []));
               return `<tr>
                 <td>${fmtDate(r.fecha)}</td>
                 <td style="font-weight:600;color:var(--text)">${r.cliente}</td>
-                <td>${r.concepto}</td>
+                <td>${r.concepto}${r._credito?' <span style="opacity:.75;font-size:11px">(Crédito)</span>':''}</td>
                 <td class="amount">${fmtPrimary(montoAUsd(r.montoUSD,r.moneda))}</td>
                 <td class="amount-secondary">${fmtSecondary(montoAUsd(r.montoUSD,r.moneda))}</td>
                 <td>${fmtDate(r.fechaPago)}</td>
+                <td class="fz-comp-cell" data-fz-comp-paths="${pathsAttr}"><span style="font-size:11px;color:var(--text-muted)">…</span></td>
                 <td>${statusBadge(r.estado)}</td>
               </tr>`;
             }).join('')}</tbody>
@@ -1562,6 +1873,9 @@ function renderIngresos(el){
     },
     options:chartDefaults()
   });
+  requestAnimationFrame(function () {
+    finanzasHydrateIngresoComprobantes(el);
+  });
 }
 
 // ===== VIEW: GASTOS =====
@@ -1570,11 +1884,11 @@ function renderGastos(el){
   const data = filterFinanzasRows(gastos,'fecha');
   const total = data.reduce((s,r)=>s+montoAUsd(r.montoUSD,r.moneda),0);
   const mayorGasto = data.length ? data.reduce((max,r)=>montoAUsd(r.montoUSD,r.moneda)>montoAUsd(max.montoUSD,max.moneda)?r:max,data[0]) : null;
-  const catColors = {Sueldos:'blue',Publicidad:'pink',Oficina:'green',Software:'purple',Servicios:'orange',Impuestos:'amber',Otros:'gray',General:'gray'};
+  const catColors = {'Crédito · Gastos Ads':'credito',Sueldos:'blue',Publicidad:'pink',Oficina:'green',Software:'purple',Servicios:'orange',Impuestos:'amber',Otros:'gray',General:'gray'};
 
   el.innerHTML = `
     <div class="view active">
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px">Gastos compartidos por la organización (<strong>finanzas_app_gastos</strong>).</p>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px">Gastos manuales (<strong>finanzas_app_gastos</strong>) más líneas <strong>Crédito · Gastos Ads</strong> (gasto + fee por movimiento, fecha de operación).</p>
       <div class="section-header">
         <div></div>
         <button class="btn btn-primary" onclick="openModal('gasto')">
@@ -1614,7 +1928,7 @@ function renderGastos(el){
               return `<tr>
                 <td>${fmtDate(r.fecha)}</td>
                 <td><span class="badge ${catBadge}"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:2px"></span>${r.categoria}</span></td>
-                <td>${r.concepto}</td>
+                <td>${r.concepto}${r._credito?' <span style="opacity:.75;font-size:11px">(Crédito)</span>':''}</td>
                 <td>${r.proveedor}</td>
                 <td class="amount">${fmtPrimary(montoAUsd(r.montoUSD,r.moneda))}</td>
                 <td class="amount-secondary">${fmtSecondary(montoAUsd(r.montoUSD,r.moneda))}</td>
@@ -1781,7 +2095,7 @@ function renderCobrar(el){
 
   el.innerHTML = `
     <div class="view active">
-      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px">Cuentas por cobrar compartidas (<strong>finanzas_app_cuentas_cobrar</strong>); el estado se recalcula al cargar según el vencimiento.</p>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px">Cuentas manuales (<strong>finanzas_app_cuentas_cobrar</strong>) más <strong>deuda neta por cliente</strong> calculada en Crédito (pendiente − garantías vigentes), alineada al módulo Crédito.</p>
       <div class="section-header">
         <div></div>
         <button type="button" class="btn btn-primary" onclick="openModal('cuenta')">
@@ -1808,7 +2122,7 @@ function renderCobrar(el){
               const dias = daysUntil(r.fechaVencimiento);
               return `<tr>
                 <td style="font-weight:600;color:var(--text)">${r.cliente}</td>
-                <td>${r.servicio}</td>
+                <td>${r.servicio}${r._credito?' <span style="opacity:.75;font-size:11px">(Crédito)</span>':''}</td>
                 <td class="amount">${fmtPrimary(montoAUsd(r.montoUSD,r.moneda))}</td>
                 <td class="amount-secondary">${fmtSecondary(montoAUsd(r.montoUSD,r.moneda))}</td>
                 <td>${fmtDate(r.fechaEmision)}</td>
@@ -2027,6 +2341,7 @@ function renderCalendario(el){
   const events = [
     ...deudas.map(d=>({date:(d.proxPago||'').slice(0,10),label:d.banco+' - Cuota',type:'debt'})),
     ...cuentasCobrar.filter(r=>r.estado!=='Vencido').map(r=>({date:(r.fechaVencimiento||'').slice(0,10),label:r.cliente,type:'income'})),
+    ...creditoCalendarCobros.filter((e)=>e.date && e.date.slice(0,7)===ymCal).map((e)=>({date:e.date.slice(0,10),label:e.label,type:'income'})),
     ...sueldos.filter(r=>(r.fechaPago||'').slice(0,7)===ymCal).map(r=>({date:(r.fechaPago||'').slice(0,10),label:'Nómina '+r.empleado,type:'salary'})),
     ...impuestos.filter(r=>r.estado==='Pendiente').map(r=>({date:(r.fechaVencimiento||'').slice(0,10),label:r.tipo,type:'tax'})),
   ];
@@ -2064,12 +2379,20 @@ function renderCalendario(el){
   const allUpcoming = [
     ...deudas.map(d=>({date:d.proxPago,concepto:d.concepto,tipo:'Deuda',badge:'badge-red',monto:montoAUsd(d.cuotaMensual!=null?d.cuotaMensual:0,d.moneda),target:d.banco})),
     ...cuentasCobrar.filter(r=>r.estado!=='Vencido').map(r=>({date:r.fechaVencimiento,concepto:r.servicio,tipo:'Cobro',badge:'badge-blue',monto:montoAUsd(r.montoUSD,r.moneda),target:r.cliente})),
+    ...creditoCalendarCobros.filter((e)=>e.date && e.date.slice(0,7)===ymCal).map((e)=>({
+      date: e.date,
+      concepto: 'Cobro Crédito · ' + e.label,
+      tipo: 'Cobro Crédito',
+      badge: 'badge-blue',
+      monto: montoAUsd(e.montoUsd, 'USD'),
+      target: e.cliente,
+    })),
     ...(nominaMes>0?[{date:ymCal+'-28',concepto:'Nómina (mes vista)',tipo:'Sueldo',badge:'badge-green',monto:nominaMes,target:'Planilla'}]:[]),
     ...impuestos.filter(r=>r.estado==='Pendiente').map(r=>({date:r.fechaVencimiento,concepto:r.tipo+' '+r.periodo,tipo:'Impuesto',badge:'badge-amber',monto:montoAUsd(r.montoUSD,r.moneda),target:'SUNAT'})),
   ].sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,12);
 
-  const totalPagar = allUpcoming.filter(u=>u.tipo!=='Cobro').reduce((s,u)=>s+u.monto,0);
-  const totalCobrar = allUpcoming.filter(u=>u.tipo==='Cobro').reduce((s,u)=>s+u.monto,0);
+  const totalPagar = allUpcoming.filter((u)=>u.tipo!=='Cobro' && u.tipo!=='Cobro Crédito').reduce((s,u)=>s+u.monto,0);
+  const totalCobrar = allUpcoming.filter((u)=>u.tipo==='Cobro' || u.tipo==='Cobro Crédito').reduce((s,u)=>s+u.monto,0);
 
   el.innerHTML = `
     <div class="view active">
@@ -2406,6 +2729,11 @@ window.finanzasInitApp = async function finanzasInitApp(){
     console.error(e);
     finanzasLoadError = (e && e.message) ? e.message : String(e);
     finanzasDataLoadedAt = new Date().toISOString();
+  }
+  try {
+    finanzasSubscribeDataRealtime();
+  } catch (eS) {
+    console.warn('[Finanzas] Realtime init', eS);
   }
   renderSidebar();
   renderFilterBar();
