@@ -5197,6 +5197,8 @@ renderers.clients = function() {
   }).join('');
   grid.innerHTML = thead + rows;
   applyClientListRowVisibility();
+  /* Tras recargar datos (p. ej. guardar cliente), el DOM es nuevo: sin esto las filas quedan .fade-in sin .visible (opacity 0), igual que el kanban tras repintar. */
+  grid.querySelectorAll('.client-table-row.fade-in').forEach(function(el) { el.classList.add('visible'); });
 };
 
 function filterClients(status, btn) {
