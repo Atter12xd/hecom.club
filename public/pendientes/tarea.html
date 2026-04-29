@@ -2215,6 +2215,70 @@ body.holistic-name-gate-open { overflow: hidden; }
   color: var(--color-text-faint);
 }
 
+/* Correos cliente: filas + botón agregar */
+.cl-email-rows { display: flex; flex-direction: column; gap: 8px; }
+.cl-email-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.cl-email-row .form-input { flex: 1; min-width: 0; }
+.cl-email-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--color-divider, #e2e8f0);
+  background: var(--color-surface-2, #f8fafc);
+  color: var(--color-text-muted, #64748b);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.cl-email-btn:hover {
+  background: var(--color-primary-highlight, #eff6ff);
+  border-color: var(--color-primary, #2563eb);
+  color: var(--color-primary, #2563eb);
+}
+.cl-email-remove.cl-email-remove--hidden { visibility: hidden; pointer-events: none; }
+.cl-email-add-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+.cl-email-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px dashed var(--color-divider, #cbd5e1);
+  background: transparent;
+  color: var(--color-primary, #2563eb);
+  font-size: var(--text-sm, 0.875rem);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.cl-email-add:hover {
+  border-style: solid;
+  background: var(--color-primary-highlight, #eff6ff);
+}
+.cl-email-add svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--color-primary-highlight, #eff6ff);
+  color: var(--color-primary, #2563eb);
+  box-sizing: content-box;
+}
+
 /* ══════════════════════════════════════════════
    NOTIFICATION PANEL
 ══════════════════════════════════════════════ */
@@ -4806,6 +4870,82 @@ function tareasFormatEmailsDisplay(str) {
   var list = tareasParseEmailListFromString(str);
   if (!list.length) return '';
   return list.join(' · ');
+}
+
+/** Correos con UI de filas + botón «Agregar correo» (icono +). */
+function tareasClientEmailRemoveSvg() {
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+}
+function tareasClientEmailPlusSvg() {
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+}
+function tareasInitClientEmailFields(initialEmails) {
+  var wrap = document.getElementById('cl-emails-wrap');
+  if (!wrap) return;
+  var arr = initialEmails && initialEmails.length ? initialEmails.slice() : [''];
+  wrap.innerHTML = arr.map(function(em) {
+    return '<div class="cl-email-row">' +
+      '<input type="email" class="form-input cl-email-input" placeholder="correo@empresa.com" value="' + escTareas(em) + '" autocomplete="email" />' +
+      '<button type="button" class="cl-email-btn cl-email-remove" aria-label="Quitar este correo" title="Quitar">' +
+      tareasClientEmailRemoveSvg() + '</button></div>';
+  }).join('');
+  tareasBindClientEmailFields();
+  tareasUpdateClientEmailRemoveVisibility();
+}
+function tareasBindClientEmailFields() {
+  var wrap = document.getElementById('cl-emails-wrap');
+  var addBtn = document.getElementById('cl-email-add');
+  if (!wrap) return;
+  if (addBtn) {
+    addBtn.onclick = function(ev) {
+      ev.preventDefault();
+      var row = document.createElement('div');
+      row.className = 'cl-email-row';
+      row.innerHTML =
+        '<input type="email" class="form-input cl-email-input" placeholder="correo@empresa.com" value="" autocomplete="email" />' +
+        '<button type="button" class="cl-email-btn cl-email-remove" aria-label="Quitar este correo" title="Quitar">' +
+        tareasClientEmailRemoveSvg() + '</button>';
+      wrap.appendChild(row);
+      var inp = row.querySelector('.cl-email-input');
+      if (inp) inp.focus();
+      row.querySelector('.cl-email-remove').onclick = function(e) {
+        e.preventDefault();
+        tareasRemoveClientEmailRow(row);
+      };
+      tareasUpdateClientEmailRemoveVisibility();
+    };
+  }
+  wrap.querySelectorAll('.cl-email-remove').forEach(function(btn) {
+    btn.onclick = function(e) {
+      e.preventDefault();
+      var row = btn.closest('.cl-email-row');
+      if (row) tareasRemoveClientEmailRow(row);
+    };
+  });
+}
+function tareasRemoveClientEmailRow(row) {
+  var wrap = document.getElementById('cl-emails-wrap');
+  if (!wrap || !row) return;
+  if (wrap.querySelectorAll('.cl-email-row').length <= 1) return;
+  row.remove();
+  tareasUpdateClientEmailRemoveVisibility();
+}
+function tareasUpdateClientEmailRemoveVisibility() {
+  var rows = document.querySelectorAll('#cl-emails-wrap .cl-email-row');
+  var multi = rows.length > 1;
+  rows.forEach(function(row) {
+    var rm = row.querySelector('.cl-email-remove');
+    if (rm) rm.classList.toggle('cl-email-remove--hidden', !multi);
+  });
+}
+function tareasGetClientEmailsFromInputs() {
+  var inputs = document.querySelectorAll('#cl-emails-wrap .cl-email-input');
+  var parts = [];
+  inputs.forEach(function(inp) {
+    var v = inp.value.trim();
+    if (v) parts.push(v);
+  });
+  return tareasParseEmailListFromString(parts.join('\n'));
 }
 
 async function loadTareasData() {
@@ -7443,7 +7583,14 @@ function openModal(type) {
       <div class="form-group"><label for="cl-name">Nombre / Empresa <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="Ej: Luna Beauty" id="cl-name" autocomplete="organization"></div>
       <div class="form-group"><label for="cl-ind">Tienda <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="Nombre de la tienda" id="cl-ind" autocomplete="off"></div>
       <div class="form-group"><label for="cl-tienda-url">URL de tienda (Shopify u online) <span style="color:#b91c1c">*</span></label><input class="form-input" required id="cl-tienda-url" placeholder="https://tu-tienda.myshopify.com" inputmode="url" autocomplete="url"><p class="form-file-hint" style="margin:6px 0 0">Pegá la URL completa. Si falta https://, se agrega al guardar.</p></div>
-      <div class="form-group"><label for="cl-emails">Correos <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-emails" rows="3" placeholder="uno@empresa.com&#10;otro@empresa.com" autocomplete="email"></textarea><p class="form-file-hint" style="margin:6px 0 0">Varios correos: uno por línea o separados por coma.</p></div>
+      <div class="form-group">
+        <label for="cl-emails-wrap">Correos <span style="color:#b91c1c">*</span></label>
+        <div id="cl-emails-wrap" class="cl-email-rows"></div>
+        <div class="cl-email-add-wrap">
+          <button type="button" class="cl-email-add" id="cl-email-add">${tareasClientEmailPlusSvg()}<span>Agregar correo</span></button>
+        </div>
+        <p class="form-file-hint" style="margin:6px 0 0">Tocá <strong>+ Agregar correo</strong> para sumar otra dirección.</p>
+      </div>
       <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="+51 987 654 321" id="cl-phone" autocomplete="tel"></div>
       <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
       <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
@@ -7465,6 +7612,7 @@ function openModal(type) {
       </div>`;
     footer.innerHTML = `<button class="btn-secondary" onclick="closeModal(null,true)">Cancelar</button><button class="btn-primary" onclick="addClient()">Crear Cliente</button>`;
     setTimeout(function() {
+      tareasInitClientEmailFields([]);
       var finp = document.getElementById('cl-new-avatar-file');
       var pick = document.getElementById('cl-new-avatar-pick');
       var lab = document.getElementById('cl-new-avatar-label');
@@ -7752,7 +7900,14 @@ function openEditClient(id) {
     <div class="form-group"><label for="cl-name">Nombre / Empresa <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.n||'').replace(/"/g,'&quot;')}" id="cl-name" autocomplete="organization"></div>
     <div class="form-group"><label for="cl-ind">Tienda <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.tp||'').replace(/"/g,'&quot;')}" id="cl-ind" placeholder="Nombre de la tienda" autocomplete="off"></div>
     <div class="form-group"><label for="cl-tienda-url">URL de tienda (Shopify u online) <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${shopVal}" id="cl-tienda-url" placeholder="https://tu-tienda.myshopify.com" inputmode="url" autocomplete="url"><p class="form-file-hint" style="margin:6px 0 0">Pegá la URL completa. Si no tiene https://, se agrega al guardar.</p></div>
-    <div class="form-group"><label for="cl-emails">Correos <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-emails" rows="3" placeholder="uno@empresa.com&#10;otro@empresa.com" autocomplete="email">${(c.email||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea><p class="form-file-hint" style="margin:6px 0 0">Podés poner <strong>varios correos</strong>: uno por línea o separados por coma.</p></div>
+    <div class="form-group">
+      <label for="cl-emails-wrap">Correos <span style="color:#b91c1c">*</span></label>
+      <div id="cl-emails-wrap" class="cl-email-rows"></div>
+      <div class="cl-email-add-wrap">
+        <button type="button" class="cl-email-add" id="cl-email-add">${tareasClientEmailPlusSvg()}<span>Agregar correo</span></button>
+      </div>
+      <p class="form-file-hint" style="margin:6px 0 0">Tocá <strong>+ Agregar correo</strong> para sumar otra dirección.</p>
+    </div>
     <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.phone||'').replace(/"/g,'&quot;')}" id="cl-phone" placeholder="+51 987 654 321" autocomplete="tel"></div>
     <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
     <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
@@ -7780,6 +7935,7 @@ function openEditClient(id) {
   showModalOverlay();
   setTimeout(function() {
     var cRow = clients.find(function(x) { return x.id === _editingClientId; });
+    tareasInitClientEmailFields(tareasParseEmailListFromString((cRow && cRow.email) || ''));
     var finp = document.getElementById('cl-avatar-file');
     var pick = document.getElementById('cl-avatar-pick');
     var ph = (c.photo && String(c.photo).trim()) || '';
@@ -7845,16 +8001,16 @@ function tareasNormalizeTiendaUrl(raw) {
 function tareasValidatePendientesClientForm() {
   var nameEl = document.getElementById('cl-name');
   var tiendaEl = document.getElementById('cl-ind');
-  var emailsEl = document.getElementById('cl-emails');
+  var emailsWrap = document.getElementById('cl-emails-wrap');
   var phoneEl = document.getElementById('cl-phone');
   var urlEl = document.getElementById('cl-tienda-url');
   var statusEl = document.getElementById('cl-status');
   var cumpleEl = document.getElementById('cl-cumple');
   var notesEl = document.getElementById('cl-notes');
-  if (!nameEl || !tiendaEl || !emailsEl || !phoneEl || !urlEl || !notesEl) return false;
+  if (!nameEl || !tiendaEl || !emailsWrap || !phoneEl || !urlEl || !notesEl) return false;
   var name = nameEl.value.trim();
   var tienda = tiendaEl.value.trim();
-  var emails = tareasParseEmailListFromString(emailsEl.value);
+  var emails = tareasGetClientEmailsFromInputs();
   var phone = phoneEl.value.trim().replace(/\s+/g, ' ');
   var urlRaw = urlEl.value.trim();
   var notes = notesEl.value.trim();
@@ -7922,7 +8078,7 @@ function updateClient() {
       tipo: document.getElementById('cl-ind').value.trim(),
       url_tienda: tareasNormalizeTiendaUrl(document.getElementById('cl-tienda-url').value),
       contacto_nombre: cPrev ? (cPrev.contact || '') : '',
-      email: tareasEmailsStorageFromList(tareasParseEmailListFromString(document.getElementById('cl-emails').value)),
+      email: tareasEmailsStorageFromList(tareasGetClientEmailsFromInputs()),
       telefono: document.getElementById('cl-phone').value.trim().replace(/\s+/g, ' '),
       status: document.getElementById('cl-status').value || 'activo',
       servicios: cPrev && Array.isArray(cPrev.svcs) ? cPrev.svcs : [],
@@ -8345,7 +8501,7 @@ function addClient() {
     presupuesto: null,
     gastado: '$0',
     contacto_nombre: null,
-    email: tareasEmailsStorageFromList(tareasParseEmailListFromString(document.getElementById('cl-emails').value)),
+    email: tareasEmailsStorageFromList(tareasGetClientEmailsFromInputs()),
     telefono: document.getElementById('cl-phone').value.trim().replace(/\s+/g, ' '),
     proxima_accion: 'Agendar kickoff meeting',
     contrato_inicio: null,
