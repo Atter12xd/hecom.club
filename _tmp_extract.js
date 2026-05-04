@@ -1,0 +1,10 @@
+const fs = require("fs");
+const s = fs.readFileSync("credito-app/credito-app.js", "utf8");
+const start = s.indexOf('h.jsxs("div",{className:"hm-report-total-wrap"');
+const sub = s.slice(start);
+const endMarker = '})]})]})]})]})}),h.jsx("div",{className:"hm-resumen-pro-body';
+const end = sub.indexOf(endMarker);
+console.log("end found", end);
+const block = sub.slice(0, end);
+console.log("block len", block.length);
+fs.writeFileSync("_tmp_block1.txt", block);
