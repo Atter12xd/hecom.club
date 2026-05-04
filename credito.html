@@ -682,15 +682,20 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260506toolbar-vcenter" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260506toolbar-sixmo" />
   <!-- Métricas: toolbar — inline en credito.html para misma respuesta que /credito (no-store) y sin depender solo del CSS cacheado -->
   <style id="hm-credito-metrics-toolbar-align">
-    /* Centrar verticalmente el bloque Usuario respecto al calendario (más alto) — elimina blanco debajo */
+    /* Usuario arriba en la fila (sin centrar vs Período) — menos banda blanca arriba/abajo en la columna Usuario */
     .hm-resumen-pro-toolbar-row {
-      align-items: center !important;
-      align-content: center;
+      align-items: flex-start !important;
+      align-content: flex-start;
     }
-    /* El select hf() apila label + input; Período va más compacto — una fila evita hueco entre “Usuario” y “Todos” */
+    .hm-resumen-pro-toolbar-row .hm-resumen-pro-ss {
+      align-self: flex-start;
+      padding: 0;
+      margin: 0;
+    }
+    /* El select hf() apila label + input; una fila evita hueco entre “Usuario” y “Todos” */
     .hm-resumen-pro-toolbar-row .hm-resumen-pro-ss > div {
       display: flex !important;
       flex-flow: row wrap !important;
