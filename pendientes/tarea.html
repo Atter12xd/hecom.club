@@ -7951,7 +7951,7 @@ function openModal(type) {
       </div>
       <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
       <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego ingresá el número móvil.</p>
-      <div class="form-group"><label for="cl-instagram">Instagram <span style="font-weight:400;color:var(--color-text-faint)">(opcional)</span></label><input class="form-input" type="text" id="cl-instagram" autocomplete="off" placeholder="@marca o https://instagram.com/…"></div>
+      <div class="form-group"><label for="cl-instagram">Instagram <span style="color:#b91c1c">*</span></label><input class="form-input" type="text" id="cl-instagram" required autocomplete="off" placeholder="@marca o https://instagram.com/…"></div>
       <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
       <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required placeholder="Objetivos, expectativas..." id="cl-notes"></textarea></div>
@@ -8276,7 +8276,7 @@ function openEditClient(id) {
     </div>
     <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
     <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego el número móvil.</p>
-    <div class="form-group"><label for="cl-instagram">Instagram <span style="font-weight:400;color:var(--color-text-faint)">(opcional)</span></label><input class="form-input" type="text" id="cl-instagram" autocomplete="off" placeholder="@marca o https://instagram.com/…" value="${(c.ig||'').replace(/"/g,'&quot;')}"></div>
+    <div class="form-group"><label for="cl-instagram">Instagram <span style="color:#b91c1c">*</span></label><input class="form-input" type="text" id="cl-instagram" required autocomplete="off" placeholder="@marca o https://instagram.com/…" value="${(c.ig||'').replace(/"/g,'&quot;')}"></div>
     <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
     <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-notes">${(c.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></div>
@@ -8374,7 +8374,7 @@ function tareasInstagramToUrl(raw) {
   return 'https://www.instagram.com/' + h + '/';
 }
 
-/** Valor para columna `instagram` en tareas_clientes (null si vacío). */
+/** Valor para columna `instagram` en tareas_clientes (obligatorio en formulario). */
 function tareasClientInstagramForDb() {
   var el = document.getElementById('cl-instagram');
   if (!el) return null;
@@ -8457,7 +8457,8 @@ function tareasValidatePendientesClientForm() {
   var statusEl = document.getElementById('cl-status');
   var cumpleEl = document.getElementById('cl-cumple');
   var notesEl = document.getElementById('cl-notes');
-  if (!nameEl || !tiendaEl || !emailsWrap || !phoneEl || !urlEl || !notesEl) return false;
+  var igEl = document.getElementById('cl-instagram');
+  if (!nameEl || !tiendaEl || !emailsWrap || !phoneEl || !urlEl || !notesEl || !igEl) return false;
   var name = nameEl.value.trim();
   var tienda = tiendaEl.value.trim();
   var emails = tareasGetClientEmailsFromInputs();
@@ -8509,6 +8510,11 @@ function tareasValidatePendientesClientForm() {
   }
   if (!notes) {
     alert('Completá brief / notas.');
+    return false;
+  }
+  var igVal = igEl.value.trim();
+  if (!igVal) {
+    alert('Completá Instagram (@usuario o enlace al perfil).');
     return false;
   }
   if (_editingClientId) {
