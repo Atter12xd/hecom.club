@@ -655,7 +655,7 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260428gerente-sync1";
+          var appSrc = "/credito-app/credito-app.js?v=20260507months-center";
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -682,16 +682,16 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260506toolbar-sixmo" />
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260507months-center" />
   <!-- Métricas: toolbar — inline en credito.html para misma respuesta que /credito (no-store) y sin depender solo del CSS cacheado -->
   <style id="hm-credito-metrics-toolbar-align">
-    /* Usuario arriba en la fila (sin centrar vs Período) — menos banda blanca arriba/abajo en la columna Usuario */
+    /* Usuario centrado en vertical respecto al bloque Período */
     .hm-resumen-pro-toolbar-row {
-      align-items: flex-start !important;
-      align-content: flex-start;
+      align-items: center !important;
+      align-content: center;
     }
     .hm-resumen-pro-toolbar-row .hm-resumen-pro-ss {
-      align-self: flex-start;
+      align-self: center;
       padding: 0;
       margin: 0;
     }
