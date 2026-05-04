@@ -853,7 +853,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
   -webkit-overflow-scrolling: touch;
 }
 .clients-table {
-  min-width: 920px;
+  min-width: 980px;
   background: var(--color-surface);
   border: 1px solid var(--color-divider);
   border-radius: var(--r-xl);
@@ -861,7 +861,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
 }
 .clients-thead {
   display: grid;
-  grid-template-columns: minmax(188px, 1.5fr) minmax(96px, 0.85fr) minmax(132px, 1fr) minmax(96px, 0.8fr) minmax(112px, 1fr) 88px 52px minmax(120px, 1.05fr) 84px;
+  grid-template-columns: minmax(188px, 1.5fr) minmax(96px, 0.85fr) minmax(132px, 1fr) minmax(96px, 0.8fr) minmax(52px, 0.35fr) minmax(112px, 1fr) 88px 52px minmax(120px, 1.05fr) 84px;
   padding: var(--sp-3) var(--sp-4);
   background: var(--color-surface-2);
   border-bottom: 1px solid var(--color-divider);
@@ -875,7 +875,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
 }
 .client-table-row {
   display: grid;
-  grid-template-columns: minmax(188px, 1.5fr) minmax(96px, 0.85fr) minmax(132px, 1fr) minmax(96px, 0.8fr) minmax(112px, 1fr) 88px 52px minmax(120px, 1.05fr) 84px;
+  grid-template-columns: minmax(188px, 1.5fr) minmax(96px, 0.85fr) minmax(132px, 1fr) minmax(96px, 0.8fr) minmax(52px, 0.35fr) minmax(112px, 1fr) 88px 52px minmax(120px, 1.05fr) 84px;
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--color-divider);
   align-items: center;
@@ -903,6 +903,7 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
 }
 .client-table-cell--name .client-name-meta { flex: 1; min-width: 0; }
 .client-table-cell--name .team-avatars { margin-top: 4px; }
+.client-table-cell--center { text-align: center; }
 .client-table-cell--muted {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
@@ -5312,7 +5313,8 @@ async function loadTareasData() {
       var photo = fotoTareas || fotoCredito;
       if (photo && tareasHotlinkAvatarLikelyBlocked(photo)) photo = '';
       var shopUrl = (r.url_tienda != null && String(r.url_tienda).trim()) ? String(r.url_tienda).trim() : '';
-      return { id: r.id, creditoClientId: r.credito_client_id || null, n: n, tp: r.tipo || '', shopUrl: shopUrl, c: r.color || '#666', photo: photo, phases: Array.isArray(r.fases) ? r.fases : [], curr: r.fase_actual || 0, svcs: Array.isArray(r.servicios) ? r.servicios : [], team: Array.isArray(r.equipo_ids) ? r.equipo_ids : [], entregables: r.entregables || 0, done: r.entregables_hechos || 0, tickets: r.tickets_count || 0, meetings: r.meetings_count || 0, satisfaction: satVal, budget: r.presupuesto || '', spent: r.gastado || '', contact: contact, email: email, phone: phone, birthday: tareasCumpleanosIsoFromRow(r), nextAction: r.proxima_accion || '', contractStart: r.contrato_inicio || '', contractEnd: r.contrato_fin || '', monthlyFee: r.fee_mensual || '', health: healthVal, healthTxt: r.health_txt || '', notes: r.notes || '', status: r.status || 'activo' };
+      var igRaw = (r.instagram != null && String(r.instagram).trim()) ? String(r.instagram).trim() : '';
+      return { id: r.id, creditoClientId: r.credito_client_id || null, n: n, tp: r.tipo || '', shopUrl: shopUrl, ig: igRaw, c: r.color || '#666', photo: photo, phases: Array.isArray(r.fases) ? r.fases : [], curr: r.fase_actual || 0, svcs: Array.isArray(r.servicios) ? r.servicios : [], team: Array.isArray(r.equipo_ids) ? r.equipo_ids : [], entregables: r.entregables || 0, done: r.entregables_hechos || 0, tickets: r.tickets_count || 0, meetings: r.meetings_count || 0, satisfaction: satVal, budget: r.presupuesto || '', spent: r.gastado || '', contact: contact, email: email, phone: phone, birthday: tareasCumpleanosIsoFromRow(r), nextAction: r.proxima_accion || '', contractStart: r.contrato_inicio || '', contractEnd: r.contrato_fin || '', monthlyFee: r.fee_mensual || '', health: healthVal, healthTxt: r.health_txt || '', notes: r.notes || '', status: r.status || 'activo' };
     });
     clients.sort(function(a, b) {
       return (a.n || '').localeCompare(b.n || '', 'es', { sensitivity: 'base' });
@@ -5745,6 +5747,7 @@ renderers.clients = function() {
       <div>Contacto</div>
       <div>Email</div>
       <div>Teléfono</div>
+      <div>IG</div>
       <div>Servicios</div>
       <div>Estado</div>
       <div>Sat.</div>
@@ -5778,6 +5781,7 @@ renderers.clients = function() {
       <div class="client-table-cell client-table-cell--muted">${c.contact || '—'}</div>
       <div class="client-table-cell client-table-cell--muted">${c.email ? escTareas(tareasFormatEmailsDisplay(c.email)) : '—'}</div>
       <div class="client-table-cell client-table-cell--muted">${c.phone || '—'}</div>
+      <div class="client-table-cell client-table-cell--center">${(c.ig && String(c.ig).trim()) ? '<a href="' + escAttrUrlTareas(tareasInstagramToUrl(c.ig)) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="Instagram" style="font-weight:700;color:var(--color-primary);font-size:var(--text-xs)">IG</a>' : '—'}</div>
       <div class="client-table-cell" style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${svcHtml}</div>
       <div class="client-table-cell">${statusPill}</div>
       <div class="client-table-cell"><span class="pill ${satPill}" title="Satisfacción">${satLabel}</span></div>
@@ -7947,6 +7951,7 @@ function openModal(type) {
       </div>
       <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
       <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego ingresá el número móvil.</p>
+      <div class="form-group"><label for="cl-instagram">Instagram <span style="font-weight:400;color:var(--color-text-faint)">(opcional)</span></label><input class="form-input" type="text" id="cl-instagram" autocomplete="off" placeholder="@marca o https://instagram.com/…"></div>
       <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
       <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required placeholder="Objetivos, expectativas..." id="cl-notes"></textarea></div>
@@ -8120,6 +8125,7 @@ function openClientDetail(idx) {
   var invBlock = pFin.finRead ? `<div class="info-item"><div class="lbl">Inversión</div><div class="val" style="font-variant-numeric:tabular-nums">${c.spent || '—'} de ${c.budget || '—'} (${c.monthlyFee || '—'}/mes)</div></div>` : '';
   var cumpleBlock = (c.birthday && String(c.birthday).trim()) ? `<div class="info-item"><div class="lbl">Cumpleaños</div><div class="val">${escTareas(tareasFormatCumpleanosDisplay(c.birthday))}</div></div>` : '';
   var shopBlock = (c.shopUrl && String(c.shopUrl).trim()) ? `<div class="info-item"><div class="lbl">URL tienda</div><div class="val" style="word-break:break-all"><a href="${escAttrUrlTareas(c.shopUrl)}" target="_blank" rel="noopener noreferrer">${escTareas(c.shopUrl)}</a></div></div>` : '';
+  var igBlock = (c.ig && String(c.ig).trim()) ? `<div class="info-item"><div class="lbl">Instagram</div><div class="val"><a href="${escAttrUrlTareas(tareasInstagramToUrl(c.ig))}" target="_blank" rel="noopener noreferrer">${escTareas(String(c.ig).trim())}</a></div></div>` : '';
 
   document.getElementById('modalTitle').textContent = (c.n || 'Cliente') + ' — Detalle';
   var detailSubParts = [];
@@ -8135,6 +8141,7 @@ function openClientDetail(idx) {
     <div class="info-grid" style="margin-bottom:var(--sp-5)">
       ${invBlock}
       ${shopBlock}
+      ${igBlock}
       ${cumpleBlock}
       <div class="info-item"><div class="lbl">Satisfacción</div><div class="val" style="font-variant-numeric:tabular-nums">${satLabel}</div></div>
     </div>
@@ -8269,6 +8276,7 @@ function openEditClient(id) {
     </div>
     <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
     <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego el número móvil.</p>
+    <div class="form-group"><label for="cl-instagram">Instagram <span style="font-weight:400;color:var(--color-text-faint)">(opcional)</span></label><input class="form-input" type="text" id="cl-instagram" autocomplete="off" placeholder="@marca o https://instagram.com/…" value="${(c.ig||'').replace(/"/g,'&quot;')}"></div>
     <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
     <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-notes">${(c.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></div>
@@ -8352,6 +8360,27 @@ function tareasNormalizeTiendaUrl(raw) {
   } catch (e) {
     return '';
   }
+}
+
+/** Instagram: URL para enlace (handle @x o path sin dominio → instagram.com) */
+function tareasInstagramToUrl(raw) {
+  var s = String(raw || '').trim();
+  if (!s) return '';
+  if (/^https?:\/\//i.test(s)) {
+    try { return new URL(s).href.split('?')[0].split('#')[0]; } catch (e) { return s; }
+  }
+  var h = s.replace(/^@/, '').replace(/^(www\.)?instagram\.com\/?/i, '').split('/')[0].split('?')[0];
+  if (!h) return 'https://www.instagram.com/';
+  return 'https://www.instagram.com/' + h + '/';
+}
+
+/** Valor para columna `instagram` en tareas_clientes (null si vacío). */
+function tareasClientInstagramForDb() {
+  var el = document.getElementById('cl-instagram');
+  if (!el) return null;
+  var v = String(el.value || '').trim();
+  if (!v) return null;
+  return v.length > 400 ? v.slice(0, 400) : v;
 }
 
 function tareasIntlTelInputCtor() {
@@ -8524,6 +8553,7 @@ function updateClient() {
       fee_mensual: cPrev ? (cPrev.monthlyFee || cPrev.budget || '') : '',
       notes: document.getElementById('cl-notes').value || '',
       cumpleanos: (function() { var el = document.getElementById('cl-cumple'); var v = el && el.value.trim(); return v ? v : null; })(),
+      instagram: tareasClientInstagramForDb(),
       avatar_url: avatar_url
     };
   }
@@ -8599,7 +8629,7 @@ function updateClient() {
     runSupabaseWithRow(row);
   } else {
     var c = clients.find(function(x){ return x.id === _editingClientId; });
-    if (c) { c.n = row.nombre; c.tp = row.tipo; c.shopUrl = row.url_tienda || ''; c.email = row.email; c.phone = row.telefono; c.status = row.status; c.notes = row.notes; c.birthday = row.cumpleanos ? String(row.cumpleanos).slice(0, 10) : ''; c.photo = row.avatar_url || c.photo || ''; }
+    if (c) { c.n = row.nombre; c.tp = row.tipo; c.shopUrl = row.url_tienda || ''; c.email = row.email; c.phone = row.telefono; c.ig = row.instagram || ''; c.status = row.status; c.notes = row.notes; c.birthday = row.cumpleanos ? String(row.cumpleanos).slice(0, 10) : ''; c.photo = row.avatar_url || c.photo || ''; }
     _editingClientId = null;
     renderers.clients(); updateBadges();
     closeModal(null, true);
@@ -8950,7 +8980,8 @@ function addClient() {
     health_txt: 'Nuevo — Pendiente de onboarding',
     notes: document.getElementById('cl-notes').value.trim(),
     status: statusNew || 'onboarding',
-    cumpleanos: (function() { var el = document.getElementById('cl-cumple'); var v = el && el.value.trim(); return v ? v : null; })()
+    cumpleanos: (function() { var el = document.getElementById('cl-cumple'); var v = el && el.value.trim(); return v ? v : null; })(),
+    instagram: tareasClientInstagramForDb()
   };
   if (supabase) {
     var pendingAvatar = _newClientAvatarFile;
@@ -8995,7 +9026,7 @@ function addClient() {
     clients.push({
       n, id: null, tp: row.tipo, shopUrl: row.url_tienda || '', c: row.color, phases: row.fases, curr: 0, svcs: [], team: [],
       entregables: 0, done: 0, tickets: 0, meetings: 0, satisfaction: null, budget: '', spent: row.gastado,
-      contact: '', email: row.email, phone: row.telefono,
+      contact: '', email: row.email, phone: row.telefono, ig: row.instagram || '',
       nextAction: row.proxima_accion, contractStart: '', contractEnd: '',
       monthlyFee: '', health: 50, healthTxt: row.health_txt, notes: row.notes, status: row.status,
       birthday: row.cumpleanos ? String(row.cumpleanos).slice(0, 10) : '',
