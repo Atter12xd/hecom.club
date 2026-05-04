@@ -43,6 +43,7 @@ Excepcion: si solo hay archivo directo en `hecom.club` (por ejemplo HTML de modu
 
 - **Fuente de verdad al editar:** `pendientes/tarea.html` en la **raiz del repo** (`hecom.club/pendientes/tarea.html`). La URL publica `/pendientes/...` en Vercel se resuelve contra esa carpeta `pendientes/` del proyecto, no contra `public/pendientes/`.
 - **`public/pendientes/tarea.html`** es una **copia** que en la practica duplica trabajo si se parchean **los dos** en cada cambio. Para avanzar rapido: **cambiar solo** `pendientes/tarea.html`. Copiar a `public/` solo si un pipeline o release lo exige de forma explicita.
+- **Si en el navegador no ves los ultimos cambios** (sigue el texto o HTML viejo), es muy probable que el entorno este sirviendo la copia bajo `public/pendientes/` o cache CDN. Solucion: **volver a copiar** el canonico a public, p. ej. `pendientes/tarea.html` → `public/pendientes/tarea.html`, y desplegar; luego recarga dura (Ctrl+Shift+R).
 - Objetivo: evitar divergencia y turnos dobles en cada PR o prompt.
 
 ## Supabase en este repo (importante)

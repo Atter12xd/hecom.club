@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/pendientes/holistic-design-system.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.0/build/css/intlTelInput.min.css">
 <style>
 /* Tokens: holistic-design-system.css — referencia visual de esta app para Crédito y Creativos */
 /* ══════════════════════════════════════════════
@@ -2166,6 +2167,34 @@ body.holistic-name-gate-open { overflow: hidden; }
 
 /* Form elements */
 .form-group { margin-bottom: var(--sp-4); }
+/* intl-tel-input — acoplado a inputs Pendientes (modal cliente) */
+#modalBody .iti { width: 100%; }
+#modalBody .iti__flag-container { border-radius: var(--r-md) 0 0 var(--r-md); border-right: 1px solid var(--color-divider); }
+#modalBody .iti__selected-flag { border-radius: var(--r-md) 0 0 var(--r-md); padding: 0 10px 0 12px; }
+#modalBody .iti input.iti__tel-input,
+#modalBody .iti input[type=tel] {
+  width: 100%;
+  height: auto;
+  min-height: 42px;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--r-md);
+  background: var(--color-surface);
+  font-size: var(--text-sm);
+}
+#modalBody .iti--show-flags .iti__selected-dial-code {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+#modalBody .iti__country-list {
+  border-radius: var(--r-md);
+  border: 1px solid var(--color-divider);
+  box-shadow: var(--shadow-md);
+  font-size: var(--text-sm);
+}
+#modalBody .iti__country-name { color: var(--color-text); }
+
 .form-group label {
   display: block;
   font-size: var(--text-xs);
@@ -2768,6 +2797,7 @@ window.hmDumpAuthUser = function() {
 </script>
 <!-- UMD antes del fetch de config: si /api/supabase-config resuelve muy rápido, el microtask del .then del auth no debe ejecutarse antes de que exista window.supabase. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.0/build/js/intlTelInput.min.js"></script>
 <script>
 (function(){
   window.__HECOM_SB_READY__=(function(){
@@ -7896,6 +7926,7 @@ function openModal(type) {
     }, 80);
 
   } else if (type === 'client') {
+    tareasDestroyClientPhoneIti();
     if (_newClientAvatarPreviewUrl && String(_newClientAvatarPreviewUrl).indexOf('blob:') === 0) {
       try { URL.revokeObjectURL(_newClientAvatarPreviewUrl); } catch (e) {}
     }
@@ -7914,8 +7945,8 @@ function openModal(type) {
         </div>
         <p class="form-file-hint" style="margin:6px 0 0">Tocá <strong>+ Agregar correo</strong> para sumar otra dirección.</p>
       </div>
-      <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required placeholder="+51 987 654 321" id="cl-phone" autocomplete="tel"></div>
-      <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
+      <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
+      <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego ingresá el número móvil.</p>
       <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
       <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required placeholder="Objetivos, expectativas..." id="cl-notes"></textarea></div>
@@ -7941,6 +7972,7 @@ function openModal(type) {
       var lab = document.getElementById('cl-new-avatar-label');
       tareasShowNewClientAvatarPreview('');
       tareasBindNewClientAvatarPreviewZoom();
+      tareasInitClientPhoneIti('');
       if (pick && finp) {
         pick.onclick = function() { finp.click(); };
         finp.onchange = function(ev) {
@@ -8067,6 +8099,7 @@ function closeModal(e, forceClose) {
   if (e && e.target !== overlay) return;
   overlay.removeAttribute('data-tareas-backdrop-lock');
   tareasCleanupClientAvatarModalsOnClose();
+  tareasDestroyClientPhoneIti();
   var modalEl = document.querySelector('#modalOverlay .modal');
   if (modalEl) {
     modalEl.classList.remove('modal-compact');
@@ -8144,6 +8177,8 @@ var _clientEditAvatarPreviewUrl = null;
 /** Archivo elegido en «Nuevo cliente»; se sube después del INSERT (necesitamos el id de fila). */
 var _newClientAvatarFile = null;
 var _newClientAvatarPreviewUrl = null;
+/** Instancia intl-tel-input para #cl-phone (nuevo / editar cliente). */
+var _clientPhoneIti = null;
 
 function tareasCleanupClientAvatarModalsOnClose() {
   if (_clientEditAvatarPreviewUrl && String(_clientEditAvatarPreviewUrl).indexOf('blob:') === 0) {
@@ -8209,6 +8244,7 @@ function tareasBindNewClientAvatarPreviewZoom() {
 function openEditClient(id) {
   var c = clients.find(function(x){ return x.id === id; });
   if (!c) return;
+  tareasDestroyClientPhoneIti();
   tareasCleanupClientAvatarModalsOnClose();
   _editingClientId = id;
   _clientEditAvatarTouched = false;
@@ -8231,8 +8267,8 @@ function openEditClient(id) {
       </div>
       <p class="form-file-hint" style="margin:6px 0 0">Tocá <strong>+ Agregar correo</strong> para sumar otra dirección.</p>
     </div>
-    <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.phone||'').replace(/"/g,'&quot;')}" id="cl-phone" placeholder="+51 987 654 321" autocomplete="tel"></div>
-    <p class="form-file-hint" style="margin:-4px 0 12px">Poné el celular con código de país. En Perú es <strong>+51</strong> y después los 9 números del móvil. Ejemplo: <strong>+51 987 654 321</strong> (los espacios son opcionales; podés escribirlo como te resulte más claro).</p>
+    <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
+    <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego el número móvil.</p>
     <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
     <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-notes">${(c.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></div>
@@ -8259,6 +8295,7 @@ function openEditClient(id) {
   setTimeout(function() {
     var cRow = clients.find(function(x) { return x.id === _editingClientId; });
     tareasInitClientEmailFields(tareasParseEmailListFromString((cRow && cRow.email) || ''));
+    tareasInitClientPhoneIti((cRow && cRow.phone) ? String(cRow.phone).trim() : '');
     var finp = document.getElementById('cl-avatar-file');
     var pick = document.getElementById('cl-avatar-pick');
     var ph = (c.photo && String(c.photo).trim()) || '';
@@ -8317,9 +8354,70 @@ function tareasNormalizeTiendaUrl(raw) {
   }
 }
 
+function tareasIntlTelInputCtor() {
+  if (typeof intlTelInput === 'function') return intlTelInput;
+  if (typeof window !== 'undefined' && typeof window.intlTelInput === 'function') return window.intlTelInput;
+  return null;
+}
+
+function tareasDestroyClientPhoneIti() {
+  if (_clientPhoneIti) {
+    try { _clientPhoneIti.destroy(); } catch (e) {}
+    _clientPhoneIti = null;
+  }
+}
+
+/** Inicializa selector de país + prefijo (intl-tel-input). existingE164 ej. +51955259206 */
+function tareasInitClientPhoneIti(existingE164) {
+  tareasDestroyClientPhoneIti();
+  var input = document.getElementById('cl-phone');
+  if (!input) return;
+  var Factory = tareasIntlTelInputCtor();
+  if (!Factory) {
+    if (existingE164) input.value = String(existingE164).trim();
+    return;
+  }
+  var utilsUrl = 'https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.0/build/js/utils.js';
+  _clientPhoneIti = Factory(input, {
+    initialCountry: 'pe',
+    preferredCountries: ['pe', 'mx', 'co', 'cl', 'ar', 'es', 'us', 'ec', 'bo', 'uy', 'py', 'br', 've'],
+    separateDialCode: true,
+    formatOnDisplay: true,
+    utilsScript: utilsUrl
+  });
+  if (existingE164 && String(existingE164).trim()) {
+    try { _clientPhoneIti.setNumber(String(existingE164).trim()); } catch (e1) {}
+  }
+}
+
+/** Número internacional para guardar (E.164 cuando intl-tel-input puede armarlo). */
+function tareasGetClientPhoneValue() {
+  if (_clientPhoneIti) {
+    try {
+      var num = _clientPhoneIti.getNumber();
+      if (num && String(num).replace(/\s/g, '').length >= 8) return String(num).replace(/\s/g, '').trim();
+    } catch (e) {}
+  }
+  var el = document.getElementById('cl-phone');
+  if (!el) return '';
+  return String(el.value || '').replace(/\s+/g, ' ').trim();
+}
+
+function tareasIsClientPhoneAcceptable() {
+  var phone = tareasGetClientPhoneValue();
+  var digits = phone.replace(/\D/g, '');
+  if (digits.length < 8 || digits.length > 16) return false;
+  if (_clientPhoneIti && typeof window.intlTelInputUtils !== 'undefined' && typeof _clientPhoneIti.isValidNumber === 'function') {
+    try {
+      return _clientPhoneIti.isValidNumber() === true;
+    } catch (e) {}
+  }
+  return true;
+}
+
 /**
  * Validación formulario Nuevo / Editar cliente (campos obligatorios).
- * Teléfono: texto libre; recomendado Perú +51 + 9 dígitos móvil.
+ * Teléfono: intl-tel-input (país + prefijo) o entrada manual si falló la lib.
  */
 function tareasValidatePendientesClientForm() {
   var nameEl = document.getElementById('cl-name');
@@ -8334,7 +8432,7 @@ function tareasValidatePendientesClientForm() {
   var name = nameEl.value.trim();
   var tienda = tiendaEl.value.trim();
   var emails = tareasGetClientEmailsFromInputs();
-  var phone = phoneEl.value.trim().replace(/\s+/g, ' ');
+  var phone = tareasGetClientPhoneValue();
   var urlRaw = urlEl.value.trim();
   var notes = notesEl.value.trim();
   var cumple = cumpleEl ? cumpleEl.value.trim() : '';
@@ -8359,9 +8457,8 @@ function tareasValidatePendientesClientForm() {
       return false;
     }
   }
-  var digits = phone.replace(/\D/g, '');
-  if (!phone || digits.length < 8) {
-    alert('Completá el teléfono con código de país. Ej. Perú: +51 y 9 dígitos móvil (+51 987 654 321).');
+  if (!phone || !tareasIsClientPhoneAcceptable()) {
+    alert('Completá un teléfono válido. Elegí el país con la bandera; el prefijo (ej. +51 para Perú) se coloca solo.');
     return false;
   }
   if (!urlRaw) {
@@ -8421,7 +8518,7 @@ function updateClient() {
       url_tienda: tareasNormalizeTiendaUrl(document.getElementById('cl-tienda-url').value),
       contacto_nombre: cPrev ? (cPrev.contact || '') : '',
       email: tareasEmailsStorageFromList(tareasGetClientEmailsFromInputs()),
-      telefono: document.getElementById('cl-phone').value.trim().replace(/\s+/g, ' '),
+      telefono: tareasGetClientPhoneValue(),
       status: document.getElementById('cl-status').value || 'activo',
       servicios: cPrev && Array.isArray(cPrev.svcs) ? cPrev.svcs : [],
       fee_mensual: cPrev ? (cPrev.monthlyFee || cPrev.budget || '') : '',
@@ -8844,7 +8941,7 @@ function addClient() {
     gastado: '$0',
     contacto_nombre: null,
     email: tareasEmailsStorageFromList(tareasGetClientEmailsFromInputs()),
-    telefono: document.getElementById('cl-phone').value.trim().replace(/\s+/g, ' '),
+    telefono: tareasGetClientPhoneValue(),
     proxima_accion: 'Agendar kickoff meeting',
     contrato_inicio: null,
     contrato_fin: null,
