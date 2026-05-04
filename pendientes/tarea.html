@@ -7597,7 +7597,7 @@ function openModal(type) {
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
       <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required placeholder="Objetivos, expectativas..." id="cl-notes"></textarea></div>
       <div class="form-group">
-        <div style="font-size:0.75rem;font-weight:600;margin-bottom:4px">Foto de perfil <span style="font-weight:500;color:var(--color-text-muted)">(opcional)</span></div>
+        <div style="font-size:0.75rem;font-weight:600;margin-bottom:4px">Foto de perfil <span style="color:#b91c1c">*</span></div>
         <p class="form-file-hint" style="margin:4px 0 8px">Elegí archivo, mirá la vista previa (clic para ampliar). <strong>Se sube al crear</strong> el cliente (JPG, PNG, WebP o GIF, máx. 5 MB).</p>
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
           <input type="file" id="cl-new-avatar-file" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
@@ -7914,7 +7914,7 @@ function openEditClient(id) {
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
     <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-notes">${(c.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></div>
     <div class="form-group">
-      <div style="font-size:0.75rem;font-weight:600;margin-bottom:4px">Foto de perfil</div>
+      <div style="font-size:0.75rem;font-weight:600;margin-bottom:4px">Foto de perfil <span style="color:#b91c1c">*</span></div>
       <p class="form-file-hint" style="margin:4px 0 8px">Elegí un archivo y revisá la vista previa (clic para ampliar). Se <strong>sube al guardar</strong> (JPG, PNG, WebP o GIF, máx. 5 MB).</p>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
         <input type="file" id="cl-avatar-file" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none" />
@@ -8060,6 +8060,25 @@ function tareasValidatePendientesClientForm() {
   }
   if (!notes) {
     alert('Completá brief / notas.');
+    return false;
+  }
+  if (_editingClientId) {
+    var cEd = clients.find(function(x) { return x.id === _editingClientId; });
+    var hasPendingAvatar = !!_clientEditAvatarPendingFile;
+    var keptOrSetUrl = false;
+    if (hasPendingAvatar) {
+      keptOrSetUrl = true;
+    } else if (_clientEditAvatarTouched) {
+      keptOrSetUrl = !!(_clientEditAvatarUrl && String(_clientEditAvatarUrl).trim());
+    } else {
+      keptOrSetUrl = !!(cEd && cEd.photo && String(cEd.photo).trim());
+    }
+    if (!keptOrSetUrl) {
+      alert('La foto de perfil es obligatoria. Elegí una imagen o conservá la actual.');
+      return false;
+    }
+  } else if (!_newClientAvatarFile) {
+    alert('La foto de perfil es obligatoria. Elegí una imagen.');
     return false;
   }
   return true;
