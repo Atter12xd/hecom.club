@@ -682,8 +682,8 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260504metrics-align" />
-  <!-- Métricas: alinear “Usuario” con “Periodo” (inline = misma petición que esta página; no depende del caché de credito-app.css) -->
+  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260505metrics-usuario-row" />
+  <!-- Métricas: toolbar — inline en credito.html para misma respuesta que /credito (no-store) y sin depender solo del CSS cacheado -->
   <style id="hm-credito-metrics-toolbar-align">
     .hm-resumen-pro-toolbar-row {
       align-items: flex-start !important;
@@ -691,6 +691,23 @@
     }
     .hm-resumen-pro-toolbar-row > .hm-resumen-pro-ss {
       align-self: flex-start !important;
+    }
+    /* El select hf() apila label + input; Período va más compacto — una fila evita hueco entre “Usuario” y “Todos” */
+    .hm-resumen-pro-toolbar-row .hm-resumen-pro-ss > div {
+      display: flex !important;
+      flex-flow: row wrap !important;
+      align-items: center !important;
+      gap: 10px 12px !important;
+      margin-bottom: 0 !important;
+    }
+    .hm-resumen-pro-toolbar-row .hm-resumen-pro-ss > div > label {
+      margin-bottom: 0 !important;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    .hm-resumen-pro-toolbar-row .hm-resumen-pro-ss > div > input[type="text"] {
+      flex: 1 1 160px;
+      min-width: 140px;
     }
   </style>
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />

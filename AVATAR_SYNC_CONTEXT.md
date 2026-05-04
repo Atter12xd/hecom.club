@@ -67,6 +67,16 @@ Implicacion para futuras IAs:
 
 Nota: en Credito, el JS suele venir minificado en `hecom.club`. Fuente editable habitual: `marketing/marketing/holistic-app/src/App.jsx`.
 
+#### Crédito — Métricas (toolbar Usuario / Período), por qué Pendientes “sí” y esto a veces “no”
+
+- **Pendientes** es básicamente un solo `tarea.html`: tocás un archivo y el deploy sirve ese HTML.
+- **Crédito** es SPA: `credito.html` + bundle `credito-app.js` + `credito-app/credito-app.css`. Los cambios de **solo CSS** pueden no verse si el navegador mantiene una copia vieja del `.css` (mismo `?v=` en el `<link>`) o si no se desplegó el artefacto en `public/credito-app/`.
+- **Ajuste de layout en Métricas** (alinear filtro Usuario con Período, sin hueco feo):
+  - Reglas extra al **final** de `credito-app/credito-app.css` (y copia en `public/`).
+  - Bloque **`<style id="hm-credito-metrics-toolbar-align">`** en `credito.html` y **`public/credito.html`**: va en el mismo documento que responde `https://www.hecom.club/credito` (Vercel reescribe a `credito.html`), con `Cache-Control: no-store` para esa ruta, así el fix viaja con la página sin depender solo del caché del CSS grande.
+  - El componente de búsqueda `hf()` en el bundle **apila** etiqueta “Usuario” y el input en **columna**; Período es más compacto. El CSS de refuerzo pone **label + input en una fila** (flex) para acercar el aspecto al bloque Período.
+- Tras editar: **subir `credito.html` + `credito-app.css`** (y bundle si tocás JS), **subir `?v=`** del `<link>` del CSS al cambiar el archivo, y mantener **alineados** `credito.html` en la raíz y `public/credito.html` si el pipeline usa ambos.
+
 ### Pendientes
 
 - **`pendientes/tarea.html`** — canonico; todos los cambios de UI/JS de Pendientes van aqui.
