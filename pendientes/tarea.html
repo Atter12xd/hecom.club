@@ -549,6 +549,93 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
   gap: var(--sp-2);
 }
 
+/* Marketing — demo de campañas (misma línea visual que el resto de vistas) */
+.marketing-demo-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-5);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  background: var(--color-surface-offset);
+  border: 1px dashed var(--color-divider);
+  border-radius: var(--r-md);
+}
+.marketing-demo-banner strong { color: var(--color-text); }
+.marketing-demo-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  gap: var(--sp-5);
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .marketing-demo-layout { grid-template-columns: 1fr; }
+}
+.marketing-demo-cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.marketing-demo-cat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  padding: 6px 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--color-divider);
+  background: var(--color-surface);
+  cursor: pointer;
+  user-select: none;
+}
+.marketing-demo-cat-label:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+}
+.marketing-demo-cat {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary);
+}
+.marketing-demo-preview-wrap {
+  overflow-x: auto;
+  margin-top: var(--sp-3);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--r-md);
+}
+.marketing-demo-preview-table {
+  font-size: var(--text-xs);
+  width: 100%;
+  border-collapse: collapse;
+}
+.marketing-demo-preview-table th {
+  text-align: left;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-divider);
+}
+.marketing-demo-preview-table td {
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-divider);
+  vertical-align: middle;
+}
+.marketing-demo-preview-table tr:last-child td { border-bottom: none; }
+.marketing-demo-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+@media (max-width: 520px) {
+  .marketing-demo-stat-row { grid-template-columns: 1fr; }
+}
+
 /* ══════════════════════════════════════════════
    TABS
 ══════════════════════════════════════════════ */
@@ -3121,15 +3208,99 @@ window.__HECOM_SB_READY__.then(function(){
     <div>
       <h3 style="margin-bottom:4px">Marketing</h3>
       <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-muted);max-width:44rem;line-height:1.45">
-        Envíos masivos por <strong>email</strong>, <strong>SMS</strong> y <strong>WhatsApp</strong>, con audiencias segmentadas por <strong>estado</strong> del cliente y <strong>categoría</strong>.</p>
+        Envíos masivos por <strong>email</strong>, <strong>SMS</strong> y <strong>WhatsApp</strong>, con audiencias segmentadas por <strong>estado</strong> del cliente y <strong>categoría</strong> de servicio.</p>
+    </div>
+    <div class="section-actions">
+      <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:9999px;background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:600">Demo · sin envíos reales</span>
     </div>
   </div>
-  <div class="card fade-in">
-    <div class="card-body" style="padding:var(--sp-6);text-align:center;max-width:36rem;margin:0 auto">
-      <div style="display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:9999px;background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:600;letter-spacing:0.02em;margin-bottom:var(--sp-4)">En desarrollo</div>
-      <p style="margin:0 0 var(--sp-3);font-size:var(--text-sm);color:var(--color-text);line-height:1.5">
-        Esta sección conectará campañas y envíos con tu base de clientes. Mientras tanto, el listado y datos los seguís en <strong>Clientes</strong>.</p>
-      <p class="empty-state" style="font-size:var(--text-xs);color:var(--color-text-muted);margin:0">Próximamente: redactar mensaje, elegir canal, filtrar por Activo / Onboarding y por categoría de servicio.</p>
+
+  <div class="marketing-demo-banner fade-in" role="note">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px;opacity:0.7" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <span><strong>Vista de demostración.</strong> Los filtros usan tus clientes cargados en <strong>Clientes</strong>. El botón de envío está desactivado hasta conectar proveedores (SMTP, SMS, WhatsApp Business).</span>
+  </div>
+
+  <div class="marketing-demo-layout">
+    <div class="card fade-in marketing-demo-card">
+      <div class="card-body">
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin-bottom:var(--sp-2)">Canal</div>
+        <div class="tabs" id="marketing-channel-tabs" role="tablist" aria-label="Canal de envío">
+          <button type="button" class="tab active" data-ch="email" onclick="marketingDemoSetChannel('email',this)">Email</button>
+          <button type="button" class="tab" data-ch="sms" onclick="marketingDemoSetChannel('sms',this)">SMS</button>
+          <button type="button" class="tab" data-ch="whatsapp" onclick="marketingDemoSetChannel('whatsapp',this)">WhatsApp</button>
+        </div>
+        <p id="marketing-demo-channel-hint" style="margin:var(--sp-3) 0;font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.45"></p>
+
+        <div id="marketing-demo-subject-wrap" class="form-group" style="margin-bottom:var(--sp-3)">
+          <label for="marketing-demo-subject">Asunto</label>
+          <input type="text" class="form-input" id="marketing-demo-subject" placeholder="Ej: Novedades para {{nombre}}" autocomplete="off">
+        </div>
+
+        <div class="form-group" style="margin-bottom:var(--sp-4)">
+          <label for="marketing-demo-body">Mensaje</label>
+          <textarea class="form-textarea" id="marketing-demo-body" rows="8" placeholder=""></textarea>
+          <p class="form-file-hint" style="margin:8px 0 0">Variables sugeridas: <code style="font-size:0.75em">{{nombre}}</code>, <code style="font-size:0.75em">{{tienda}}</code> (se reemplazarán al enviar).</p>
+        </div>
+
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin-bottom:var(--sp-2)">Audiencia — estado del cliente</div>
+        <div class="form-group" style="margin-bottom:var(--sp-4)">
+          <label for="marketing-demo-status">Estado</label>
+          <select class="form-select" id="marketing-demo-status" aria-label="Filtrar por estado">
+            <option value="all">Todos</option>
+            <option value="activo">Activo</option>
+            <option value="onboarding">Onboarding</option>
+          </select>
+        </div>
+
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin-bottom:var(--sp-2)">Segmentación por categoría (servicios)</div>
+        <p class="form-file-hint" style="margin:0 0 var(--sp-2)">Marcá una o varias. Si no marcás ninguna, se incluyen <strong>todos</strong> los que cumplan el estado.</p>
+        <div class="marketing-demo-cats" id="marketing-demo-cats">
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-mk"> Marketing</label>
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-br"> Branding</label>
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-vi"> Video</label>
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-so"> Social</label>
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-de"> Diseño</label>
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-se"> SEO</label>
+          <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-ad"> Paid Ads</label>
+        </div>
+
+        <div style="margin-top:var(--sp-5);display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center">
+          <button type="button" class="btn-primary" disabled title="Pendiente de integración con proveedor">Programar envío</button>
+          <button type="button" class="btn-secondary" onclick="marketingDemoPreviewAlert()" title="Solo demostración">Vista previa (demo)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card fade-in">
+      <div class="card-body">
+        <div style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--sp-1)">Audiencia estimada</div>
+        <p style="margin:0 0 var(--sp-3);font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.45">Cálculo en vivo según filtros y clientes en esta sesión.</p>
+        <div class="stat-card" style="padding:var(--sp-4);margin-bottom:var(--sp-4)">
+          <div class="stat-value" id="marketing-demo-count" style="color:var(--color-primary)">0</div>
+          <div class="stat-label">Contactos que recibirían el envío</div>
+        </div>
+        <div class="marketing-demo-stat-row">
+          <div class="stat-card" style="padding:var(--sp-3)">
+            <div class="stat-value" style="font-size:var(--text-lg)" id="marketing-demo-sms-segments">0</div>
+            <div class="stat-label">SMS · segmentos (~160 car.)</div>
+          </div>
+          <div class="stat-card" style="padding:var(--sp-3)">
+            <div class="stat-value" style="font-size:var(--text-lg)">—</div>
+            <div class="stat-label">Email · aperturas (futuro)</div>
+          </div>
+          <div class="stat-card" style="padding:var(--sp-3)">
+            <div class="stat-value" style="font-size:var(--text-lg)">—</div>
+            <div class="stat-label">WA · plantillas (futuro)</div>
+          </div>
+        </div>
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin:var(--sp-4) 0 var(--sp-2)">Muestra de destinatarios</div>
+        <div class="marketing-demo-preview-wrap">
+          <table class="marketing-demo-preview-table" aria-label="Vista previa de audiencia">
+            <thead><tr><th>Cliente</th><th>Estado</th><th>Correo</th></tr></thead>
+            <tbody id="marketing-demo-preview-rows"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -5200,6 +5371,9 @@ function reloadTareasData(thenRender) {
     /* Siempre repintar vistas: si solo se ejecutaba thenRender (p. ej. closeModal tras borrar),
        antes no se llamaba renderers.kanban/tickets y el tablero seguía mostrando filas ya borradas en BD. */
     renderers.clients?.();
+    if (typeof marketingDemoRefreshAudience === 'function' && document.getElementById('view-marketing') && document.getElementById('view-marketing').classList.contains('active')) {
+      marketingDemoRefreshAudience();
+    }
     renderers.kanban?.();
     renderers.tickets?.();
     renderers.cierres?.();
@@ -5383,11 +5557,125 @@ function closeMobileSidebar() {
 }
 
 // ══════════════════════════════════════════════════════════════════
+//  MARKETING (demo UI — envíos reales pendientes de proveedor)
+// ══════════════════════════════════════════════════════════════════
+var marketingDemoChannel = 'email';
+var marketingDemoDelegateBound = false;
+
+function marketingDemoSetChannel(ch, btn) {
+  marketingDemoChannel = ch || 'email';
+  document.querySelectorAll('#marketing-channel-tabs .tab').forEach(function(t) {
+    t.classList.toggle('active', (t.getAttribute('data-ch') || '') === marketingDemoChannel);
+  });
+  var sub = document.getElementById('marketing-demo-subject-wrap');
+  var ph = document.getElementById('marketing-demo-body');
+  var hint = document.getElementById('marketing-demo-channel-hint');
+  if (sub) sub.style.display = marketingDemoChannel === 'email' ? '' : 'none';
+  if (ph) {
+    if (marketingDemoChannel === 'email') {
+      ph.placeholder = 'Hola {{nombre}},\n\nQueríamos contarte novedades de tu cuenta…\n\n— Equipo Holistic';
+      ph.rows = 8;
+    } else if (marketingDemoChannel === 'sms') {
+      ph.placeholder = 'Hola {{nombre}}, tu campaña está lista. Respondé SI para más info. (mensaje corto — demo)';
+      ph.rows = 4;
+    } else {
+      ph.placeholder = 'Hola {{nombre}} 👋 Mensaje tipo WhatsApp. Las plantillas masivas requieren aprobación en Meta Business (demo).';
+      ph.rows = 6;
+    }
+  }
+  if (hint) {
+    hint.textContent = marketingDemoChannel === 'email'
+      ? 'Email: asunto + cuerpo. Variables: {{nombre}}, {{tienda}}.'
+      : marketingDemoChannel === 'sms'
+        ? 'SMS: texto corto; coste estimado por segmentos (~160 caracteres).'
+        : 'WhatsApp: plantillas y políticas de negocio — integración pendiente.';
+  }
+}
+
+function marketingDemoFilteredClients() {
+  var list = typeof clients !== 'undefined' && Array.isArray(clients) ? clients : [];
+  var sel = document.getElementById('marketing-demo-status');
+  var st = sel && sel.value ? sel.value : 'all';
+  var catEls = document.querySelectorAll('.marketing-demo-cat:checked');
+  var cats = [];
+  for (var i = 0; i < catEls.length; i++) cats.push(catEls[i].value);
+  return list.filter(function(c) {
+    if (!c) return false;
+    if (st !== 'all' && String(c.status || 'activo') !== st) return false;
+    if (cats.length === 0) return true;
+    var sv = Array.isArray(c.svcs) ? c.svcs : [];
+    for (var j = 0; j < cats.length; j++) {
+      if (sv.indexOf(cats[j]) >= 0) return true;
+    }
+    return false;
+  });
+}
+
+function marketingDemoRefreshAudience() {
+  var filtered = marketingDemoFilteredClients();
+  var n = filtered.length;
+  var countEl = document.getElementById('marketing-demo-count');
+  if (countEl) countEl.textContent = String(n);
+  var smsSeg = document.getElementById('marketing-demo-sms-segments');
+  if (smsSeg) {
+    var tb0 = document.getElementById('marketing-demo-body');
+    var bodyLen = tb0 && tb0.value ? tb0.value.length : 0;
+    var per = Math.max(1, Math.ceil(bodyLen / 160) || 1);
+    smsSeg.textContent = String(n * per);
+  }
+  var tbody = document.getElementById('marketing-demo-preview-rows');
+  if (tbody) {
+    var sample = filtered.slice(0, 5);
+    if (sample.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty-state" style="padding:var(--sp-4);text-align:center">Ningún cliente coincide. Probá otro estado o desmarcá categorías.</td></tr>';
+    } else {
+      tbody.innerHTML = sample.map(function(c) {
+        var raw = String(c.email || '').split(/[\n,;]+/)[0].trim() || '—';
+        var stLabel = String(c.status || '—');
+        return '<tr><td>' + escTareas(c.n || '—') + '</td><td style="text-transform:capitalize">' + escTareas(stLabel) + '</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escAttrUrlTareas(raw) + '">' + escTareas(raw) + '</td></tr>';
+      }).join('');
+    }
+  }
+}
+
+function marketingDemoPreviewAlert() {
+  var n = marketingDemoFilteredClients().length;
+  var ch = marketingDemoChannel === 'sms' ? 'SMS' : marketingDemoChannel === 'whatsapp' ? 'WhatsApp' : 'Email';
+  alert('Demo: en producción aquí verías la vista previa ' + ch + ' para ' + n + ' destinatarios.');
+}
+
+function marketingDemoBindOnce() {
+  if (marketingDemoDelegateBound) return;
+  var root = document.getElementById('view-marketing');
+  if (!root) return;
+  marketingDemoDelegateBound = true;
+  root.addEventListener('change', function(e) {
+    var t = e.target;
+    if (!t) return;
+    if (t.id === 'marketing-demo-status' || (t.classList && t.classList.contains('marketing-demo-cat'))) {
+      marketingDemoRefreshAudience();
+    }
+  });
+  var ta = document.getElementById('marketing-demo-body');
+  if (ta) ta.addEventListener('input', function() { marketingDemoRefreshAudience(); });
+}
+
+function marketingDemoInitView() {
+  marketingDemoBindOnce();
+  var tab = document.querySelector('#marketing-channel-tabs .tab[data-ch="' + marketingDemoChannel + '"]')
+    || document.querySelector('#marketing-channel-tabs .tab[data-ch="email"]');
+  marketingDemoSetChannel(marketingDemoChannel, tab);
+  marketingDemoRefreshAudience();
+}
+
+// ══════════════════════════════════════════════════════════════════
 //  RENDERERS
 // ══════════════════════════════════════════════════════════════════
 const renderers = {};
 
-renderers.marketing = function() {};
+renderers.marketing = function() {
+  setTimeout(marketingDemoInitView, 0);
+};
 
 // ─── CLIENTS ───
 function refreshClientsCountBadge() {
