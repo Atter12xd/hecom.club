@@ -3222,8 +3222,9 @@ window.__HECOM_SB_READY__.then(function(){
     <div class="section-actions">
       <div class="tabs" id="clientTabs" role="tablist" aria-label="Filtrar clientes">
         <button class="tab active" onclick="filterClients('all',this)" role="tab" aria-selected="true">Todos</button>
-        <button class="tab" onclick="filterClients('activo',this)" role="tab">Activos</button>
-        <button class="tab" onclick="filterClients('onboarding',this)" role="tab">Onboarding</button>
+        <button class="tab" onclick="filterClients('top',this)" role="tab">Top</button>
+        <button class="tab" onclick="filterClients('bueno',this)" role="tab">Bueno</button>
+        <button class="tab" onclick="filterClients('potencial',this)" role="tab">Potencial</button>
       </div>
       <button class="btn-primary" onclick="openModal('client')">+ Nuevo Cliente</button>
     </div>
@@ -3273,18 +3274,19 @@ window.__HECOM_SB_READY__.then(function(){
           <p class="form-file-hint" style="margin:8px 0 0">Variables sugeridas: <code style="font-size:0.75em">{{nombre}}</code>, <code style="font-size:0.75em">{{tienda}}</code> (se reemplazarán al enviar).</p>
         </div>
 
-        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin-bottom:var(--sp-2)">Audiencia — estado del cliente</div>
+        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin-bottom:var(--sp-2)">Audiencia — categoría del cliente</div>
         <div class="form-group" style="margin-bottom:var(--sp-4)">
-          <label for="marketing-demo-status">Estado</label>
-          <select class="form-select" id="marketing-demo-status" aria-label="Filtrar por estado">
+          <label for="marketing-demo-status">Categoría</label>
+          <select class="form-select" id="marketing-demo-status" aria-label="Filtrar por categoría">
             <option value="all">Todos</option>
-            <option value="activo">Activo</option>
-            <option value="onboarding">Onboarding</option>
+            <option value="top">Top</option>
+            <option value="bueno">Bueno</option>
+            <option value="potencial">Potencial</option>
           </select>
         </div>
 
         <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin-bottom:var(--sp-2)">Segmentación por categoría (servicios)</div>
-        <p class="form-file-hint" style="margin:0 0 var(--sp-2)">Marcá una o varias. Si no marcás ninguna, se incluyen <strong>todos</strong> los que cumplan el estado.</p>
+        <p class="form-file-hint" style="margin:0 0 var(--sp-2)">Marcá una o varias. Si no marcás ninguna, se incluyen <strong>todos</strong> los que cumplan la categoría elegida arriba.</p>
         <div class="marketing-demo-cats" id="marketing-demo-cats">
           <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-mk"> Marketing</label>
           <label class="marketing-demo-cat-label"><input type="checkbox" class="marketing-demo-cat" value="tag-br"> Branding</label>
@@ -3327,7 +3329,7 @@ window.__HECOM_SB_READY__.then(function(){
         <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);margin:var(--sp-4) 0 var(--sp-2)">Muestra de destinatarios</div>
         <div class="marketing-demo-preview-wrap">
           <table class="marketing-demo-preview-table" aria-label="Vista previa de audiencia">
-            <thead><tr><th>Cliente</th><th>Estado</th><th>Correo</th></tr></thead>
+            <thead><tr><th>Cliente</th><th>Categoría</th><th>Correo</th></tr></thead>
             <tbody id="marketing-demo-preview-rows"></tbody>
           </table>
         </div>
@@ -4464,7 +4466,7 @@ let TEAM = [];
 let ATTENDANCE_MEMBERS = [];
 let MT = {};
 let clients = [];
-/** Pestaña activa en la lista de clientes: all | activo | onboarding */
+/** Pestaña activa en la lista de clientes: all | top | bueno | potencial */
 let clientListFilterStatus = 'all';
 let KT = [];
 let tickets = [];
@@ -4472,6 +4474,21 @@ let workflows = [];
 let calI = [];
 let calendarViewMonth = new Date().getMonth() + 1;
 let calendarViewYear = new Date().getFullYear();
+
+/** Categoría de cliente en BD/UI: top | bueno | potencial. Migra valores viejos activo→bueno, onboarding→potencial. */
+function tareasNormalizeClienteCategoriaFromDb(raw) {
+  var s = String(raw || '').trim().toLowerCase();
+  if (s === 'top' || s === 'bueno' || s === 'potencial') return s;
+  if (s === 'activo') return 'bueno';
+  if (s === 'onboarding') return 'potencial';
+  return 'potencial';
+}
+function tareasClienteCategoriaLabel(key) {
+  var k = tareasNormalizeClienteCategoriaFromDb(key);
+  if (k === 'top') return 'Top';
+  if (k === 'bueno') return 'Bueno';
+  return 'Potencial';
+}
 
 // ══════════════════════════════════════════════════════════════════
 //  CARGA DESDE SUPABASE (Fase 3.1)
@@ -5314,7 +5331,7 @@ async function loadTareasData() {
       if (photo && tareasHotlinkAvatarLikelyBlocked(photo)) photo = '';
       var shopUrl = (r.url_tienda != null && String(r.url_tienda).trim()) ? String(r.url_tienda).trim() : '';
       var igRaw = (r.instagram != null && String(r.instagram).trim()) ? String(r.instagram).trim() : '';
-      return { id: r.id, creditoClientId: r.credito_client_id || null, n: n, tp: r.tipo || '', shopUrl: shopUrl, ig: igRaw, c: r.color || '#666', photo: photo, phases: Array.isArray(r.fases) ? r.fases : [], curr: r.fase_actual || 0, svcs: Array.isArray(r.servicios) ? r.servicios : [], team: Array.isArray(r.equipo_ids) ? r.equipo_ids : [], entregables: r.entregables || 0, done: r.entregables_hechos || 0, tickets: r.tickets_count || 0, meetings: r.meetings_count || 0, satisfaction: satVal, budget: r.presupuesto || '', spent: r.gastado || '', contact: contact, email: email, phone: phone, birthday: tareasCumpleanosIsoFromRow(r), nextAction: r.proxima_accion || '', contractStart: r.contrato_inicio || '', contractEnd: r.contrato_fin || '', monthlyFee: r.fee_mensual || '', health: healthVal, healthTxt: r.health_txt || '', notes: r.notes || '', status: r.status || 'activo' };
+      return { id: r.id, creditoClientId: r.credito_client_id || null, n: n, tp: r.tipo || '', shopUrl: shopUrl, ig: igRaw, c: r.color || '#666', photo: photo, phases: Array.isArray(r.fases) ? r.fases : [], curr: r.fase_actual || 0, svcs: Array.isArray(r.servicios) ? r.servicios : [], team: Array.isArray(r.equipo_ids) ? r.equipo_ids : [], entregables: r.entregables || 0, done: r.entregables_hechos || 0, tickets: r.tickets_count || 0, meetings: r.meetings_count || 0, satisfaction: satVal, budget: r.presupuesto || '', spent: r.gastado || '', contact: contact, email: email, phone: phone, birthday: tareasCumpleanosIsoFromRow(r), nextAction: r.proxima_accion || '', contractStart: r.contrato_inicio || '', contractEnd: r.contrato_fin || '', monthlyFee: r.fee_mensual || '', health: healthVal, healthTxt: r.health_txt || '', notes: r.notes || '', status: tareasNormalizeClienteCategoriaFromDb(r.status) };
     });
     clients.sort(function(a, b) {
       return (a.n || '').localeCompare(b.n || '', 'es', { sensitivity: 'base' });
@@ -5633,7 +5650,8 @@ function marketingDemoFilteredClients() {
   for (var i = 0; i < catEls.length; i++) cats.push(catEls[i].value);
   return list.filter(function(c) {
     if (!c) return false;
-    if (st !== 'all' && String(c.status || 'activo') !== st) return false;
+    var cat = tareasNormalizeClienteCategoriaFromDb(c.status);
+    if (st !== 'all' && cat !== st) return false;
     if (cats.length === 0) return true;
     var sv = Array.isArray(c.svcs) ? c.svcs : [];
     for (var j = 0; j < cats.length; j++) {
@@ -5659,12 +5677,12 @@ function marketingDemoRefreshAudience() {
   if (tbody) {
     var sample = filtered.slice(0, 5);
     if (sample.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="3" class="empty-state" style="padding:var(--sp-4);text-align:center">Ningún cliente coincide. Probá otro estado o desmarcá categorías.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="3" class="empty-state" style="padding:var(--sp-4);text-align:center">Ningún cliente coincide. Probá otra categoría o desmarcá los servicios.</td></tr>';
     } else {
       tbody.innerHTML = sample.map(function(c) {
         var raw = String(c.email || '').split(/[\n,;]+/)[0].trim() || '—';
-        var stLabel = String(c.status || '—');
-        return '<tr><td>' + escTareas(c.n || '—') + '</td><td style="text-transform:capitalize">' + escTareas(stLabel) + '</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escAttrUrlTareas(raw) + '">' + escTareas(raw) + '</td></tr>';
+        var stLabel = tareasClienteCategoriaLabel(c.status);
+        return '<tr><td>' + escTareas(c.n || '—') + '</td><td>' + escTareas(stLabel) + '</td><td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + escAttrUrlTareas(raw) + '">' + escTareas(raw) + '</td></tr>';
       }).join('');
     }
   }
@@ -5749,7 +5767,7 @@ renderers.clients = function() {
       <div>Teléfono</div>
       <div>IG</div>
       <div>Servicios</div>
-      <div>Estado</div>
+      <div>Categoría</div>
       <div>Sat.</div>
       <div>Próxima acción</div>
       <div class="client-table-cell--actions"></div>
@@ -5760,12 +5778,12 @@ renderers.clients = function() {
     const teamHtml = (c.team || []).map(id => makeAvatar(id, 24)).join('');
     const satPill = satNum != null && satNum >= 95 ? 'pill-green' : satNum != null && satNum >= 85 ? 'pill-orange' : 'pill-orange2';
     const satLabel = satNum != null ? (satNum + '%') : '—';
-    const st = c.status || '';
-    const statusPill = st === 'activo'
-      ? '<span class="pill pill-green">Activo</span>'
-      : st === 'onboarding'
-        ? '<span class="pill pill-orange2">Onboarding</span>'
-        : `<span class="pill pill-orange">${st || '—'}</span>`;
+    const st = tareasNormalizeClienteCategoriaFromDb(c.status);
+    const statusPill = st === 'top'
+      ? '<span class="pill pill-green">Top</span>'
+      : st === 'bueno'
+        ? '<span class="pill pill-orange">Bueno</span>'
+        : '<span class="pill pill-orange2">Potencial</span>';
     return `
     <div class="client-table-row fade-in client-table-row--interactive" role="row" data-status="${st}" data-client-index="${ci}" title="Clic en la fila para editar cliente">
       <div class="client-table-cell client-table-cell--name">
@@ -7952,7 +7970,7 @@ function openModal(type) {
       <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
       <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego ingresá el número móvil.</p>
       <div class="form-group"><label for="cl-instagram">Instagram <span style="color:#b91c1c">*</span></label><input class="form-input" type="text" id="cl-instagram" required autocomplete="off" placeholder="@marca o https://instagram.com/…"></div>
-      <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="onboarding" selected>Onboarding</option><option value="activo">Activo</option></select></div>
+      <div class="form-group"><label for="cl-status">Categoría <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="" disabled selected>Elegir categoría</option><option value="top">Top</option><option value="bueno">Bueno</option><option value="potencial">Potencial</option></select></div>
       <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple"><p class="form-file-hint">Persona de contacto / titular</p></div>
       <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required placeholder="Objetivos, expectativas..." id="cl-notes"></textarea></div>
       <div class="form-group">
@@ -8262,6 +8280,7 @@ function openEditClient(id) {
   var footer = document.getElementById('modalFooter');
   title.textContent = 'Editar Cliente';
   var shopVal = (c.shopUrl != null && String(c.shopUrl).trim()) ? String(c.shopUrl).trim().replace(/"/g, '&quot;') : '';
+  var stCat = tareasNormalizeClienteCategoriaFromDb(c.status);
   body.innerHTML = `
     <div class="form-group"><label for="cl-name">Nombre / Empresa <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.n||'').replace(/"/g,'&quot;')}" id="cl-name" autocomplete="organization"></div>
     <div class="form-group"><label for="cl-ind">Tienda <span style="color:#b91c1c">*</span></label><input class="form-input" required value="${(c.tp||'').replace(/"/g,'&quot;')}" id="cl-ind" placeholder="Nombre de la tienda" autocomplete="off"></div>
@@ -8277,7 +8296,7 @@ function openEditClient(id) {
     <div class="form-group"><label for="cl-phone">Teléfono <span style="color:#b91c1c">*</span></label><input class="form-input" type="tel" id="cl-phone" autocomplete="tel" placeholder="987 654 321"></div>
     <p class="form-file-hint" style="margin:-4px 0 12px">Elegí el <strong>país con la bandera</strong>: el prefijo (Perú <strong>+51</strong>, etc.) se aplica solo. Luego el número móvil.</p>
     <div class="form-group"><label for="cl-instagram">Instagram <span style="color:#b91c1c">*</span></label><input class="form-input" type="text" id="cl-instagram" required autocomplete="off" placeholder="@marca o https://instagram.com/…" value="${(c.ig||'').replace(/"/g,'&quot;')}"></div>
-    <div class="form-group"><label for="cl-status">Estado <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="activo" ${c.status==='activo'?'selected':''}>Activo</option><option value="onboarding" ${c.status==='onboarding'?'selected':''}>Onboarding</option></select></div>
+    <div class="form-group"><label for="cl-status">Categoría <span style="color:#b91c1c">*</span></label><select class="form-select" required id="cl-status"><option value="top" ${stCat==='top'?'selected':''}>Top</option><option value="bueno" ${stCat==='bueno'?'selected':''}>Bueno</option><option value="potencial" ${stCat==='potencial'?'selected':''}>Potencial</option></select></div>
     <div class="form-group"><label for="cl-cumple">Cumpleaños <span style="color:#b91c1c">*</span></label><input class="form-input" required type="date" id="cl-cumple" value="${(c.birthday||'').replace(/"/g,'&quot;')}"><p class="form-file-hint">Persona de contacto / titular</p></div>
     <div class="form-group"><label for="cl-notes">Brief / Notas <span style="color:#b91c1c">*</span></label><textarea class="form-textarea" required id="cl-notes">${(c.notes||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></div>
     <div class="form-group">
@@ -8466,7 +8485,7 @@ function tareasValidatePendientesClientForm() {
   var urlRaw = urlEl.value.trim();
   var notes = notesEl.value.trim();
   var cumple = cumpleEl ? cumpleEl.value.trim() : '';
-  var status = statusEl ? statusEl.value.trim() : 'activo';
+  var status = statusEl ? statusEl.value.trim() : '';
 
   if (!name) {
     alert('Completá nombre / empresa.');
@@ -8500,8 +8519,8 @@ function tareasValidatePendientesClientForm() {
     alert('La URL de la tienda no es válida (ej. https://mitienda.myshopify.com).');
     return false;
   }
-  if (statusEl && !status) {
-    alert('Elegí el estado del cliente.');
+  if (!status || !/^(top|bueno|potencial)$/.test(status)) {
+    alert('Elegí la categoría (Top, Bueno o Potencial).');
     return false;
   }
   if (!cumple) {
@@ -8554,7 +8573,7 @@ function updateClient() {
       contacto_nombre: cPrev ? (cPrev.contact || '') : '',
       email: tareasEmailsStorageFromList(tareasGetClientEmailsFromInputs()),
       telefono: tareasGetClientPhoneValue(),
-      status: document.getElementById('cl-status').value || 'activo',
+      status: (function() { var v = document.getElementById('cl-status'); var x = v && v.value.trim(); return /^(top|bueno|potencial)$/.test(x) ? x : 'potencial'; })(),
       servicios: cPrev && Array.isArray(cPrev.svcs) ? cPrev.svcs : [],
       fee_mensual: cPrev ? (cPrev.monthlyFee || cPrev.budget || '') : '',
       notes: document.getElementById('cl-notes').value || '',
@@ -8958,7 +8977,7 @@ function addClient() {
   if (!tareasValidatePendientesClientForm()) return;
   var n = document.getElementById('cl-name').value.trim();
   var colors = ['#EA580C','#DC2626','#16A34A','#7C3AED','#B45309','#0891B2','#BE185D','#CA8A04'];
-  var statusNew = document.getElementById('cl-status') ? document.getElementById('cl-status').value : 'onboarding';
+  var statusNew = document.getElementById('cl-status') ? document.getElementById('cl-status').value.trim() : '';
   var row = {
     nombre: n,
     tipo: document.getElementById('cl-ind').value.trim(),
@@ -8985,7 +9004,7 @@ function addClient() {
     health: 50,
     health_txt: 'Nuevo — Pendiente de onboarding',
     notes: document.getElementById('cl-notes').value.trim(),
-    status: statusNew || 'onboarding',
+    status: /^(top|bueno|potencial)$/.test(statusNew) ? statusNew : 'potencial',
     cumpleanos: (function() { var el = document.getElementById('cl-cumple'); var v = el && el.value.trim(); return v ? v : null; })(),
     instagram: tareasClientInstagramForDb()
   };
