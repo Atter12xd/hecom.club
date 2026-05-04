@@ -39,6 +39,12 @@ Para evitar cambios que luego se pierden:
 
 Excepcion: si solo hay archivo directo en `hecom.club` (por ejemplo HTML de modulo no compilado), se edita ahi y su copia en `public/`.
 
+### Pendientes — un solo archivo para iterar (importante para IAs)
+
+- **Fuente de verdad al editar:** `pendientes/tarea.html` en la **raiz del repo** (`hecom.club/pendientes/tarea.html`). La URL publica `/pendientes/...` en Vercel se resuelve contra esa carpeta `pendientes/` del proyecto, no contra `public/pendientes/`.
+- **`public/pendientes/tarea.html`** es una **copia** que en la practica duplica trabajo si se parchean **los dos** en cada cambio. Para avanzar rapido: **cambiar solo** `pendientes/tarea.html`. Copiar a `public/` solo si un pipeline o release lo exige de forma explicita.
+- Objetivo: evitar divergencia y turnos dobles en cada PR o prompt.
+
 ## Supabase en este repo (importante)
 
 La carpeta `supabase/` en el repo es referencia historica de scripts/migrations.
@@ -62,8 +68,8 @@ Nota: en Credito, el JS suele venir minificado en `hecom.club`. Fuente editable 
 
 ### Pendientes
 
-- `pendientes/tarea.html`
-- `public/pendientes/tarea.html` (copia deploy)
+- **`pendientes/tarea.html`** — canonico; todos los cambios de UI/JS de Pendientes van aqui.
+- `public/pendientes/tarea.html` — copia opcional; no mantenerla a mano en cada cambio salvo que el deploy lo requiera (ver seccion *Pendientes — un solo archivo* arriba).
 
 ### Creativos
 
@@ -212,7 +218,7 @@ Los modulos internos deben mandar a **`https://www.hecom.club/login`** si no hay
    - update `gerentes.avatar_url`
    - sync de claves locales
    - refresh de estado/UI
-5. Si cambias un archivo en carpeta raiz, evaluar si existe copia en `public/` y sincronizar.
+5. Si cambias un archivo en carpeta raiz, evaluar si existe copia en `public/` y sincronizar **cuando haga falta para deploy**; en **Pendientes** priorizar solo `pendientes/tarea.html` (ver seccion dedicada).
 6. En Credito, priorizar cambio en fuente `marketing/marketing/holistic-app/src/` y luego build + sync a `hecom.club`.
 7. Mantener cache-bust en recursos cuando se parchea bundle (`?v=...`) para evitar falso negativo por cache.
 
@@ -231,7 +237,7 @@ Los modulos internos deben mandar a **`https://www.hecom.club/login`** si no hay
 - `www.hecom.club` y `hecom.club` no comparten `localStorage`.
 - RLS/permisos impiden `update` en `gerentes`.
 - Bundle viejo en cache del navegador.
-- Se edito solo archivo raiz, pero el deploy sirve `public/...`.
+- Se edito solo archivo raiz, pero el deploy sirve `public/...` (en **Pendientes** el caso habitual es al reves: la ruta `/pendientes/` usa la carpeta `pendientes/` en raiz; una copia vieja en `public/pendientes/` no sustituye al canonico salvo URL distinta).
 
 ## Convencion recomendada a futuro
 
