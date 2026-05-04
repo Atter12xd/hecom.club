@@ -2849,6 +2849,15 @@ window.__HECOM_SB_READY__.then(function(){
         <span class="nav-badge orange" id="badge-clients">0</span>
       </button>
 
+      <button class="nav-item" data-view="marketing" onclick="navigate('marketing',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M3 11v2a1 1 0 0 0 1 1h1l3 2V8l-3 2H4a1 1 0 0 0-1 1z"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </svg>
+        Marketing
+      </button>
+
       <button class="nav-item tareas-admin-only" data-view="kanban" onclick="navigate('kanban',this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <rect x="3" y="3" width="5" height="18" rx="1"/>
@@ -3106,6 +3115,25 @@ window.__HECOM_SB_READY__.then(function(){
   </div>
 </section>
 
+<!-- ══════════════ MARKETING VIEW ══════════════ -->
+<section class="view" id="view-marketing" aria-label="Marketing">
+  <div class="section-header">
+    <div>
+      <h3 style="margin-bottom:4px">Marketing</h3>
+      <p style="margin:0;font-size:var(--text-xs);color:var(--color-text-muted);max-width:44rem;line-height:1.45">
+        Envíos masivos por <strong>email</strong>, <strong>SMS</strong> y <strong>WhatsApp</strong>, con audiencias segmentadas por <strong>estado</strong> del cliente y <strong>categoría</strong>.</p>
+    </div>
+  </div>
+  <div class="card fade-in">
+    <div class="card-body" style="padding:var(--sp-6);text-align:center;max-width:36rem;margin:0 auto">
+      <div style="display:inline-flex;align-items:center;justify-content:center;padding:6px 14px;border-radius:9999px;background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:600;letter-spacing:0.02em;margin-bottom:var(--sp-4)">En desarrollo</div>
+      <p style="margin:0 0 var(--sp-3);font-size:var(--text-sm);color:var(--color-text);line-height:1.5">
+        Esta sección conectará campañas y envíos con tu base de clientes. Mientras tanto, el listado y datos los seguís en <strong>Clientes</strong>.</p>
+      <p class="empty-state" style="font-size:var(--text-xs);color:var(--color-text-muted);margin:0">Próximamente: redactar mensaje, elegir canal, filtrar por Activo / Onboarding y por categoría de servicio.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════════ KANBAN VIEW ══════════════ -->
 <section class="view" id="view-kanban" aria-label="Tablero de entregables">
   <div class="section-header">
@@ -3313,6 +3341,10 @@ window.__HECOM_SB_READY__.then(function(){
       <div class="cmd-item" onclick="navigate('clients');closeCmdPalette()" data-cmd="Clientes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <div class="cmd-item-text"><div class="cmd-item-name">Clientes</div><div class="cmd-item-desc">Seguimiento integral de clientes</div></div>
+      </div>
+      <div class="cmd-item" onclick="navigate('marketing');closeCmdPalette()" data-cmd="Marketing campañas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 11v2a1 1 0 0 0 1 1h1l3 2V8l-3 2H4a1 1 0 0 0-1 1z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+        <div class="cmd-item-text"><div class="cmd-item-name">Marketing</div><div class="cmd-item-desc">Email, SMS y WhatsApp masivos (en desarrollo)</div></div>
       </div>
       <div class="cmd-item tareas-admin-only" onclick="navigate('kanban');closeCmdPalette()" data-cmd="Entregables Kanban">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="5" height="15" rx="1"/></svg>
@@ -5284,7 +5316,8 @@ function clientAvatarMarkup(c, opts) {
 //  NAVIGATION
 // ══════════════════════════════════════════════════════════════════
 const pageNames = {
-  dashboard:'Dashboard',clients:'Seguimiento de Clientes',kanban:'Entregables (dev)',
+  dashboard:'Dashboard',clients:'Seguimiento de Clientes',marketing:'Marketing',
+  kanban:'Entregables (dev)',
   cierres:'Registro de cierres',
   tickets:'Tickets (equipo)',calendar:'Calendario del equipo',workload:'Equipo de trabajo',
   attendance:'Asistencia Verificada'
@@ -5353,6 +5386,8 @@ function closeMobileSidebar() {
 //  RENDERERS
 // ══════════════════════════════════════════════════════════════════
 const renderers = {};
+
+renderers.marketing = function() {};
 
 // ─── CLIENTS ───
 function refreshClientsCountBadge() {
