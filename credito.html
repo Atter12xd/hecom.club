@@ -60,7 +60,7 @@
       var VERSION = "credito-preflight-20260429";
       var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
       /** Bump solo en deploy (sync-credito-public.ps1). En localhost / ?fastreload=1 se usa ?t= para iterar como Pendientes sin redesplegar ?v=. */
-      var CREDITO_STATIC_ASSET_V = "20260505143501";
+      var CREDITO_STATIC_ASSET_V = "20260505200624";
       function creditoFastAssetReload() {
         try {
           var h = (typeof location !== "undefined" && location.hostname) || "";
@@ -719,7 +719,7 @@
       preflight();
     })();
   </script>
-  <link id="credito-app-stylesheet" rel="stylesheet" href="/credito-app/credito-app.css?v=20260505143501" />
+  <link id="credito-app-stylesheet" rel="stylesheet" href="/credito-app/credito-app.css?v=20260505200624" />
   <!-- Métricas: toolbar — inline en credito.html para misma respuesta que /credito (no-store) y sin depender solo del CSS cacheado -->
   <style id="hm-credito-metrics-toolbar-align">
     /* Usuario centrado en vertical respecto al bloque Período */
