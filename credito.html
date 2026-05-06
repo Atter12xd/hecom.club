@@ -59,6 +59,32 @@
     (function () {
       var VERSION = "credito-preflight-20260429";
       var DEBUG = (window.location.search || "").indexOf("debug=1") >= 0;
+      /** Bump solo en deploy (sync-credito-public.ps1). En localhost / ?fastreload=1 se usa ?t= para iterar como Pendientes sin redesplegar ?v=. */
+      var CREDITO_STATIC_ASSET_V = "20260505143501";
+      function creditoFastAssetReload() {
+        try {
+          var h = (typeof location !== "undefined" && location.hostname) || "";
+          var qs = (typeof location !== "undefined" && location.search) || "";
+          if (qs.indexOf("fastreload=1") >= 0) {
+            try {
+              sessionStorage.setItem("credito_fastreload", "1");
+            } catch (_) {}
+          }
+          if (qs.indexOf("fastreload=0") >= 0) {
+            try {
+              sessionStorage.removeItem("credito_fastreload");
+            } catch (_) {}
+          }
+          if (h === "localhost" || h === "127.0.0.1") return true;
+          try {
+            if (sessionStorage.getItem("credito_fastreload") === "1") return true;
+          } catch (_) {}
+          return qs.indexOf("fastreload=1") >= 0;
+        } catch (_) {
+          return false;
+        }
+      }
+      var CREDITO_FAST_ASSETS = creditoFastAssetReload();
       var panel = null;
       function ensurePanel() {
         if (!DEBUG || panel) return;
@@ -655,7 +681,8 @@
         }
         var app = document.getElementById("credito-app-script");
         if (app) {
-          var appSrc = "/credito-app/credito-app.js?v=20260505143501";
+          var appBase = "/credito-app/credito-app.js";
+          var appSrc = CREDITO_FAST_ASSETS ? appBase + "?t=" + Date.now() : appBase + "?v=" + CREDITO_STATIC_ASSET_V;
           app.onload = function () {
             logInfo("app-loaded", { src: app.getAttribute("src") || null });
             setTimeout(function () {
@@ -669,6 +696,16 @@
           app.onerror = function () { logError("app-load-error", { src: app.getAttribute("src") || null, version: VERSION }); };
           app.setAttribute("src", appSrc);
         }
+        try {
+          var cssEl = document.getElementById("credito-app-stylesheet");
+          if (cssEl) {
+            var cssBase = "/credito-app/credito-app.css";
+            cssEl.setAttribute(
+              "href",
+              CREDITO_FAST_ASSETS ? cssBase + "?t=" + Date.now() : cssBase + "?v=" + CREDITO_STATIC_ASSET_V
+            );
+          }
+        } catch (_) {}
       }
       window.addEventListener("error", function (ev) {
         logError("window-error", { message: ev && ev.message ? ev.message : "unknown" });
@@ -682,7 +719,7 @@
       preflight();
     })();
   </script>
-  <link rel="stylesheet" href="/credito-app/credito-app.css?v=20260505143501" />
+  <link id="credito-app-stylesheet" rel="stylesheet" href="/credito-app/credito-app.css?v=20260505143501" />
   <!-- Métricas: toolbar — inline en credito.html para misma respuesta que /credito (no-store) y sin depender solo del CSS cacheado -->
   <style id="hm-credito-metrics-toolbar-align">
     /* Usuario centrado en vertical respecto al bloque Período */

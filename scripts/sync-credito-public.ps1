@@ -8,6 +8,9 @@
 .EXAMPLE
   .\scripts\sync-credito-public.ps1
   .\scripts\sync-credito-public.ps1 -WhatIf
+
+  Desarrollo rápido sin bump manual: `.\scripts\watch-credito-public.ps1` + Crédito en localhost
+  (usa `?t=` en JS/CSS automáticamente). Producción: este script sigue siendo el paso completo.
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param()
@@ -59,6 +62,11 @@ foreach ($f in $htmlFiles) {
     '(credito-app\.css\?v=)[^"''&]+',
     { param($m) $m.Groups[1].Value + $stamp },
     [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+  )
+  $next = [regex]::Replace(
+    $next,
+    '(CREDITO_STATIC_ASSET_V\s*=\s*")[^"]+(")',
+    { param($m) $m.Groups[1].Value + $stamp + $m.Groups[2].Value }
   )
   if ($next -eq $raw) {
     Write-Warning "No se encontraron query credito-app.js|css ?v= en: $f"

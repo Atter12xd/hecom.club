@@ -1,0 +1,10 @@
+const fs = require("fs");
+const s = fs.readFileSync("credito-app/credito-app.js", "utf8");
+const w1 = s.indexOf('className:"hm-report-total-wrap"');
+const w2 = s.indexOf('className:"hm-report-total-wrap"', w1 + 1);
+const b = s.indexOf('h.jsxs("div",{className:"hm-detail-stats hm-metricas-kpi-row"', w2);
+const key = 'Do(rt)]}),h.jsxs("div",{className:"hm-report-total-wrap"';
+const a = s.lastIndexOf(key, b);
+const mid = s.slice(a + "Do(rt)]}),".length, b);
+console.log("w2", w2, "midLen", mid.length);
+console.log("ends", mid.slice(-95));
