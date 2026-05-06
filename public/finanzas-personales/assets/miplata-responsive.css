@@ -1,0 +1,54 @@
+/*
+  MiPlata (finanzas-personales): responsive sin tocar el bundle React.
+  El layout original es fila: aside 232px + main. En móvil eso deja el contenido
+  apretado; aquí apilamos column-reverse para ver primero el contenido y el menú abajo.
+*/
+
+@media (max-width: 767.98px) {
+  #root > div.flex:first-of-type {
+    flex-direction: column-reverse;
+    height: auto !important;
+    min-height: 100svh;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root > div.flex:first-of-type > aside {
+    width: 100% !important;
+    flex-shrink: 0;
+    max-height: min(340px, 42svh);
+    overflow-y: auto;
+    border-top: 1px solid hsl(var(--sidebar-border) / 1);
+  }
+
+  #root > div.flex:first-of-type > main {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden;
+  }
+
+  /* Contenedor interior (clase generada por Tailwind en el build) */
+  #root main div.max-w-\[1120px\] {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  /* Fila título + selector de periodo: varias líneas si hace falta */
+  #root main div.flex.items-center.justify-between {
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  /* KPIs: en teléfonos muy angostos una sola columna */
+  @media (max-width: 420px) {
+    #root main div.grid.grid-cols-2.lg\:grid-cols-4 {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}
