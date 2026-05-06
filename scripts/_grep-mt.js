@@ -15,3 +15,4 @@ while ((m = re.exec(s)) !== null) {
   if (count >= 40) break;
 }
 console.log("\ntotal Mt& matches", count);
+console.log("\ntotal Mt& matches", count);
