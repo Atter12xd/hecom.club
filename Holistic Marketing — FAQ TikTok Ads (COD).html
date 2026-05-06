@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holistic Marketing — Documentación TikTok Ads para ecommerce COD</title>
+<meta name="description" content="Documentación oficial de Holistic Marketing — agencia especializada en TikTok Ads para ecommerce con modelo COD en Perú y LATAM. Suscripción de cuentas de agencia, líneas de crédito publicitario, gestión de campañas y servicios complementarios.">
+<link rel="canonical" href="https://www.hecom.club/docs/">
+<meta property="og:url" content="https://www.hecom.club/docs/">
+
+<!-- Preload fonts to avoid FOUC / parpadeo -->
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23000'/%3E%3Cpath d='M9 22V10M9 16h7M16 10v12M23 10l-3 12' stroke='%2325F4EE' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<style>
+:root {
+  /* === TikTok palette === */
+  --tt-black: #000000;
+  --tt-cyan: #25F4EE;
+  --tt-magenta: #FE2C55;
+  --tt-cyan-soft: #E6FDFC;
+  --tt-magenta-soft: #FFE9EE;
+
+  /* === Surfaces === */
+  --bg-primary: #FFFFFF;
+  --bg-muted: #F8F9FA;
+  --bg-subtle: #F1F1F2;
+  --bg-code: #161823;
+
+  /* === Text === */
+  --text-primary: #161823;
+  --text-secondary: #2A2A35;
+  --text-muted: #6B6F76;
+  --text-faint: #9AA0A6;
+  --text-inverse: #FFFFFF;
+
+  /* === Accent (TikTok cyan as primary, magenta for CTAs) === */
+  --accent: var(--tt-cyan);
+  --accent-strong: #0AC5BF;
+  --accent-light: var(--tt-cyan-soft);
+  --cta: var(--tt-magenta);
+  --cta-hover: #E51F46;
+
+  /* === Borders === */
+  --border: #EAEAEC;
+  --border-strong: #D5D6D9;
+
+  /* === Callouts === */
+  --info-bg: var(--tt-cyan-soft); --info-border: var(--accent-strong); --info-text: #066B68;
+  --success-bg: #E8F8EE; --success-border: #18A957; --success-text: #0B6B36;
+  --warning-bg: #FFF6E5; --warning-border: #F0A800; --warning-text: #7A5400;
+  --danger-bg: var(--tt-magenta-soft); --danger-border: var(--tt-magenta); --danger-text: #9B0F2E;
+
+  /* === Layout === */
+  --sidebar-width: 280px;
+  --toc-width: 0px;
+  --header-height: 64px;
+  --subheader-height: 44px;
+  --announcement-height: 40px;
+  --max-content: 760px;
+
+  /* === Type === */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, Consolas, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+html, body { background: var(--bg-primary); }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent horizontal flash */
+  overflow-x: hidden;
+}
+
+a { color: var(--accent-strong); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: inherit; cursor: pointer; }
+
+/* Smooth content transitions to prevent flash */
+.content {
+  opacity: 1;
+  transition: opacity 120ms ease;
+}
+.content.is-loading { opacity: 0; }
+
+/* === Announcement === */
+.announcement {
+  height: var(--announcement-height);
+  background: var(--tt-black);
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  gap: 10px;
+}
+.announcement i { color: var(--tt-cyan); }
+.announcement a { color: var(--tt-cyan); font-weight: 600; }
+.announcement a:hover { color: var(--tt-magenta); text-decoration: none; }
+
+/* === Header === */
+.header {
+  height: var(--header-height);
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.header-logo:hover { text-decoration: none; }
+.header-logo span { color: var(--text-muted); font-weight: 500; }
+
+.header-search { flex: 1; max-width: 420px; position: relative; }
+.header-search input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px 0 38px;
+  background: var(--bg-subtle);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.header-search input:focus {
+  background: var(--bg-primary);
+  border-color: var(--accent-strong);
+}
+.header-search i {
+  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+  color: var(--text-faint); font-size: 14px; pointer-events: none;
+}
+.header-search kbd {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-sans); font-size: 11px; color: var(--text-muted);
+  background: var(--bg-primary); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 6px;
+}
+
+.header-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.header-nav a {
+  padding: 8px 12px; font-size: 14px; color: var(--text-secondary);
+  border-radius: 6px; font-weight: 500;
+  transition: background 150ms ease, color 150ms ease;
+}
+.header-nav a:hover { background: var(--bg-muted); text-decoration: none; }
+
+.btn-cta {
+  padding: 8px 14px; background: var(--cta); color: var(--text-inverse);
+  border-radius: 6px; font-size: 14px; font-weight: 600; border: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background 150ms ease, transform 100ms ease;
+}
+.btn-cta:hover { background: var(--cta-hover); color: white; text-decoration: none; }
+.btn-cta:active { transform: scale(0.98); }
+
+.btn-ghost {
+  padding: 7px 12px; background: transparent; border: 1px solid var(--border);
+  color: var(--text-secondary); border-radius: 6px; font-size: 14px;
+  font-weight: 500; display: inline-flex; align-items: center; gap: 6px;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.btn-ghost:hover { background: var(--bg-muted); border-color: var(--border-strong); }
+
+/* === Subheader === */
+.subheader {
+  height: var(--subheader-height);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px; gap: 4px;
+  background: var(--bg-primary);
+  position: sticky; top: var(--header-height); z-index: 49;
+}
+.subheader a {
+  padding: 0 14px; height: var(--subheader-height);
+  display: inline-flex; align-items: center; font-size: 14px;
+  color: var(--text-muted); font-weight: 500;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.subheader a:hover { color: var(--text-primary); text-decoration: none; }
+.subheader a.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--tt-magenta);
+}
+
+/* === Layout === */
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  max-width: 1280px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* === Sidebar === */
+.sidebar {
+  position: sticky;
+  top: calc(var(--header-height) + var(--subheader-height));
+  height: calc(100vh - var(--header-height) - var(--subheader-height));
+  overflow-y: auto;
+  padding: 24px 16px 40px;
+  border-right: 1px solid var(--border);
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+.sidebar-section { margin-bottom: 20px; }
+.sidebar-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--text-faint);
+  padding: 8px 12px; margin-bottom: 4px;
+}
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 12px;
+  font-size: 14px; color: var(--text-secondary);
+  border-radius: 6px; font-weight: 400;
+  transition: background 150ms ease, color 150ms ease;
+  margin-bottom: 1px;
+  border-left: 3px solid transparent;
+  margin-left: -3px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+.sidebar-item i {
+  font-size: 14px; width: 16px; text-align: center;
+  color: var(--text-faint); flex-shrink: 0;
+}
+.sidebar-item:hover {
+  background: var(--bg-muted); color: var(--text-primary); text-decoration: none;
+}
+.sidebar-item:hover i { color: var(--text-secondary); }
+.sidebar-item.active {
+  background: var(--accent-light);
+  color: var(--accent-strong);
+  font-weight: 500;
+  border-left-color: var(--tt-magenta);
+}
+.sidebar-item.active i { color: var(--accent-strong); }
+
+/* === Content === */
+.content {
+  padding: 32px 48px 80px;
+  max-width: calc(var(--max-content) + 96px);
+  width: 100%;
+  min-width: 0;
+  min-height: 60vh;
+}
+
+.breadcrumbs {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-faint); margin-bottom: 16px;
+}
+.breadcrumbs a { color: var(--text-muted); cursor: pointer; }
+.breadcrumbs a:hover { color: var(--text-primary); text-decoration: none; }
+.breadcrumbs i { font-size: 10px; color: var(--text-faint); }
+
+.content h1 {
+  font-size: 34px; font-weight: 700; letter-spacing: -0.02em;
+  line-height: 1.2; margin: 0 0 12px; color: var(--text-primary);
+}
+.content .lead {
+  font-size: 17px; color: var(--text-muted); line-height: 1.55; margin: 0 0 32px;
+}
+.content h2 {
+  font-size: 24px; font-weight: 600; letter-spacing: -0.01em;
+  line-height: 1.3; margin: 48px 0 16px; color: var(--text-primary);
+  scroll-margin-top: calc(var(--header-height) + var(--subheader-height) + 24px);
+}
+.content h3 {
+  font-size: 19px; font-weight: 600; line-height: 1.35;
+  margin: 32px 0 12px; color: var(--text-primary);
+  scroll-margin-top: calc(var(--header-height) + var(--subheader-height) + 24px);
+}
+.content h4 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; color: var(--text-primary); }
+
+.content p { margin: 0 0 16px; color: var(--text-secondary); font-size: 16px; line-height: 1.7; }
+.content ul, .content ol { margin: 0 0 16px; padding-left: 24px; color: var(--text-secondary); }
+.content li { margin-bottom: 6px; line-height: 1.7; }
+.content strong { color: var(--text-primary); font-weight: 600; }
+
+.content code {
+  font-family: var(--font-mono); font-size: 0.88em;
+  background: var(--bg-subtle); color: var(--text-primary);
+  padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border);
+}
+
+/* === Callouts === */
+.callout {
+  display: flex; gap: 12px; padding: 14px 16px;
+  border-radius: 6px; margin: 20px 0;
+  border-left: 3px solid; font-size: 14.5px; line-height: 1.6;
+}
+.callout i { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+.callout > div { flex: 1; }
+.callout p { margin: 0; color: inherit; font-size: inherit; }
+.callout p + p { margin-top: 8px; }
+.callout strong { color: inherit; }
+.callout-info { background: var(--info-bg); border-left-color: var(--info-border); color: var(--info-text); }
+.callout-info i { color: var(--info-border); }
+.callout-success { background: var(--success-bg); border-left-color: var(--success-border); color: var(--success-text); }
+.callout-success i { color: var(--success-border); }
+.callout-warning { background: var(--warning-bg); border-left-color: var(--warning-border); color: var(--warning-text); }
+.callout-warning i { color: var(--warning-border); }
+.callout-danger { background: var(--danger-bg); border-left-color: var(--danger-border); color: var(--danger-text); }
+.callout-danger i { color: var(--danger-border); }
+
+/* === Tables === */
+.content table {
+  width: 100%; border-collapse: collapse; margin: 20px 0;
+  font-size: 14px; border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+}
+.content th {
+  background: var(--bg-muted); text-align: left;
+  padding: 10px 14px; font-weight: 600;
+  color: var(--text-primary); border-bottom: 1px solid var(--border); font-size: 13px;
+}
+.content td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  color: var(--text-secondary); vertical-align: top;
+}
+.content tr:last-child td { border-bottom: none; }
+
+/* === Code blocks === */
+.code-block {
+  background: var(--bg-code); border-radius: 8px;
+  margin: 20px 0; overflow: hidden; border: 1px solid #2A2D3A;
+}
+.code-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; border-bottom: 1px solid #2A2D3A; background: #0F1119;
+}
+.code-block-lang {
+  font-size: 12px; color: var(--tt-cyan);
+  font-family: var(--font-mono); text-transform: lowercase;
+}
+.code-block-copy {
+  background: transparent; color: #9AA0A6; border: none;
+  font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border-radius: 4px;
+  transition: background 150ms ease, color 150ms ease;
+}
+.code-block-copy:hover { background: #2A2D3A; color: var(--tt-cyan); }
+.code-block pre {
+  margin: 0; padding: 14px 16px;
+  font-family: var(--font-mono); font-size: 13.5px; line-height: 1.6;
+  color: #E5E7EB; overflow-x: auto;
+}
+
+/* === Cards === */
+.cards {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 14px; margin: 24px 0;
+}
+.card {
+  display: block; padding: 20px;
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-primary); cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+.card:hover {
+  border-color: var(--tt-cyan);
+  box-shadow: 0 1px 3px rgba(37,244,238,0.15), 0 4px 12px rgba(0,0,0,0.04);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.card-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--tt-black); color: var(--tt-cyan);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px; font-size: 16px;
+  position: relative;
+}
+.card-icon::after {
+  content: ''; position: absolute; inset: 0; border-radius: 8px;
+  background: var(--tt-magenta); mix-blend-mode: screen; opacity: 0.18;
+}
+.card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
+.card-desc { font-size: 13.5px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+/* === Pagination === */
+.pagination {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin: 56px 0 0; padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+.pagination a {
+  display: flex; flex-direction: column;
+  padding: 16px 20px; border: 1px solid var(--border);
+  border-radius: 10px; cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.pagination a:hover {
+  border-color: var(--tt-cyan); background: var(--bg-muted); text-decoration: none;
+}
+.pagination .next { text-align: right; }
+.pagination .label {
+  font-size: 12px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px; margin-bottom: 4px;
+}
+.pagination .next .label { justify-content: flex-end; }
+.pagination .title { font-size: 15px; color: var(--text-primary); font-weight: 600; }
+
+/* === Footer === */
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-muted);
+  padding: 48px 32px;
+  margin-top: 80px;
+}
+.footer-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+}
+.footer-brand p {
+  color: var(--text-muted); font-size: 14px; line-height: 1.6;
+  margin: 12px 0 16px; max-width: 320px;
+}
+.footer-social { display: flex; gap: 8px; }
+.footer-social a {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border); border-radius: 6px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.footer-social a:hover {
+  background: var(--bg-primary); color: var(--tt-magenta);
+  border-color: var(--tt-magenta); text-decoration: none;
+}
+.footer-col h4 {
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.footer-col ul { list-style: none; padding: 0; margin: 0; }
+.footer-col li { margin-bottom: 8px; }
+.footer-col a { color: var(--text-muted); font-size: 14px; cursor: pointer; }
+.footer-col a:hover { color: var(--text-primary); text-decoration: none; }
+
+/* === Mobile === */
+.mobile-toggle {
+  display: none;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 10px; color: var(--text-secondary);
+}
+.sidebar-backdrop {
+  display: none;
+  position: fixed; inset: var(--header-height) 0 0 0;
+  background: rgba(0,0,0,0.4); z-index: 39;
+}
+.sidebar-backdrop.show { display: block; }
+
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar {
+    position: fixed; left: 0;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    width: 280px; background: var(--bg-primary);
+    z-index: 40; transform: translateX(-100%);
+    transition: transform 250ms ease;
+    border-right: 1px solid var(--border);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .subheader { display: none; }
+  .header-search { max-width: none; }
+  .header-nav { display: none; }
+  .mobile-toggle { display: inline-flex; }
+  .content { padding: 24px 20px 60px; }
+  .cards { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+
+/* === No-flash background while pages load === */
+#app { min-height: 100vh; background: var(--bg-primary); }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="announcement">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>Mayo 2026 — actualización del centro de documentación: nuevas secciones de suscripción y crédito publicitario.</span>
+    <a href="#/changelog" data-route="changelog">Ver cambios →</a>
+  </div>
+
+  <header class="header">
+    <button class="mobile-toggle" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+    <a href="#/index" data-route="index" class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Holistic Marketing">
+        <rect x="2" y="2" width="28" height="28" rx="7" fill="#000000"/>
+        <path d="M9 22V10M9 16h7M16 10v12M23 10l-3 12" stroke="#25F4EE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Holistic <span>/ Docs</span>
+    </a>
+    <div class="header-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Buscar en la documentación..." aria-label="Buscar">
+      <kbd>⌘K</kbd>
+    </div>
+    <nav class="header-nav">
+      <a href="#/suscripcion" data-route="suscripcion">Suscripción</a>
+      <a href="#/credito-publicitario" data-route="credito-publicitario">Crédito</a>
+      <a href="#/contacto" data-route="contacto">Contacto</a>
+    </nav>
+    <a href="#/contacto" data-route="contacto" class="btn-cta">Agendar diagnóstico <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i></a>
+  </header>
+
+  <nav class="subheader">
+    <a href="#/index" data-route="index" class="active">Documentación</a>
+    <a href="#/suscripcion" data-route="suscripcion">Suscripción</a>
+    <a href="#/credito-publicitario" data-route="credito-publicitario">Crédito</a>
+    <a href="#/gestion-campanas" data-route="gestion-campanas">Gestión</a>
+    <a href="#/changelog" data-route="changelog">Changelog</a>
+  </nav>
+
+  <div class="sidebar-backdrop"></div>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Comenzar</div>
+        <a class="sidebar-item" href="#/index" data-route="index"><i class="fa-solid fa-house"></i>Introducción</a>
+        <a class="sidebar-item" href="#/quienes-somos" data-route="quienes-somos"><i class="fa-solid fa-building"></i>Quiénes somos</a>
+        <a class="sidebar-item" href="#/ecommerce-cod" data-route="ecommerce-cod"><i class="fa-solid fa-truck"></i>Ecommerce COD</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Suscripción de cuentas</div>
+        <a class="sidebar-item" href="#/suscripcion" data-route="suscripcion"><i class="fa-solid fa-id-card"></i>Programa de suscripción</a>
+        <a class="sidebar-item" href="#/cuentas-agencia" data-route="cuentas-agencia"><i class="fa-solid fa-user-shield"></i>Cuentas de agencia</a>
+        <a class="sidebar-item" href="#/soporte-prioritario" data-route="soporte-prioritario"><i class="fa-solid fa-headset"></i>Soporte prioritario</a>
+        <a class="sidebar-item" href="#/suscripcion-baja" data-route="suscripcion-baja"><i class="fa-solid fa-circle-minus"></i>Baja del programa</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Crédito publicitario</div>
+        <a class="sidebar-item" href="#/credito-publicitario" data-route="credito-publicitario"><i class="fa-solid fa-credit-card"></i>Líneas de crédito</a>
+        <a class="sidebar-item" href="#/credito-evaluacion" data-route="credito-evaluacion"><i class="fa-solid fa-magnifying-glass-chart"></i>Evaluación de riesgo</a>
+        <a class="sidebar-item" href="#/credito-cobranza" data-route="credito-cobranza"><i class="fa-solid fa-hand-holding-dollar"></i>Cobranza</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Gestión de campañas</div>
+        <a class="sidebar-item" href="#/gestion-campanas" data-route="gestion-campanas"><i class="fa-brands fa-tiktok"></i>Servicio de gestión</a>
+        <a class="sidebar-item" href="#/fundamentos" data-route="fundamentos"><i class="fa-solid fa-graduation-cap"></i>Cómo funciona TikTok Ads</a>
+        <a class="sidebar-item" href="#/formatos-anuncios" data-route="formatos-anuncios"><i class="fa-solid fa-photo-film"></i>Formatos de anuncio</a>
+        <a class="sidebar-item" href="#/estructura-campanas" data-route="estructura-campanas"><i class="fa-solid fa-sitemap"></i>Estructura de campañas</a>
+        <a class="sidebar-item" href="#/pixel-capi" data-route="pixel-capi"><i class="fa-solid fa-server"></i>Pixel y CAPI</a>
+        <a class="sidebar-item" href="#/escalado" data-route="escalado"><i class="fa-solid fa-arrow-trend-up"></i>Escalado</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Creativos</div>
+        <a class="sidebar-item" href="#/creativos-cod" data-route="creativos-cod"><i class="fa-solid fa-video"></i>Creativos COD</a>
+        <a class="sidebar-item" href="#/produccion-ugc" data-route="produccion-ugc"><i class="fa-solid fa-user-video"></i>Producción de UGC</a>
+        <a class="sidebar-item" href="#/creativos-ia" data-route="creativos-ia"><i class="fa-solid fa-microchip"></i>Creativos con IA</a>
+        <a class="sidebar-item" href="#/briefs-creativos" data-route="briefs-creativos"><i class="fa-solid fa-clipboard-list"></i>Briefs creativos</a>
+        <a class="sidebar-item" href="#/hooks" data-route="hooks"><i class="fa-solid fa-fish-fins"></i>Hooks y guiones</a>
+        <a class="sidebar-item" href="#/testing-creativos" data-route="testing-creativos"><i class="fa-solid fa-flask"></i>Matriz de testing</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Servicios complementarios</div>
+        <a class="sidebar-item" href="#/flyers-diseno" data-route="flyers-diseno"><i class="fa-solid fa-palette"></i>Diseño y flyers</a>
+        <a class="sidebar-item" href="#/consultoria" data-route="consultoria"><i class="fa-solid fa-people-arrows"></i>Consultoría</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Métricas y atribución</div>
+        <a class="sidebar-item" href="#/metricas-tiktok" data-route="metricas-tiktok"><i class="fa-solid fa-chart-pie"></i>Métricas TikTok Ads</a>
+        <a class="sidebar-item" href="#/ads-manager" data-route="ads-manager"><i class="fa-solid fa-table-list"></i>Lectura del Ads Manager</a>
+        <a class="sidebar-item" href="#/benchmarks" data-route="benchmarks"><i class="fa-solid fa-ruler-horizontal"></i>Benchmarks</a>
+        <a class="sidebar-item" href="#/atribucion-modelado" data-route="atribucion-modelado"><i class="fa-solid fa-diagram-project"></i>Atribución y modelado</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Operación</div>
+        <a class="sidebar-item" href="#/reportes-kpis" data-route="reportes-kpis"><i class="fa-solid fa-chart-line"></i>Reportes y KPIs</a>
+        <a class="sidebar-item" href="#/sla" data-route="sla"><i class="fa-solid fa-clock"></i>SLA</a>
+        <a class="sidebar-item" href="#/facturacion" data-route="facturacion"><i class="fa-solid fa-file-invoice-dollar"></i>Facturación</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Recursos</div>
+        <a class="sidebar-item" href="#/glosario" data-route="glosario"><i class="fa-solid fa-book"></i>Glosario</a>
+        <a class="sidebar-item" href="#/changelog" data-route="changelog"><i class="fa-solid fa-clock-rotate-left"></i>Changelog</a>
+        <a class="sidebar-item" href="#/contacto" data-route="contacto"><i class="fa-solid fa-envelope"></i>Contacto</a>
+      </div>
+    </aside>
+
+    <main class="content" id="content"></main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#/index" data-route="index" class="header-logo">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="28" height="28" rx="7" fill="#000000"/>
+            <path d="M9 22V10M9 16h7M16 10v12M23 10l-3 12" stroke="#25F4EE" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Holistic
+        </a>
+        <p>Agencia especializada en TikTok Ads para ecommerce con modelo COD en Perú y LATAM. Operamos suscripción de cuentas, líneas de crédito publicitario, gestión de campañas y servicios complementarios.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Documentación</h4>
+        <ul>
+          <li><a href="#/index" data-route="index">Introducción</a></li>
+          <li><a href="#/ecommerce-cod" data-route="ecommerce-cod">Ecommerce COD</a></li>
+          <li><a href="#/pixel-capi" data-route="pixel-capi">Pixel y CAPI</a></li>
+          <li><a href="#/reportes-kpis" data-route="reportes-kpis">Reportes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="#/suscripcion" data-route="suscripcion">Suscripción</a></li>
+          <li><a href="#/credito-publicitario" data-route="credito-publicitario">Crédito publicitario</a></li>
+          <li><a href="#/gestion-campanas" data-route="gestion-campanas">Gestión de campañas</a></li>
+          <li><a href="#/consultoria" data-route="consultoria">Consultoría</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Términos</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Cookies</a></li>
+          <li><a href="#/sla" data-route="sla">SLA</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const PAGES = {"index":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Introducción</span>\n</div>\n\n<h1>Centro de Documentación</h1>\n<p class=\"lead\">Guía operativa de Holistic Marketing — agencia especializada en TikTok Ads para ecommerce con modelo COD (contra entrega) en Perú y LATAM. Aquí están los procesos, condiciones comerciales y procedimientos técnicos de cada línea de servicio.</p>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Quién debe leer esto.</strong> Suscriptores de cuentas de agencia, anunciantes con línea de crédito activa, clientes de gestión de campañas y prospectos en evaluación. Documento público, mantenido por el equipo de operaciones.</p>\n  </div>\n</div>\n\n<h2 id=\"lineas-servicio\">Las 4 líneas de servicio</h2>\n<div class=\"cards\">\n  <a class=\"card\" href=\"#/suscripcion\" data-route=\"suscripcion\">\n    <div class=\"card-icon\"><i class=\"fa-solid fa-id-card\"></i></div>\n    <p class=\"card-title\">Suscripción de cuentas de agencia</p>\n    <p class=\"card-desc\">Acceso a cuentas publicitarias ilimitadas. $500 USD entrada + $50 USD/mes.</p>\n  </a>\n  <a class=\"card\" href=\"#/credito-publicitario\" data-route=\"credito-publicitario\">\n    <div class=\"card-icon\"><i class=\"fa-solid fa-credit-card\"></i></div>\n    <p class=\"card-title\">Líneas de crédito publicitario</p>\n    <p class=\"card-desc\">Crédito para invertir en TikTok Ads. Pago entre el día 1 y 7 de cada mes.</p>\n  </a>\n  <a class=\"card\" href=\"#/gestion-campanas\" data-route=\"gestion-campanas\">\n    <div class=\"card-icon\"><i class=\"fa-brands fa-tiktok\"></i></div>\n    <p class=\"card-title\">Gestión de campañas TikTok Ads</p>\n    <p class=\"card-desc\">Configuración, optimización y escalamiento para ecommerce COD.</p>\n  </a>\n  <a class=\"card\" href=\"#/flyers-diseno\" data-route=\"flyers-diseno\">\n    <div class=\"card-icon\"><i class=\"fa-solid fa-palette\"></i></div>\n    <p class=\"card-title\">Servicios complementarios</p>\n    <p class=\"card-desc\">Creativos, flyers, marketing digital y consultoría.</p>\n  </a>\n</div>\n\n<h2 id=\"cod\">Sobre el modelo COD</h2>\n<p>COD (Cash on Delivery, contra entrega) es el modelo dominante en Perú y buena parte de LATAM. El cliente final paga en efectivo al recibir el producto, lo que cambia por completo cómo se mide el rendimiento de una campaña en TikTok Ads frente a un ecommerce con prepago.</p>\n\n<table>\n  <thead><tr><th>Concepto</th><th>Prepago tradicional</th><th>COD</th></tr></thead>\n  <tbody>\n    <tr><td>Métrica de éxito inicial</td><td>Compra confirmada (Complete Payment)</td><td>Lead u orden generada (Form Submit / Complete Payment con valor 0)</td></tr>\n    <tr><td>Cuándo se cobra</td><td>Al hacer checkout</td><td>Al entregar el producto</td></tr>\n    <tr><td>Indicador real de rentabilidad</td><td>ROAS in-platform</td><td>Tasa de entrega (delivery rate) × ticket promedio − costo logístico − costo del producto</td></tr>\n    <tr><td>Riesgo principal</td><td>Fraude de pago</td><td>Rechazos en entrega y devoluciones</td></tr>\n  </tbody>\n</table>\n\n<p>Toda la documentación técnica, de creativos y de KPIs de esta guía asume modelo COD salvo que se indique lo contrario. La sección <a href=\"#/ecommerce-cod\" data-route=\"ecommerce-cod\">Ecommerce COD</a> profundiza en cómo se gestiona el funnel completo.</p>\n\n<h2 id=\"convenciones\">Convenciones</h2>\n<p>Las indicaciones marcadas como <strong>obligatorias</strong> son requisitos para que el servicio opere correctamente. Las marcadas como <strong>recomendadas</strong> son buenas prácticas que aplicamos por defecto. Lo marcado como <strong>opcional</strong> queda a criterio del cliente o suscriptor.</p>\n\n<div class=\"pagination\">\n  <span></span>\n  <a class=\"next\" href=\"#/quienes-somos\" data-route=\"quienes-somos\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Quiénes somos</span>\n  </a>\n</div>\n","quienes-somos":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Quiénes somos</span>\n</div>\n\n<h1>Quiénes somos</h1>\n<p class=\"lead\">Holistic Marketing es una agencia con base en Perú especializada en TikTok Ads para ecommerce COD. Operamos cuatro líneas de servicio que se complementan: suscripción de cuentas de agencia, líneas de crédito publicitario, gestión de campañas y servicios complementarios.</p>\n\n<h2 id=\"modelo\">Cómo está construido el modelo</h2>\n<p>A diferencia de una agencia tradicional que vive solo del fee de gestión, nuestro modelo combina cuatro fuentes de valor. Esto nos permite atender desde el anunciante que solo necesita una cuenta publicitaria estable hasta la marca que requiere operación completa con creativos y crédito.</p>\n\n<table>\n  <thead><tr><th>Línea</th><th>A quién atiende</th><th>Modelo de cobro</th></tr></thead>\n  <tbody>\n    <tr><td>Suscripción de cuentas de agencia</td><td>Anunciantes que operan sus propias campañas y necesitan cuentas estables.</td><td>$500 USD entrada + $50 USD/mes recurrente.</td></tr>\n    <tr><td>Líneas de crédito publicitario</td><td>Anunciantes con flujo COD que necesitan financiar el spend del mes.</td><td>Reembolso entre el día 1 y 7 del mes siguiente.</td></tr>\n    <tr><td>Gestión de campañas</td><td>Marcas que delegan operación end-to-end.</td><td>Fee mensual + variable según plan.</td></tr>\n    <tr><td>Servicios complementarios</td><td>Suscriptores y clientes que requieren creativos, flyers o consultoría.</td><td>Por proyecto o paquete.</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"diferencial\">El diferencial comercial</h2>\n<p>El core del negocio es la <strong>suscripción de cuentas de agencia</strong>. Mientras la mayoría de agencias en LATAM solo aceptan a marcas que delegan toda la operación, nosotros operamos un programa donde el anunciante mantiene control directo sobre sus campañas pero con la ventaja de operar bajo una agencia partner: cuentas más estables, soporte prioritario y acceso anticipado a features nuevas de TikTok.</p>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Aclaración importante.</strong> No vendemos cuentas publicitarias ni Business Centers. El suscriptor obtiene <strong>acceso</strong> a cuentas mientras su pago mensual esté activo. Si la suscripción se da de baja, el acceso a las cuentas se retira siguiendo el procedimiento descrito en <a href=\"#/suscripcion-baja\" data-route=\"suscripcion-baja\">Baja del servicio</a>.</p>\n  </div>\n</div>\n\n<h2 id=\"cobertura\">Mercados de operación</h2>\n<ul>\n  <li><strong>Perú</strong> — mercado principal, foco operativo y logístico.</li>\n  <li><strong>Colombia, Ecuador, Bolivia, México</strong> — operación COD activa con anunciantes y partners logísticos.</li>\n  <li><strong>Otros LATAM</strong> — caso a caso según disponibilidad de logística COD del anunciante.</li>\n</ul>\n\n<h2 id=\"quienes\">Equipo y atención</h2>\n<table>\n  <thead><tr><th>Rol</th><th>Función</th></tr></thead>\n  <tbody>\n    <tr><td>Account Manager</td><td>Punto de contacto para clientes de gestión y suscriptores premium.</td></tr>\n    <tr><td>Soporte de suscriptores</td><td>Atención dedicada para usuarios del programa de cuentas.</td></tr>\n    <tr><td>Media Buyer</td><td>Operación de campañas en cuentas gestionadas.</td></tr>\n    <tr><td>Diseñador / Editor</td><td>Producción de creativos, flyers y edits para suscriptores y clientes.</td></tr>\n    <tr><td>Riesgo y crédito</td><td>Gestión de líneas de crédito, evaluación y cobranza.</td></tr>\n  </tbody>\n</table>\n\n<div class=\"pagination\">\n  <a href=\"#/index\" data-route=\"index\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Introducción</span>\n  </a>\n  <a class=\"next\" href=\"#/ecommerce-cod\" data-route=\"ecommerce-cod\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Ecommerce COD</span>\n  </a>\n</div>\n","ecommerce-cod":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Ecommerce COD</span>\n</div>\n\n<h1>Ecommerce COD: cómo opera el funnel</h1>\n<p class=\"lead\">El modelo contra entrega cambia por completo la lógica de medición y optimización de una cuenta de TikTok Ads. Esta página explica cómo gestionamos ese funnel y dónde se gana o se pierde dinero.</p>\n\n<h2 id=\"funnel\">El funnel COD paso a paso</h2>\n<ol>\n  <li><strong>Anuncio en TikTok</strong> — el usuario ve el video y hace clic.</li>\n  <li><strong>Landing</strong> — formulario simple (nombre, teléfono, dirección, opcional email).</li>\n  <li><strong>Lead capturado</strong> — el sistema CRM o WhatsApp registra el pedido.</li>\n  <li><strong>Confirmación</strong> — call center o agente de WhatsApp valida la orden con el cliente.</li>\n  <li><strong>Despacho</strong> — courier sale a entregar.</li>\n  <li><strong>Entrega y cobro</strong> — el cliente paga en efectivo o yape/plin al recibir.</li>\n  <li><strong>Liquidación</strong> — el courier deposita el efectivo recolectado al anunciante (1–7 días después).</li>\n</ol>\n\n<h2 id=\"metricas-funnel\">Métricas críticas en cada paso</h2>\n<table>\n  <thead><tr><th>Etapa</th><th>Métrica</th><th>Benchmark sano (Perú)</th></tr></thead>\n  <tbody>\n    <tr><td>Anuncio → Landing</td><td>CTR</td><td>≥ 1.0%</td></tr>\n    <tr><td>Landing → Lead</td><td>CVR landing</td><td>8% – 18%</td></tr>\n    <tr><td>Lead → Confirmado</td><td>Tasa de confirmación</td><td>55% – 75%</td></tr>\n    <tr><td>Confirmado → Entregado</td><td>Tasa de entrega (delivery rate)</td><td>55% – 80%</td></tr>\n    <tr><td>Costo por lead</td><td>CPL</td><td>S/ 8 – S/ 25 según producto</td></tr>\n    <tr><td>Costo por orden entregada</td><td>CPA real</td><td>30% – 50% del ticket promedio</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Por qué la tasa de entrega es la métrica reina.</strong> Un CPL bajo no significa rentabilidad si la mitad de los pedidos no se entrega. Trabajamos delivery rate como KPI primario junto al CPL. Una cuenta sana sostiene 60%+ de entrega; por debajo de 50% revisamos calidad de leads, scripts de confirmación y cobertura logística.</p>\n  </div>\n</div>\n\n<h2 id=\"optimizacion\">Cómo optimizamos el algoritmo en COD</h2>\n<p>TikTok no conoce qué leads se entregan. Por defecto optimiza al evento que recibe (lead, formulario, compra), no al evento que importa (entrega cobrada). Para corregir esto usamos tres técnicas:</p>\n\n<ul>\n  <li><strong>Envío de eventos calificados vía CAPI.</strong> Cuando el lead se confirma o entrega, disparamos un evento server-side <code>CompleteRegistration</code> o <code>CompletePayment</code> con el valor real cobrado. El algoritmo aprende a buscar leads que terminan entregándose.</li>\n  <li><strong>Optimización por valor.</strong> En cuentas con histórico, configuramos Min ROAS pasando el ticket cobrado real, no el del lead inicial.</li>\n  <li><strong>Audiencias custom de buenos pagadores.</strong> Subimos lista hash de teléfonos de clientes que sí entregaron y pagaron, y construimos lookalikes sobre esa lista.</li>\n</ul>\n\n<h2 id=\"logistica\">Logística y cobertura</h2>\n<p>El éxito de una campaña COD depende tanto del courier como del creativo. Aspectos que evaluamos antes de lanzar:</p>\n<ul>\n  <li>Cobertura geográfica del courier — ¿qué provincias o departamentos atiende?</li>\n  <li>Tasa histórica de entrega del courier en la categoría.</li>\n  <li>Tiempo de entrega prometido vs real (idealmente 24–72h en Lima, 3–7 días en provincia).</li>\n  <li>Política de reintentos cuando el cliente no contesta.</li>\n  <li>Frecuencia y formato de liquidación de efectivo al anunciante.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Lo que no asumimos.</strong> No operamos la logística del cliente, no contratamos couriers en su nombre y no manejamos efectivo. La operación logística es responsabilidad del anunciante. Sí auditamos los datos de entrega para alimentar la optimización de campañas.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/quienes-somos\" data-route=\"quienes-somos\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Quiénes somos</span>\n  </a>\n  <a class=\"next\" href=\"#/suscripcion\" data-route=\"suscripcion\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Suscripción de cuentas</span>\n  </a>\n</div>\n","suscripcion":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Suscripción de cuentas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Programa</span>\n</div>\n\n<h1>Programa de suscripción de cuentas de agencia</h1>\n<p class=\"lead\">El programa de suscripción es el modelo principal por el cual un anunciante accede a cuentas publicitarias de TikTok bajo nuestro Business Center. La suscripción es un servicio recurrente: el acceso depende del pago mensual vigente, no de una compra única.</p>\n\n<h2 id=\"condiciones\">Condiciones comerciales</h2>\n<table>\n  <thead><tr><th>Concepto</th><th>Monto</th><th>Periodicidad</th></tr></thead>\n  <tbody>\n    <tr><td>Inscripción inicial (one-time)</td><td>USD 500</td><td>Único, al activar la suscripción</td></tr>\n    <tr><td>Mensualidad</td><td>USD 50</td><td>Mensual, mientras esté activa</td></tr>\n    <tr><td>Comisión por cuenta adicional</td><td>Sin costo</td><td>—</td></tr>\n    <tr><td>Comisión sobre la inversión publicitaria</td><td>No aplica al programa de suscripción</td><td>—</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Modalidad de pago.</strong> Aceptamos transferencia bancaria internacional, USDT (red TRC-20 o ERC-20) y pasarelas locales en Perú. La inscripción se cobra al firmar el contrato. La mensualidad se factura entre el día 1 y 7 de cada mes calendario.</p>\n  </div>\n</div>\n\n<h2 id=\"incluye\">Qué incluye la suscripción</h2>\n<ul>\n  <li><strong>Cuentas publicitarias ilimitadas</strong> bajo el Business Center de Holistic, asignadas según necesidad operativa del anunciante.</li>\n  <li><strong>Soporte prioritario</strong> con tiempos de respuesta definidos en el documento de SLA.</li>\n  <li><strong>Acceso anticipado a funcionalidades de TikTok</strong> que se liberan progresivamente a partners (formatos beta, herramientas de optimización, segmentaciones nuevas).</li>\n  <li><strong>Guía operativa actualizada</strong> con procedimientos de carga de saldo, gestión de pixel, manejo de rechazos y políticas vigentes.</li>\n  <li><strong>Reposición de cuentas</strong> bloqueadas o restringidas por TikTok, según los criterios descritos en la sección de cuentas de agencia.</li>\n</ul>\n\n<h2 id=\"no-incluye\">Qué no incluye</h2>\n<ul>\n  <li>Inversión publicitaria. El saldo de la cuenta lo aporta el anunciante o se canaliza a través de una línea de crédito separada.</li>\n  <li>Gestión de campañas. La operación diaria de la cuenta corre por cuenta del anunciante, salvo que se contrate además el servicio de gestión.</li>\n  <li>Diseño de creativos, producción de video o copywriting. Disponibles como servicios complementarios.</li>\n  <li>Garantía de resultados publicitarios. La suscripción habilita el acceso a la plataforma; el rendimiento depende del producto, oferta y operación del anunciante.</li>\n</ul>\n\n<h2 id=\"modelo-acceso\">Modelo de acceso, no de propiedad</h2>\n<p>El suscriptor recibe acceso de uso a las cuentas publicitarias bajo el Business Center de Holistic mientras la suscripción esté vigente. No vendemos cuentas publicitarias ni Business Centers. La titularidad permanece con la agencia y el acceso se revoca al darse de baja, según el procedimiento descrito en <a href=\"#/suscripcion-baja\" data-route=\"suscripcion-baja\">Baja del programa</a>.</p>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Política antifraude.</strong> El uso de las cuentas está sujeto a las políticas de TikTok y a las cláusulas de uso aceptable del contrato. Categorías prohibidas, suplantación de marca, productos sin sustento o landings engañosas son causales inmediatas de revocación de acceso, sin reembolso de mensualidad ni inscripción.</p>\n  </div>\n</div>\n\n<h2 id=\"renovacion\">Renovación y vencimiento</h2>\n<p>La suscripción se renueva automáticamente mes a mes. Si la mensualidad no se cancela dentro de la ventana del 1 al 7, el acceso a las cuentas se suspende temporalmente el día 8. La reactivación requiere ponerse al día y, si la suspensión supera los 30 días, el pago de una nueva inscripción.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/ecommerce-cod\" data-route=\"ecommerce-cod\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Ecommerce COD</span>\n  </a>\n  <a class=\"next\" href=\"#/cuentas-agencia\" data-route=\"cuentas-agencia\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Cuentas de agencia</span>\n  </a>\n</div>\n","cuentas-agencia":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Suscripción</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Cuentas de agencia</span>\n</div>\n\n<h1>Cuentas de agencia: cómo funciona el acceso</h1>\n<p class=\"lead\">Las cuentas publicitarias entregadas en el programa de suscripción son cuentas de agencia bajo el Business Center de Holistic Marketing. Esta página describe cómo se solicitan, asignan, repondrán y revocan.</p>\n\n<h2 id=\"naturaleza\">Naturaleza de las cuentas</h2>\n<ul>\n  <li>Las cuentas se crean y administran dentro del Business Center de Holistic.</li>\n  <li>El suscriptor recibe rol de Operator o Analyst, según su preferencia. La administración del Business Center no se delega.</li>\n  <li>El método de pago de cada cuenta lo configura el anunciante (tarjeta corporativa, transferencia, USDT) o se opera bajo línea de crédito de Holistic.</li>\n  <li>El pixel y dominios se asocian a la cuenta y se mantienen aunque la cuenta se rote.</li>\n</ul>\n\n<h2 id=\"solicitud\">Solicitud de cuentas adicionales</h2>\n<ol>\n  <li>El suscriptor solicita una nueva cuenta vía el canal de soporte.</li>\n  <li>Indica país, moneda y zona horaria deseados, además del producto o landing principal.</li>\n  <li>Operaciones provisiona la cuenta dentro de las primeras 24 horas hábiles.</li>\n  <li>Se asocia el pixel, los dominios verificados y el método de pago acordado.</li>\n  <li>El anunciante recibe acceso vía invitación al Business Center.</li>\n</ol>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Sin límite de cuentas.</strong> El programa no fija un tope al número de cuentas activas mientras la suscripción esté al día. La asignación queda condicionada a uso responsable: cuentas inactivas o creadas en exceso pueden ser desactivadas para optimizar el inventario.</p>\n  </div>\n</div>\n\n<h2 id=\"reposicion\">Reposición por bloqueo</h2>\n<p>Cuando TikTok bloquea o restringe una cuenta, aplicamos el siguiente protocolo:</p>\n<table>\n  <thead><tr><th>Causa del bloqueo</th><th>Acción</th><th>Tiempo de reposición</th></tr></thead>\n  <tbody>\n    <tr><td>Falso positivo o error de revisión</td><td>Apelación ante TikTok</td><td>24 a 72 horas</td></tr>\n    <tr><td>Bloqueo por carga inusual de saldo</td><td>Verificación de método de pago y desbloqueo</td><td>24 horas</td></tr>\n    <tr><td>Bloqueo por anuncio rechazado reincidente</td><td>Reposición con cuenta nueva, revisión de creativos</td><td>24 horas</td></tr>\n    <tr><td>Suspensión por incumplimiento de política</td><td>No hay reposición; se evalúa caso por caso</td><td>—</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"cambio-cuenta\">Migración de pixel y dominio</h2>\n<p>Cuando se entrega una cuenta de reposición, el pixel original puede mantenerse si TikTok no lo bloqueó. El dominio verificado se transfiere mediante reverificación DNS. Las audiencias custom basadas en pixel se conservan; las basadas en interacción de cuenta deben reconstruirse.</p>\n\n<h2 id=\"revocacion\">Revocación de acceso</h2>\n<p>El acceso se revoca en los siguientes casos:</p>\n<ul>\n  <li>Mora superior a 7 días en el pago de la mensualidad.</li>\n  <li>Incumplimiento del pago de una línea de crédito publicitario.</li>\n  <li>Vulneración de las políticas de TikTok que comprometan el Business Center.</li>\n  <li>Solicitud explícita del suscriptor (baja voluntaria).</li>\n</ul>\n\n<div class=\"callout callout-danger\">\n  <i class=\"fa-solid fa-circle-exclamation\"></i>\n  <div>\n    <p><strong>Sobre el saldo restante.</strong> Si una cuenta es revocada con saldo positivo en la billetera de TikTok, ese saldo no es reembolsable a través de Holistic: pertenece a la cuenta. Recomendamos mantener saldos mínimos operativos y recargar conforme se consume.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/suscripcion\" data-route=\"suscripcion\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Programa de suscripción</span>\n  </a>\n  <a class=\"next\" href=\"#/soporte-prioritario\" data-route=\"soporte-prioritario\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Soporte prioritario</span>\n  </a>\n</div>\n","soporte-prioritario":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Suscripción</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Soporte prioritario</span>\n</div>\n\n<h1>Soporte prioritario</h1>\n<p class=\"lead\">Los suscriptores tienen acceso a un canal de soporte directo con tiempos de respuesta acotados. Esta página define los canales, horarios, tipos de incidente y los compromisos de respuesta.</p>\n\n<h2 id=\"canales\">Canales habilitados</h2>\n<table>\n  <thead><tr><th>Canal</th><th>Uso recomendado</th><th>Disponibilidad</th></tr></thead>\n  <tbody>\n    <tr><td>WhatsApp Business (línea dedicada)</td><td>Incidentes operativos, urgencias</td><td>Lun a sáb · 9:00 – 21:00 PET</td></tr>\n    <tr><td>Correo de operaciones</td><td>Solicitudes formales, documentación</td><td>24/7 (respuesta en horario hábil)</td></tr>\n    <tr><td>Reunión semanal opcional</td><td>Revisión de cuentas, planificación</td><td>Coordinada según volumen</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"categorias\">Categorías de incidente y SLA</h2>\n<table>\n  <thead><tr><th>Categoría</th><th>Ejemplos</th><th>Primera respuesta</th><th>Resolución objetivo</th></tr></thead>\n  <tbody>\n    <tr><td>Crítico</td><td>Bloqueo de cuenta, saldo no acreditado, pixel caído</td><td>1 hora hábil</td><td>24 horas</td></tr>\n    <tr><td>Alto</td><td>Anuncio rechazado, problema de facturación</td><td>4 horas hábiles</td><td>48 horas</td></tr>\n    <tr><td>Medio</td><td>Solicitud de cuenta nueva, alta de pixel</td><td>1 día hábil</td><td>3 días hábiles</td></tr>\n    <tr><td>Bajo</td><td>Consulta general, aclaración de política</td><td>2 días hábiles</td><td>5 días hábiles</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Hora hábil.</strong> Lunes a viernes, 9:00 a 19:00 PET. Sábados 9:00 a 14:00. Domingos y feriados peruanos no se cuentan, salvo en incidentes críticos donde aplica respuesta best-effort.</p>\n  </div>\n</div>\n\n<h2 id=\"cobertura\">Qué cubre el soporte</h2>\n<ul>\n  <li>Provisión, reposición y configuración de cuentas publicitarias.</li>\n  <li>Resolución de bloqueos, revisiones y apelaciones ante TikTok.</li>\n  <li>Configuración de pixel, eventos, dominios verificados y catálogos.</li>\n  <li>Aclaración de políticas de TikTok aplicables al producto del anunciante.</li>\n  <li>Revisión de creativos antes de publicar para reducir rechazos.</li>\n  <li>Apoyo técnico en CAPI, integraciones y eventos server-side.</li>\n</ul>\n\n<h2 id=\"fuera-cobertura\">Fuera de cobertura</h2>\n<ul>\n  <li>Operación diaria de campañas (estructura, segmentación, pujas), salvo si se contrata el servicio de gestión.</li>\n  <li>Producción de creativos, edición de video, copywriting, diseño gráfico.</li>\n  <li>Soporte sobre plataformas externas (Shopify, plataformas COD, CRMs).</li>\n  <li>Asesoría legal, contable o tributaria.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Escalamiento.</strong> Si un incidente crítico no recibe respuesta dentro del SLA, el suscriptor puede escalar al correo de gerencia indicado en el contrato. El escalamiento queda registrado y dispara revisión interna del caso.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/cuentas-agencia\" data-route=\"cuentas-agencia\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Cuentas de agencia</span>\n  </a>\n  <a class=\"next\" href=\"#/suscripcion-baja\" data-route=\"suscripcion-baja\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Baja del programa</span>\n  </a>\n</div>\n","suscripcion-baja":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Suscripción</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Baja</span>\n</div>\n\n<h1>Baja del programa de suscripción</h1>\n<p class=\"lead\">Procedimiento para dar de baja la suscripción de cuentas de agencia. La baja es voluntaria, sin penalidad, y puede solicitarse en cualquier momento del mes.</p>\n\n<h2 id=\"solicitud\">Cómo solicitar la baja</h2>\n<ol>\n  <li>Enviar correo al canal de operaciones indicando la fecha en que se desea cesar la suscripción.</li>\n  <li>Indicar las cuentas activas a cargo y el saldo aproximado en cada una.</li>\n  <li>Confirmar si se desea cerrar el pixel o mantenerlo para una migración futura.</li>\n  <li>Recibir confirmación del equipo en un plazo máximo de 48 horas hábiles.</li>\n</ol>\n\n<h2 id=\"ventana\">Ventanas de baja</h2>\n<table>\n  <thead><tr><th>Solicitud recibida</th><th>Fecha efectiva de cese</th><th>Cobro</th></tr></thead>\n  <tbody>\n    <tr><td>Antes del día 7</td><td>Último día del mes vigente</td><td>Mensualidad del mes ya pagada, sin cobro siguiente</td></tr>\n    <tr><td>Entre día 8 y 25</td><td>Último día del mes siguiente</td><td>Se cobra mensualidad del mes en curso</td></tr>\n    <tr><td>Día 26 en adelante</td><td>Último día del mes siguiente</td><td>Se factura una mensualidad adicional</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Sin reembolso de mensualidad.</strong> La mensualidad cubre el periodo del 1 al 30 (o 31). Una baja a mitad de mes no genera reembolso parcial, pero el suscriptor mantiene el acceso hasta el cierre del periodo cobrado.</p>\n  </div>\n</div>\n\n<h2 id=\"acceso\">Qué pasa con las cuentas y datos</h2>\n<ul>\n  <li><strong>Cuentas publicitarias.</strong> El acceso del suscriptor se revoca el día siguiente al cese. Las cuentas regresan al pool de Holistic.</li>\n  <li><strong>Saldo en billetera de TikTok.</strong> El saldo positivo no es reembolsable por Holistic. Recomendamos consumir el saldo antes del cese.</li>\n  <li><strong>Pixel.</strong> Por defecto se conserva 90 días por si el cliente decide migrarlo a otro Business Center. Tras ese plazo se elimina.</li>\n  <li><strong>Audiencias custom y catálogos.</strong> Se eliminan al cese, salvo solicitud expresa de exportación previa.</li>\n  <li><strong>Reportes históricos.</strong> Se mantienen 12 meses con fines tributarios y operativos.</li>\n</ul>\n\n<h2 id=\"recontratacion\">Recontratación</h2>\n<p>Una baja no impide volver a suscribirse en el futuro. Si la nueva alta ocurre dentro de los 60 días posteriores al cese, no se cobra una nueva inscripción. Pasados los 60 días, aplica la inscripción inicial estándar.</p>\n\n<h2 id=\"incumplimiento\">Baja por incumplimiento</h2>\n<p>Independientemente de la baja voluntaria, Holistic puede cesar la suscripción de manera inmediata si se verifica:</p>\n<ul>\n  <li>Mora mayor a 30 días en mensualidades o líneas de crédito.</li>\n  <li>Uso de las cuentas para categorías prohibidas por TikTok.</li>\n  <li>Conductas que comprometan el Business Center o el partnership con TikTok.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>En caso de cese por incumplimiento</strong> no aplica la ventana de gracia ni la conservación de pixel. La inscripción y mensualidades pagadas no son reembolsables.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/soporte-prioritario\" data-route=\"soporte-prioritario\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Soporte prioritario</span>\n  </a>\n  <a class=\"next\" href=\"#/credito-publicitario\" data-route=\"credito-publicitario\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Líneas de crédito</span>\n  </a>\n</div>\n","credito-publicitario":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Crédito publicitario</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Líneas de crédito</span>\n</div>\n\n<h1>Líneas de crédito publicitario</h1>\n<p class=\"lead\">Holistic financia parte de la inversión publicitaria del anunciante en TikTok Ads bajo un esquema de crédito mensual. La cuenta se carga durante el mes y el cliente cancela el consumo entre el día 1 y 7 del mes siguiente.</p>\n\n<h2 id=\"que-es\">Qué es la línea de crédito</h2>\n<p>Es un límite de inversión publicitaria, expresado en USD, que el anunciante puede consumir en sus cuentas de TikTok Ads sin desembolsar el dinero por adelantado. El consumo se factura al cierre del mes y se cobra en la primera semana del siguiente.</p>\n\n<table>\n  <thead><tr><th>Concepto</th><th>Detalle</th></tr></thead>\n  <tbody>\n    <tr><td>Moneda de la línea</td><td>USD</td></tr>\n    <tr><td>Ciclo de facturación</td><td>1 al último día calendario del mes</td></tr>\n    <tr><td>Ventana de pago</td><td>Día 1 al 7 del mes siguiente</td></tr>\n    <tr><td>Línea inicial típica</td><td>USD 3,000 a USD 10,000 según evaluación</td></tr>\n    <tr><td>Límite máximo</td><td>Sin tope fijo, sujeto a histórico y garantías</td></tr>\n    <tr><td>Costo financiero</td><td>Definido caso por caso en el contrato de línea</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Para quién está pensado.</strong> Anunciantes con flujo COD activo que cobran al final del mes y necesitan invertir en publicidad antes de liquidar. La línea sincroniza el calendario de gasto publicitario con el calendario real de cobro del negocio.</p>\n  </div>\n</div>\n\n<h2 id=\"ciclo\">Ciclo del crédito mes a mes</h2>\n<ol>\n  <li><strong>Día 1 al 30 — consumo.</strong> El anunciante invierte en sus campañas. Holistic monitorea el saldo consumido vs línea aprobada.</li>\n  <li><strong>Día último del mes — corte.</strong> Se calcula el consumo total y se emite la factura.</li>\n  <li><strong>Día 1 al 7 — pago.</strong> El cliente cancela vía transferencia, USDT o medio acordado.</li>\n  <li><strong>Día 8 — verificación.</strong> Si no se ha recibido el pago, se suspende la línea y la operación pasa a cobranza.</li>\n</ol>\n\n<h2 id=\"condiciones\">Condiciones de uso</h2>\n<ul>\n  <li>La línea solo aplica a cuentas dentro del Business Center de Holistic.</li>\n  <li>El consumo se contabiliza neto de devoluciones de TikTok (saldos no consumidos por anuncios rechazados).</li>\n  <li>El anunciante debe mantener al día la suscripción mensual de cuentas para mantener la línea activa.</li>\n  <li>Cualquier comisión de cambio o pasarela aplicada al pago corre por cuenta del anunciante.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>La línea no es préstamo de capital.</strong> Holistic no entrega efectivo al anunciante. La línea solo permite consumir publicidad en cuentas administradas por la agencia. No puede usarse para retirar saldo, comprar bienes o financiar operaciones distintas a TikTok Ads.</p>\n  </div>\n</div>\n\n<h2 id=\"ampliacion\">Ampliación de línea</h2>\n<p>Tras tres meses de pagos puntuales, el anunciante puede solicitar ampliación. La revisión considera histórico de pagos, evolución del consumo y métricas de rentabilidad de las campañas. Las ampliaciones se aprueban en escalones de USD 2,000 a USD 5,000.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/suscripcion-baja\" data-route=\"suscripcion-baja\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Baja del programa</span>\n  </a>\n  <a class=\"next\" href=\"#/credito-evaluacion\" data-route=\"credito-evaluacion\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Evaluación de riesgo</span>\n  </a>\n</div>\n","credito-evaluacion":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Crédito publicitario</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Evaluación</span>\n</div>\n\n<h1>Evaluación de riesgo y aprobación</h1>\n<p class=\"lead\">Antes de habilitar una línea de crédito publicitario, Holistic realiza una evaluación del anunciante. Esta página describe los criterios, documentos y plazos del proceso.</p>\n\n<h2 id=\"criterios\">Criterios de evaluación</h2>\n<table>\n  <thead><tr><th>Dimensión</th><th>Qué evaluamos</th><th>Peso</th></tr></thead>\n  <tbody>\n    <tr><td>Operación COD</td><td>Antigüedad operativa, productos, courier, tasa de entrega histórica</td><td>Alto</td></tr>\n    <tr><td>Volumen actual</td><td>Inversión mensual reciente en TikTok u otras plataformas</td><td>Alto</td></tr>\n    <tr><td>Histórico con Holistic</td><td>Tiempo como suscriptor, puntualidad de pagos, comportamiento operativo</td><td>Alto</td></tr>\n    <tr><td>Documentación legal</td><td>RUC vigente, representante legal, estado tributario</td><td>Medio</td></tr>\n    <tr><td>Producto</td><td>Categoría permitida en TikTok, claims sustentables, landing limpia</td><td>Medio</td></tr>\n    <tr><td>Garantías</td><td>Aval personal, prenda, depósito en garantía (cuando aplica)</td><td>Variable</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"documentacion\">Documentación requerida</h2>\n<ul>\n  <li>Ficha RUC vigente o equivalente del país de operación.</li>\n  <li>Documento de identidad del representante legal y firmante.</li>\n  <li>Estados financieros internos de los últimos 6 meses (no auditados es aceptable).</li>\n  <li>Reportes de inversión publicitaria de los últimos 3 meses (Meta, TikTok u otros).</li>\n  <li>Evidencia de operación COD: liquidaciones de courier, ventas mensuales entregadas.</li>\n  <li>Para personas naturales con negocio: declaración jurada de ingresos.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Confidencialidad.</strong> Toda la documentación se trata bajo acuerdo de confidencialidad. Se utiliza únicamente para evaluar la línea y se conserva por el periodo de vigencia de la relación más 12 meses adicionales para fines tributarios.</p>\n  </div>\n</div>\n\n<h2 id=\"proceso\">Proceso de aprobación</h2>\n<ol>\n  <li><strong>Solicitud inicial.</strong> El anunciante completa un formulario con datos de la empresa, productos y volumen estimado.</li>\n  <li><strong>Entrega documental.</strong> Se sube la documentación requerida a un drive compartido seguro.</li>\n  <li><strong>Revisión.</strong> El comité de crédito evalúa el caso en un plazo de 5 a 10 días hábiles.</li>\n  <li><strong>Resultado.</strong> Se comunica monto aprobado, condiciones de costo financiero y garantías solicitadas.</li>\n  <li><strong>Firma de contrato.</strong> Contrato de línea, pagaré a la vista y, si aplica, contrato de garantía.</li>\n  <li><strong>Activación.</strong> La línea queda disponible para consumo en las cuentas del Business Center.</li>\n</ol>\n\n<h2 id=\"rechazo\">Causales frecuentes de rechazo</h2>\n<ul>\n  <li>Operación COD reciente sin histórico de tasa de entrega.</li>\n  <li>Categoría de producto restringida o prohibida por TikTok.</li>\n  <li>Inversión publicitaria inestable o discontinua.</li>\n  <li>Documentación incompleta o inconsistente.</li>\n  <li>Suscripción al programa con menos de 30 días de antigüedad.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Reaplicación.</strong> Una solicitud rechazada puede reevaluarse a los 60 días siguientes, presentando documentación actualizada y, si aplica, evidencia de operación más sólida o garantías adicionales.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/credito-publicitario\" data-route=\"credito-publicitario\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Líneas de crédito</span>\n  </a>\n  <a class=\"next\" href=\"#/credito-cobranza\" data-route=\"credito-cobranza\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Cobranza</span>\n  </a>\n</div>\n","credito-cobranza":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Crédito publicitario</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Cobranza</span>\n</div>\n\n<h1>Procedimiento de cobranza</h1>\n<p class=\"lead\">El crédito publicitario se factura al cierre de cada mes y debe cancelarse entre el día 1 y 7 del mes siguiente. Esta página describe el flujo de cobranza, recordatorios y acciones cuando un pago se atrasa.</p>\n\n<h2 id=\"calendario\">Calendario estándar</h2>\n<table>\n  <thead><tr><th>Día</th><th>Acción</th></tr></thead>\n  <tbody>\n    <tr><td>Último día del mes</td><td>Corte y cálculo del consumo</td></tr>\n    <tr><td>Día 1</td><td>Emisión de factura y comprobante</td></tr>\n    <tr><td>Día 1 a 7</td><td>Ventana ordinaria de pago</td></tr>\n    <tr><td>Día 5</td><td>Recordatorio automático de vencimiento</td></tr>\n    <tr><td>Día 7 (cierre)</td><td>Último día de pago sin penalidad</td></tr>\n    <tr><td>Día 8</td><td>Mora: suspensión de la línea</td></tr>\n    <tr><td>Día 15</td><td>Suspensión de cuentas y suscripción</td></tr>\n    <tr><td>Día 30</td><td>Caso a cobranza extrajudicial</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Comprobantes.</strong> Emitimos factura electrónica peruana (SUNAT) o invoice internacional según el país del cliente. El detalle del consumo se exporta desde TikTok y se adjunta al comprobante.</p>\n  </div>\n</div>\n\n<h2 id=\"medios-pago\">Medios de pago aceptados</h2>\n<ul>\n  <li>Transferencia bancaria local en Perú (PEN o USD).</li>\n  <li>Transferencia internacional vía SWIFT.</li>\n  <li>USDT en redes TRC-20 o ERC-20 (cotización del día del pago).</li>\n  <li>Pasarelas locales acordadas previamente.</li>\n</ul>\n\n<h2 id=\"atraso\">Cuando un pago se atrasa</h2>\n<ol>\n  <li><strong>Día 8.</strong> Se notifica al anunciante por WhatsApp y correo. Se suspende la línea: las cuentas no pueden gastar contra crédito hasta regularizar.</li>\n  <li><strong>Día 10.</strong> Se aplica interés moratorio según el contrato de línea, calculado por día de atraso.</li>\n  <li><strong>Día 15.</strong> Se suspenden los accesos a las cuentas y se pausa la suscripción mensual. Las campañas activas quedan en estado pausado.</li>\n  <li><strong>Día 30.</strong> El caso se traslada al área de cobranzas. Se ejecutan garantías y, si aplica, se inicia cobranza judicial. Se reporta a la Central de Riesgos correspondiente cuando corresponda.</li>\n</ol>\n\n<h2 id=\"acuerdos\">Acuerdos de pago</h2>\n<p>Si el anunciante anticipa un retraso, debe comunicarlo antes del día 7 al canal de operaciones. Holistic puede ofrecer un acuerdo de pago parcial bajo las siguientes condiciones:</p>\n<ul>\n  <li>Pago mínimo del 50% del saldo dentro de la ventana ordinaria.</li>\n  <li>Saldo restante en un máximo de 14 días adicionales.</li>\n  <li>Costo financiero adicional según contrato.</li>\n  <li>La línea queda con cupo reducido hasta normalizar.</li>\n</ul>\n\n<div class=\"callout callout-danger\">\n  <i class=\"fa-solid fa-circle-exclamation\"></i>\n  <div>\n    <p><strong>Mora reincidente.</strong> Dos eventos de mora en seis meses generan reducción permanente de la línea. Tres eventos generan cierre de la línea sin posibilidad de reapertura por 12 meses.</p>\n  </div>\n</div>\n\n<h2 id=\"impugnacion\">Impugnación de cargos</h2>\n<p>Si el anunciante considera que un cargo es erróneo, puede solicitar revisión dentro de los 5 días siguientes a la emisión de la factura. La revisión no suspende la fecha de pago: el monto no impugnado debe cancelarse en plazo. Si la impugnación procede, se emite nota de crédito.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/credito-evaluacion\" data-route=\"credito-evaluacion\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Evaluación de riesgo</span>\n  </a>\n  <a class=\"next\" href=\"#/gestion-campanas\" data-route=\"gestion-campanas\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Gestión de campañas</span>\n  </a>\n</div>\n","gestion-campanas":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Gestión de campañas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Servicio</span>\n</div>\n\n<h1>Gestión de campañas TikTok Ads</h1>\n<p class=\"lead\">Servicio full-service en el que Holistic opera la cuenta del anunciante: configuración, lanzamiento, optimización diaria y escalamiento. Pensado para ecommerce COD que quiere delegar la operación publicitaria.</p>\n\n<h2 id=\"alcance\">Alcance del servicio</h2>\n<table>\n  <thead><tr><th>Bloque</th><th>Incluye</th></tr></thead>\n  <tbody>\n    <tr><td>Setup inicial</td><td>Pixel, eventos, dominios verificados, catálogo, configuración de Business Center</td></tr>\n    <tr><td>Estructura de cuenta</td><td>Campañas, ad groups, segmentaciones, presupuestos</td></tr>\n    <tr><td>Operación diaria</td><td>Lanzamiento de creativos, ajuste de pujas, control de gasto, pausas y reactivaciones</td></tr>\n    <tr><td>Optimización</td><td>Análisis de funnel, escalado vertical y horizontal, gestión de fatiga creativa</td></tr>\n    <tr><td>Reportería</td><td>Reporte semanal y mensual con KPIs COD reales (CPL, delivery rate, CPA real)</td></tr>\n    <tr><td>Coordinación con cliente</td><td>Llamada semanal, canal de WhatsApp dedicado</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Independiente de la suscripción.</strong> El servicio de gestión se contrata por separado. Un anunciante puede tener suscripción sin gestión (opera él mismo) o gestión sin suscripción (con cuentas propias). En la práctica, la mayoría combina ambos.</p>\n  </div>\n</div>\n\n<h2 id=\"modelo-comercial\">Modelo comercial</h2>\n<p>La gestión se cobra bajo dos posibles esquemas, definidos en el contrato:</p>\n<ul>\n  <li><strong>Fee fijo mensual.</strong> Monto cerrado independiente de la inversión, ajustado al volumen estimado.</li>\n  <li><strong>Fee variable sobre inversión.</strong> Porcentaje sobre el ad spend del mes, con piso mínimo.</li>\n</ul>\n<p>El esquema se elige según la estabilidad del negocio: cuentas con consumo errático suelen optar por fee fijo; cuentas con consumo predecible optan por variable.</p>\n\n<h2 id=\"onboarding\">Onboarding del cliente</h2>\n<ol>\n  <li><strong>Día 1 — kickoff.</strong> Recolección de información del producto, catálogo, courier, ticket promedio, costos.</li>\n  <li><strong>Día 2 a 4 — setup técnico.</strong> Pixel, CAPI, dominios, eventos, pruebas en TikTok Events Manager.</li>\n  <li><strong>Día 3 a 5 — auditoría creativa.</strong> Inventario de creativos disponibles, identificación de gaps, brief de creativos a producir.</li>\n  <li><strong>Día 5 a 7 — primer lanzamiento.</strong> Campañas iniciales con presupuesto de testing.</li>\n  <li><strong>Día 14 — primer reporte.</strong> Lectura de funnel, ajustes, plan de escalado.</li>\n</ol>\n\n<h2 id=\"responsabilidades\">Responsabilidades del cliente</h2>\n<ul>\n  <li>Aportar inversión publicitaria o tener línea de crédito activa.</li>\n  <li>Entregar producto, ofertas, claims sustentables y posicionamiento.</li>\n  <li>Operar logística, call center de confirmación y atención post-venta.</li>\n  <li>Compartir datos de delivery rate, devoluciones y costo logístico para alimentar la optimización.</li>\n  <li>Aprobar creativos y landing antes de publicar.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>No prometemos ROAS ni órdenes mínimas.</strong> El rendimiento depende del producto, oferta, competencia y operación logística. Comprometemos proceso, KPIs leading y tiempos de respuesta, no resultados garantizados.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/credito-cobranza\" data-route=\"credito-cobranza\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Cobranza</span>\n  </a>\n  <a class=\"next\" href=\"#/fundamentos\" data-route=\"fundamentos\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Cómo funciona TikTok Ads</span>\n  </a>\n</div>\n","fundamentos":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Gestión de campañas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Fundamentos</span>\n</div>\n\n<h1>Cómo funciona TikTok Ads</h1>\n<p class=\"lead\">Marco conceptual mínimo para operar campañas en TikTok bajo modelo COD. Esta página resume la jerarquía de la cuenta, el sistema de subastas y los tipos de objetivos disponibles.</p>\n\n<h2 id=\"jerarquia\">Jerarquía de la cuenta</h2>\n<table>\n  <thead><tr><th>Nivel</th><th>Función</th><th>Decisiones clave</th></tr></thead>\n  <tbody>\n    <tr><td>Campaña</td><td>Define objetivo y presupuesto global</td><td>Objetivo de optimización, CBO, fechas</td></tr>\n    <tr><td>Ad Group</td><td>Define segmentación y entrega</td><td>Audiencia, ubicaciones, puja, evento de optimización</td></tr>\n    <tr><td>Ad</td><td>Pieza creativa</td><td>Video, copy, CTA, landing</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"subastas\">Subasta y entrega</h2>\n<p>TikTok opera una subasta de segundo precio modificada. Para cada impresión disponible, el sistema selecciona el anuncio que maximiza:</p>\n<pre><code>valor estimado = puja × probabilidad de acción × calidad del anuncio</code></pre>\n<p>Tres consecuencias prácticas:</p>\n<ul>\n  <li>Una puja alta no garantiza entrega si la calidad o tasa de conversión proyectada es baja.</li>\n  <li>El sistema favorece anuncios con mayor engagement orgánico medido en watch time, likes, shares y completions.</li>\n  <li>Cuentas frescas requieren fase de aprendizaje (~50 conversiones por ad group en 7 días) antes de estabilizarse.</li>\n</ul>\n\n<h2 id=\"objetivos\">Objetivos de campaña</h2>\n<table>\n  <thead><tr><th>Objetivo</th><th>Cuándo se usa en COD</th></tr></thead>\n  <tbody>\n    <tr><td>Reach</td><td>Casi nunca; solo branding muy específico</td></tr>\n    <tr><td>Traffic</td><td>Pruebas iniciales sin pixel</td></tr>\n    <tr><td>Video Views</td><td>Calentamiento de pixel, descarte de creativos</td></tr>\n    <tr><td>Lead Generation</td><td>Formulario nativo dentro de TikTok</td></tr>\n    <tr><td>Website Conversions</td><td>Estándar para COD: optimiza al evento configurado en pixel</td></tr>\n    <tr><td>Product Sales</td><td>Cuando hay catálogo conectado</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Por qué Website Conversions es el estándar COD.</strong> Permite optimizar al evento Lead, CompleteRegistration o CompletePayment, según la calidad de señal que envíe el pixel/CAPI. Es la única ruta para alimentar al algoritmo con eventos calificados de entrega real.</p>\n  </div>\n</div>\n\n<h2 id=\"presupuestos\">Modelos de presupuesto</h2>\n<ul>\n  <li><strong>ABO (Ad Group Budget Optimization).</strong> Presupuesto a nivel de ad group. Mayor control, recomendado en testing.</li>\n  <li><strong>CBO (Campaign Budget Optimization).</strong> Presupuesto a nivel de campaña; el sistema reparte. Recomendado en cuentas maduras con audiencias estables.</li>\n</ul>\n\n<h2 id=\"aprendizaje\">Fase de aprendizaje</h2>\n<p>Cada ad group atraviesa una fase de aprendizaje al iniciar o al sufrir cambios significativos. Durante esta fase el rendimiento es volátil. Reglas operativas:</p>\n<ul>\n  <li>No editar pujas, presupuesto, segmentación ni evento durante los primeros 3 a 5 días.</li>\n  <li>Considerar el ad group salido de aprendizaje al alcanzar ~50 conversiones del evento de optimización en 7 días.</li>\n  <li>Cambios mayores (>20% de presupuesto, cambio de evento o de audiencia) reinician el aprendizaje.</li>\n</ul>\n\n<div class=\"pagination\">\n  <a href=\"#/gestion-campanas\" data-route=\"gestion-campanas\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Gestión de campañas</span>\n  </a>\n  <a class=\"next\" href=\"#/formatos-anuncios\" data-route=\"formatos-anuncios\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Formatos de anuncio</span>\n  </a>\n</div>\n","formatos-anuncios":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Gestión de campañas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Formatos</span>\n</div>\n\n<h1>Formatos de anuncio en TikTok</h1>\n<p class=\"lead\">Catálogo de formatos disponibles en la subasta auto-servicio (Ads Manager) y cuándo usar cada uno en una operación COD.</p>\n\n<h2 id=\"tabla\">Catálogo de formatos</h2>\n<table>\n  <thead><tr><th>Formato</th><th>Especificación</th><th>Uso en COD</th></tr></thead>\n  <tbody>\n    <tr><td>In-Feed Ad estándar</td><td>Video 9:16, 5–60 s, sonido obligatorio</td><td>Caballo de batalla. 90% de la inversión.</td></tr>\n    <tr><td>Spark Ad</td><td>Anuncio basado en post orgánico (propio o de creador con código)</td><td>Cuando se trabaja con creadores y UGC.</td></tr>\n    <tr><td>Carousel (image)</td><td>Hasta 35 imágenes 9:16</td><td>Casos puntuales: catálogo, comparativas.</td></tr>\n    <tr><td>Lead Generation</td><td>Form nativo dentro de TikTok</td><td>Pruebas con landing débil; calidad de lead menor que landing externa.</td></tr>\n    <tr><td>Video Shopping Ads</td><td>Conectado a catálogo</td><td>Si se opera TikTok Shop; raro en COD puro.</td></tr>\n    <tr><td>TopView, Brand Takeover, Hashtag Challenge</td><td>Reservados</td><td>Fuera del scope de cuenta self-serve.</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"especificaciones\">Especificaciones técnicas del In-Feed</h2>\n<ul>\n  <li>Aspect ratio recomendado: 9:16 (1080 × 1920).</li>\n  <li>Duración: 9 a 60 s. Sweet spot COD: 20 a 35 s.</li>\n  <li>Codec: H.264 o H.265, MP4, MOV, MPEG.</li>\n  <li>Bitrate mínimo: 516 kbps.</li>\n  <li>Tamaño máximo: 500 MB.</li>\n  <li>Texto del anuncio (caption): hasta 100 caracteres.</li>\n  <li>Sonido: obligatorio. Anuncios sin audio limpio reducen entrega.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Zona segura.</strong> La interfaz de TikTok cubre los bordes superior e inferior del video. Mantener texto y elementos clave a 150 px del borde superior y 480 px del borde inferior para evitar tapados por CTA, descripción del anuncio y barra de navegación.</p>\n  </div>\n</div>\n\n<h2 id=\"spark\">Spark Ads</h2>\n<p>El Spark Ad permite usar un post orgánico (de la propia marca o de un creador autorizado) como anuncio. Diferencias frente al In-Feed estándar:</p>\n<ul>\n  <li>El video conserva likes, comentarios y shares acumulados.</li>\n  <li>El CTA dirige a la landing; el perfil sigue siendo el del creador o marca original.</li>\n  <li>Suele rendir mejor en CTR y watch time porque se percibe como contenido nativo.</li>\n  <li>Requiere código de autorización del creador, válido por 7, 30, 60, 90 o 365 días.</li>\n</ul>\n\n<h2 id=\"seleccion\">Cómo elegir formato</h2>\n<ol>\n  <li>Si hay UGC y creadores activos, priorizar Spark Ads para creativos top.</li>\n  <li>Cuando no hay UGC, In-Feed estándar con producción interna o stock licenciado.</li>\n  <li>Evitar Carousel salvo que el producto tenga variantes muy visuales.</li>\n  <li>Reservar Lead Gen nativo solo cuando la landing tiene problemas técnicos o de carga.</li>\n</ol>\n\n<div class=\"pagination\">\n  <a href=\"#/fundamentos\" data-route=\"fundamentos\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Cómo funciona TikTok Ads</span>\n  </a>\n  <a class=\"next\" href=\"#/estructura-campanas\" data-route=\"estructura-campanas\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Estructura de campañas</span>\n  </a>\n</div>\n","estructura-campanas":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Gestión de campañas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Estructura</span>\n</div>\n\n<h1>Estructura de campañas para COD</h1>\n<p class=\"lead\">Plantilla de estructura que aplicamos por defecto en cuentas COD. Es punto de partida, no dogma: se ajusta al volumen de creativos disponibles, antigüedad de la cuenta y estabilidad de KPIs.</p>\n\n<h2 id=\"plantilla\">Plantilla por defecto</h2>\n<table>\n  <thead><tr><th>Capa</th><th>Naming</th><th>Función</th></tr></thead>\n  <tbody>\n    <tr><td>Campaña — Testing</td><td>TST_{producto}_{mes}</td><td>Probar creativos nuevos a presupuesto controlado</td></tr>\n    <tr><td>Campaña — Escala</td><td>SCL_{producto}_{mes}</td><td>Mover los creativos ganadores a presupuesto alto</td></tr>\n    <tr><td>Campaña — Retargeting</td><td>RTG_{producto}</td><td>Remarketing a viewers de video y visitantes de landing</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"testing\">Capa de testing</h2>\n<ul>\n  <li>Modalidad ABO (presupuesto en ad group).</li>\n  <li>3 a 5 ad groups, mismo evento de optimización, audiencias amplias diferenciadas (broad, interés A, interés B, lookalike 1%, lookalike custom audience de buenos pagadores).</li>\n  <li>3 creativos por ad group, todos nuevos.</li>\n  <li>Presupuesto inicial: 3 a 5 veces el CPL objetivo, por ad group.</li>\n  <li>Ventana de evaluación: 3 días o 50 conversiones, lo que ocurra primero.</li>\n</ul>\n\n<h2 id=\"escala\">Capa de escala</h2>\n<ul>\n  <li>Modalidad CBO.</li>\n  <li>1 a 2 ad groups con audiencias amplias o lookalikes maduros.</li>\n  <li>Solo creativos que superaron testing (CPL ≤ objetivo y delivery rate ≥ 55% al cruzar con cobranza).</li>\n  <li>Escalado vertical: incremento de 20% al presupuesto cada 3 días si los KPIs se mantienen.</li>\n  <li>Escalado horizontal: duplicar campaña con la misma estructura cuando la original satura.</li>\n</ul>\n\n<h2 id=\"retargeting\">Capa de retargeting</h2>\n<ul>\n  <li>Audiencia: viewers 75% del video últimos 30 días + visitantes de landing últimos 14 días.</li>\n  <li>Excluir compradores recientes y leads ya cobrados.</li>\n  <li>Creativo: oferta concreta (descuento, bonus, urgencia limitada).</li>\n  <li>Presupuesto: 10 a 20% del total de la cuenta.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Naming consistente.</strong> Mantener el patrón {tipo}_{producto}_{audiencia}_{creativo}_{mes} en cada nivel acelera el reporting y el análisis posterior. Una cuenta sin naming consistente es ilegible al mes 3.</p>\n  </div>\n</div>\n\n<h2 id=\"evento\">Evento de optimización</h2>\n<p>Tres opciones, en orden creciente de calidad de señal:</p>\n<ol>\n  <li><strong>Lead / Form Submit.</strong> Volumen alto, calidad baja. Útil para arrancar pixel sin histórico.</li>\n  <li><strong>CompleteRegistration server-side.</strong> Disparado por CAPI cuando el lead se confirma por call center. Calidad media-alta.</li>\n  <li><strong>CompletePayment server-side con valor real.</strong> Disparado cuando el pedido se entrega y se cobra. Calidad máxima. Requiere volumen mínimo (~50 entregas/semana) para que el algoritmo aprenda.</li>\n</ol>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Migración de evento.</strong> Cuando una cuenta acumula volumen suficiente, recomendamos migrar de Lead a CompleteRegistration y, eventualmente, a CompletePayment. Cada migración reinicia el aprendizaje, así que se hace en momentos de baja presión comercial.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/formatos-anuncios\" data-route=\"formatos-anuncios\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Formatos de anuncio</span>\n  </a>\n  <a class=\"next\" href=\"#/pixel-capi\" data-route=\"pixel-capi\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Pixel y CAPI</span>\n  </a>\n</div>\n","pixel-capi":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Gestión de campañas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Pixel y CAPI</span>\n</div>\n\n<h1>Pixel y Conversions API en COD</h1>\n<p class=\"lead\">El pixel mide eventos del navegador. La Conversions API (CAPI) envía eventos desde el servidor. En COD ambos son necesarios: el pixel cubre el lead inicial y CAPI cubre la confirmación y la entrega real.</p>\n\n<h2 id=\"instalacion\">Instalación del pixel</h2>\n<ol>\n  <li>Crear el pixel desde el Events Manager de TikTok dentro del Business Center.</li>\n  <li>Verificar el dominio (registro DNS TXT) antes de activar tráfico pago.</li>\n  <li>Instalar el pixel en la landing: vía Tag Manager si la landing es propia, vía app oficial si la plataforma lo permite.</li>\n  <li>Disparar al menos los eventos: <code>PageView</code>, <code>ViewContent</code>, <code>Lead</code>.</li>\n  <li>Validar en TikTok Pixel Helper que cada evento se reciba sin duplicación.</li>\n</ol>\n\n<h2 id=\"eventos\">Mapa de eventos COD</h2>\n<table>\n  <thead><tr><th>Evento</th><th>Disparado por</th><th>Origen</th><th>Significado en COD</th></tr></thead>\n  <tbody>\n    <tr><td>PageView</td><td>Carga de landing</td><td>Pixel (browser)</td><td>El usuario llegó</td></tr>\n    <tr><td>ViewContent</td><td>Scroll o tiempo en página</td><td>Pixel</td><td>Engagement con el producto</td></tr>\n    <tr><td>Lead</td><td>Submit del formulario</td><td>Pixel + CAPI</td><td>Lead capturado, sin validar</td></tr>\n    <tr><td>CompleteRegistration</td><td>Confirmación por call center / WhatsApp</td><td>CAPI server-side</td><td>Lead validado, pedido aceptado</td></tr>\n    <tr><td>CompletePayment</td><td>Entrega y cobro confirmados</td><td>CAPI server-side</td><td>Venta cobrada, valor real</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>El truco COD.</strong> Lead es un evento ruidoso (incluye fakes, errores, no contactables). CompleteRegistration limpia esa señal. CompletePayment con valor real es la señal de oro: enseña al algoritmo a buscar usuarios que terminan pagando, no solo dejando datos.</p>\n  </div>\n</div>\n\n<h2 id=\"capi\">Implementación de CAPI</h2>\n<p>CAPI requiere una integración server-to-server. Tres rutas habituales:</p>\n<ul>\n  <li><strong>CRM o plataforma COD propia.</strong> Disparar webhook a TikTok Events API cuando cambia el estado del pedido.</li>\n  <li><strong>Sheets + Apps Script.</strong> Para anunciantes sin stack técnico, programamos un flujo que lee la liquidación del courier y envía eventos diariamente.</li>\n  <li><strong>Tag Manager server-side.</strong> Cuando hay GTM Server Container, se canaliza CAPI por ahí.</li>\n</ul>\n\n<h2 id=\"deduplicacion\">Deduplicación pixel/CAPI</h2>\n<p>Cuando el mismo evento se envía por pixel y CAPI, debe deduplicarse usando <code>event_id</code> y <code>event_time</code> idénticos en ambos lados. Sin deduplicación, TikTok cuenta dos conversiones por cada evento real.</p>\n<pre><code>{\n  \"event\": \"Lead\",\n  \"event_id\": \"lead_2026_05_05_001\",\n  \"event_time\": 1747680000,\n  \"user\": { \"phone_number\": \"<sha256>\", \"email\": \"<sha256>\" },\n  \"properties\": { \"value\": 0, \"currency\": \"PEN\" }\n}</code></pre>\n\n<h2 id=\"datos-usuario\">Calidad del dato de usuario</h2>\n<p>TikTok pondera el match en función de los identificadores enviados. En COD recomendamos enviar como mínimo:</p>\n<ul>\n  <li><code>phone_number</code> hasheado (SHA-256, formato E.164 antes de hash).</li>\n  <li><code>email</code> hasheado, cuando esté disponible.</li>\n  <li><code>external_id</code> hasheado (id interno del CRM).</li>\n  <li><code>ip</code> y <code>user_agent</code> del request original (para CAPI server-side).</li>\n  <li><code>ttclid</code> capturado en la URL al ingresar el usuario.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Privacidad.</strong> Los datos personales se envían siempre hasheados. La landing debe declarar el uso de cookies y publicidad en su política de privacidad. En jurisdicciones con consentimiento explícito (UE, Brasil), se respeta el opt-in.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/estructura-campanas\" data-route=\"estructura-campanas\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Estructura de campañas</span>\n  </a>\n  <a class=\"next\" href=\"#/escalado\" data-route=\"escalado\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Escalado</span>\n  </a>\n</div>\n","escalado":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Gestión de campañas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Escalado</span>\n</div>\n\n<h1>Estrategia de escalado</h1>\n<p class=\"lead\">El escalado en COD no es solo \"subir presupuesto\". Antes de aumentar inversión hay que validar que el funnel completo aguante: confirmación, entrega, courier, atención post-venta. Esta página define cuándo y cómo escalamos.</p>\n\n<h2 id=\"condiciones\">Condiciones para escalar</h2>\n<table>\n  <thead><tr><th>Indicador</th><th>Condición mínima</th></tr></thead>\n  <tbody>\n    <tr><td>Días estables</td><td>≥ 7 días con CPL en objetivo</td></tr>\n    <tr><td>Delivery rate</td><td>≥ 55% confirmado en cobranza del último mes</td></tr>\n    <tr><td>CPA real</td><td>≤ 50% del ticket promedio</td></tr>\n    <tr><td>Stock</td><td>Inventario suficiente para 30 días al ritmo proyectado</td></tr>\n    <tr><td>Capacidad de call center</td><td>Holgura para absorber 2x el volumen actual</td></tr>\n    <tr><td>Cobertura logística</td><td>Courier sin saturación reportada</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>El cuello de botella suele ser logístico.</strong> Hemos visto cuentas con CPL excelente que se vuelven inviables al duplicar inversión porque el courier no entrega a tiempo y el delivery rate cae 15 puntos. El escalado se planifica con courier y call center, no solo con TikTok.</p>\n  </div>\n</div>\n\n<h2 id=\"vertical\">Escalado vertical</h2>\n<p>Aumentar presupuesto en campañas o ad groups existentes. Pasos:</p>\n<ol>\n  <li>Incrementar presupuesto 20% sobre el día anterior.</li>\n  <li>Esperar 48 a 72 horas. Verificar que CPL no se desvíe más del 15%.</li>\n  <li>Si se mantiene, repetir. Si se desvía, retroceder al presupuesto anterior y esperar 2 días.</li>\n  <li>Evitar saltos mayores al 30% en menos de 24 horas: dispara reaprendizaje.</li>\n</ol>\n\n<h2 id=\"horizontal\">Escalado horizontal</h2>\n<p>Duplicar la campaña ganadora con leves variaciones. Útil cuando la audiencia satura. Variaciones recomendadas:</p>\n<ul>\n  <li>Mismo creativo, lookalike de distinto tamaño (1%, 3%, 5%).</li>\n  <li>Mismo creativo, distinto orden de hooks.</li>\n  <li>Mismo evento, distinto modo de presupuesto (ABO vs CBO).</li>\n  <li>Mismo creativo, distinta ventana de optimización (7 días click vs 1 día click).</li>\n</ul>\n\n<h2 id=\"creativos\">Renovación creativa para escalar</h2>\n<p>Una cuenta no escala sin renovación de creativos. Ratio operativo: por cada 10% adicional de presupuesto sostenido, ingresar al menos 2 creativos nuevos por semana. Sin renovación creativa, la fatiga aparece a los 14 días y el CPL crece 30 a 60% sobre el de testing.</p>\n\n<h2 id=\"senales-fatiga\">Señales de fatiga</h2>\n<ul>\n  <li>Frecuencia por usuario superior a 3 en 7 días.</li>\n  <li>CTR cae más de 25% en una semana.</li>\n  <li>CPL sube y CVR landing se mantiene (señal de fatiga arriba del funnel).</li>\n  <li>Aumento de comentarios negativos en el anuncio.</li>\n</ul>\n\n<h2 id=\"desescalado\">Desescalado</h2>\n<p>Cuando los KPIs se rompen, retroceder en el orden inverso al que se escaló: pausar primero las duplicadas más recientes, luego reducir presupuesto en escalonas de 20%. No bajar drásticamente: un recorte mayor al 40% en un día también dispara reaprendizaje.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/pixel-capi\" data-route=\"pixel-capi\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Pixel y CAPI</span>\n  </a>\n  <a class=\"next\" href=\"#/creativos-cod\" data-route=\"creativos-cod\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Creativos COD</span>\n  </a>\n</div>\n","creativos-cod":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos COD</span>\n</div>\n\n<h1>Creativos para ecommerce COD</h1>\n<p class=\"lead\">El creativo es el principal driver de rendimiento en TikTok. En COD, además, el creativo determina la calidad del lead: un anuncio engañoso atrae usuarios que no responden la llamada de confirmación. Esta página define los principios y formatos que aplicamos.</p>\n\n<h2 id=\"principios\">Principios de creativo COD</h2>\n<ul>\n  <li><strong>Producto visible en los primeros 2 segundos.</strong> Sin producto en pantalla pronto, el watch time se desploma.</li>\n  <li><strong>Demostración real, no animación.</strong> El usuario COD necesita ver el producto en uso, en contexto cotidiano.</li>\n  <li><strong>Precio y oferta explícitos.</strong> Mostrar precio antes del segundo 15 reduce leads no calificados.</li>\n  <li><strong>CTA claro hacia formulario.</strong> \"Pide aquí, paga al recibir\" baja la fricción mejor que \"Compra ahora\".</li>\n  <li><strong>Audio narrado.</strong> Voz humana, no TTS robótico. Aumenta retención y credibilidad.</li>\n</ul>\n\n<h2 id=\"estructura\">Estructura del video (20–35 s)</h2>\n<table>\n  <thead><tr><th>Segmento</th><th>Duración</th><th>Función</th></tr></thead>\n  <tbody>\n    <tr><td>Hook</td><td>0–3 s</td><td>Capturar atención. Pregunta, situación reconocible o claim sorprendente.</td></tr>\n    <tr><td>Problema</td><td>3–8 s</td><td>Articular el dolor que el producto resuelve.</td></tr>\n    <tr><td>Producto y demo</td><td>8–18 s</td><td>Mostrar el producto en uso, beneficios concretos.</td></tr>\n    <tr><td>Prueba social</td><td>18–25 s</td><td>Testimonios, antes/después, reseñas.</td></tr>\n    <tr><td>Oferta y CTA</td><td>25–35 s</td><td>Precio, condiciones COD (\"paga al recibir\"), call to action.</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Coincidencia anuncio-landing.</strong> El precio, la oferta y el bonus que aparecen en el video tienen que coincidir exactamente con la landing. Discrepancias generan rechazo en revisión y aumentan rebote.</p>\n  </div>\n</div>\n\n<h2 id=\"formatos\">Formatos creativos que rinden en COD</h2>\n<ul>\n  <li><strong>UGC review.</strong> Persona común testeando el producto, lenguaje cotidiano, sin producción artificial.</li>\n  <li><strong>Demostración antes/después.</strong> Funciona para salud, belleza, hogar.</li>\n  <li><strong>Talking head con producto en mano.</strong> Especialmente potente con creadores hispanohablantes.</li>\n  <li><strong>Storytime.</strong> Caso real (\"le compré esto a mi mamá y…\"). Alta retención.</li>\n  <li><strong>Comparativa.</strong> \"Yo antes usaba X, ahora uso Y\". Funciona si la diferencia es visible.</li>\n</ul>\n\n<h2 id=\"evitar\">Qué evitar</h2>\n<ul>\n  <li>Promesas absolutas (\"garantizado\", \"100% efectivo\", \"cura\").</li>\n  <li>Antes/después médico sensible sin sustento.</li>\n  <li>Música con copyright sin licencia comercial.</li>\n  <li>Voiceover sintético notorio.</li>\n  <li>Subtítulos cubiertos por la UI de TikTok (zona inferior).</li>\n  <li>CTAs que prometen algo distinto a lo que entrega la landing.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Ratio de rotación.</strong> Un creativo top dura entre 7 y 21 días antes de fatigar. La cadencia mínima recomendada para una cuenta en escala es 8 a 12 creativos nuevos por mes, distribuidos en hooks, demos y testimoniales.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/escalado\" data-route=\"escalado\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Escalado</span>\n  </a>\n  <a class=\"next\" href=\"#/produccion-ugc\" data-route=\"produccion-ugc\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Producción de UGC</span>\n  </a>\n</div>\n","produccion-ugc":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Producción UGC</span>\n</div>\n\n<h1>Cómo producir creativos UGC para TikTok Ads</h1>\n<p class=\"lead\">UGC (User Generated Content) es contenido grabado por una persona común usando el producto, sin estética publicitaria. Es el formato que mejor rinde en TikTok Ads para ecommerce COD: aparece nativo en el feed, baja la fricción del clic y mejora la calidad del lead.</p>\n\n<h2 id=\"por-que-ugc\">Por qué UGC supera al video de marca en COD</h2>\n<ul>\n  <li>El usuario percibe el video como contenido orgánico, no como anuncio. Aumenta el watch time entre 30% y 70% sobre piezas de marca.</li>\n  <li>El testimonio en primera persona transmite credibilidad sin tener que sustentar claims con material legal o médico.</li>\n  <li>Los costos de producción son entre 5 y 15 veces más bajos que un comercial de marca.</li>\n  <li>Permite iterar rápido: 8 a 12 creativos al mes son sostenibles, contra 1 o 2 con producción tradicional.</li>\n</ul>\n\n<h2 id=\"tipos\">Tipos de UGC que rinden</h2>\n<table>\n  <thead><tr><th>Formato</th><th>Estructura</th><th>Cuándo usarlo</th></tr></thead>\n  <tbody>\n    <tr><td>Review honesto</td><td>Persona muestra el producto, lo prueba, da opinión</td><td>Productos con resultado visible</td></tr>\n    <tr><td>Storytime</td><td>\"Te cuento qué pasó cuando usé esto\"</td><td>Categorías personales: salud, belleza, hogar</td></tr>\n    <tr><td>Day-in-the-life</td><td>Producto integrado en rutina diaria</td><td>Productos de uso frecuente</td></tr>\n    <tr><td>Antes/después</td><td>Documentación de resultado en el tiempo</td><td>Belleza, fitness, cuidado personal</td></tr>\n    <tr><td>Comparativa</td><td>\"Yo usaba X, ahora uso Y\"</td><td>Categorías saturadas</td></tr>\n    <tr><td>POV</td><td>Cámara en primera persona como si fuera el usuario</td><td>Productos manipulables, demos</td></tr>\n    <tr><td>Reacción</td><td>Persona abre el pedido, prueba en cámara</td><td>Cuentas con buena experiencia de unboxing</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Regla operativa.</strong> Producimos siempre dos formatos por creador: review largo (25 a 35 s) y review corto (12 a 18 s). El corto suele rendir mejor en testing; el largo escala mejor en audiencias amplias.</p>\n  </div>\n</div>\n\n<h2 id=\"brief\">Brief estándar para creador UGC</h2>\n<p>El brief que entregamos al creador tiene siete secciones obligatorias. Sin alguna de ellas el video llega \"publicitario\" y baja el rendimiento.</p>\n\n<table>\n  <thead><tr><th>Sección</th><th>Qué incluye</th></tr></thead>\n  <tbody>\n    <tr><td>Producto</td><td>Nombre, foto, beneficios concretos, precio, oferta vigente</td></tr>\n    <tr><td>Audiencia</td><td>Perfil demográfico y problema que resuelve el producto</td></tr>\n    <tr><td>Tono</td><td>Cómo hablar: amigo, mamá, vecina, experto. Nunca \"vendedor\"</td></tr>\n    <tr><td>Hooks sugeridos</td><td>3 a 5 frases distintas para los primeros 3 segundos</td></tr>\n    <tr><td>Puntos a mencionar</td><td>Beneficios prioritarios, en qué orden</td></tr>\n    <tr><td>Restricciones</td><td>Claims prohibidos, palabras a evitar, política de TikTok</td></tr>\n    <tr><td>Especificaciones técnicas</td><td>9:16, audio limpio, sin marca de agua, duración objetivo</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"reclutamiento\">Reclutamiento de creadores</h2>\n<p>Tres canales que usamos por orden de eficiencia:</p>\n<ol>\n  <li><strong>Clientes reales del producto.</strong> Pedirles un video a cambio de un descuento o un envío gratis. Es la fuente más auténtica.</li>\n  <li><strong>Plataformas UGC pagadas.</strong> Servicios como JoinBrands, Insense o Billo. Costo por video: USD 80 a USD 250 según país y nivel del creador.</li>\n  <li><strong>Microcreadores locales.</strong> Cuentas de TikTok con 1k a 30k seguidores. Pago directo, derechos comerciales por escrito.</li>\n</ol>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Derechos de uso.</strong> El brief debe incluir cesión de derechos de imagen y voz para uso publicitario por mínimo 12 meses. Sin esa cesión el video no puede usarse en Spark Ads ni distribuirse pagado. La ausencia de este documento es la causa #1 de pérdida de creativos top.</p>\n  </div>\n</div>\n\n<h2 id=\"errores\">Errores frecuentes en briefs</h2>\n<ul>\n  <li>Pedir un guion exacto palabra por palabra. El creador no suena natural.</li>\n  <li>Llenar el brief con frases publicitarias (\"nuestra fórmula revolucionaria\").</li>\n  <li>No mencionar el modelo COD. El video no incluye \"paga al recibir\" y la calidad de lead baja.</li>\n  <li>Pedir 5 productos en un mismo video. Diluye el mensaje y baja la conversión.</li>\n  <li>No definir el hook. El creador improvisa los primeros 3 segundos y el video no engancha.</li>\n</ul>\n\n<div class=\"pagination\">\n  <a href=\"#/creativos-cod\" data-route=\"creativos-cod\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Creativos COD</span>\n  </a>\n  <a class=\"next\" href=\"#/creativos-ia\" data-route=\"creativos-ia\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Creativos con IA</span>\n  </a>\n</div>\n","creativos-ia":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>IA</span>\n</div>\n\n<h1>Creativos con inteligencia artificial</h1>\n<p class=\"lead\">La IA generativa redujo el costo de producción creativa de manera estructural. Hoy es viable mantener una cuenta con 20 a 40 creativos nuevos por mes combinando UGC humano y piezas generadas con IA. Esta página describe cómo lo hacemos sin que el video se sienta artificial.</p>\n\n<h2 id=\"cuando-usar\">Cuándo usar IA y cuándo no</h2>\n<table>\n  <thead><tr><th>Caso</th><th>Recomendación</th></tr></thead>\n  <tbody>\n    <tr><td>Hooks adicionales sobre un video ganador</td><td>IA: voz clonada o avatar, ahorra reshoots</td></tr>\n    <tr><td>Demostración del producto</td><td>UGC humano: la IA aún falla en mostrar el producto en uso real</td></tr>\n    <tr><td>Variaciones de idioma o acento</td><td>IA: traducción y voiceover localizado</td></tr>\n    <tr><td>B-roll y planos de contexto</td><td>IA: generación de planos cortos sin actor</td></tr>\n    <tr><td>Testimonio principal de la pieza</td><td>UGC humano: un testimonio IA pierde credibilidad y baja la calidad del lead</td></tr>\n    <tr><td>Antes/después médico o de salud</td><td>UGC humano con consentimiento: las imágenes IA pueden ser rechazadas por TikTok</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Principio de uso.</strong> La IA se usa para escalar, no para reemplazar. Una cuenta sostenible combina 60% a 70% creativos con humanos reales y 30% a 40% piezas asistidas por IA. Cuentas 100% IA tienden a perder rendimiento entre la semana 4 y 8 cuando el algoritmo y el usuario detectan el patrón.</p>\n  </div>\n</div>\n\n<h2 id=\"herramientas\">Herramientas que aplicamos</h2>\n<table>\n  <thead><tr><th>Categoría</th><th>Herramientas habituales</th><th>Uso operativo</th></tr></thead>\n  <tbody>\n    <tr><td>Avatares parlantes</td><td>HeyGen, Synthesia, Captions AI</td><td>Talking head sintético para hooks o variaciones</td></tr>\n    <tr><td>Voz clonada</td><td>ElevenLabs</td><td>Reemplazar voiceover con la voz del creador original</td></tr>\n    <tr><td>Generación de video</td><td>Runway, Sora, Kling, Pika</td><td>B-roll, planos contextuales, escenas cortas</td></tr>\n    <tr><td>Imagen para flyers</td><td>Midjourney, Flux, ChatGPT image, Nano Banana</td><td>Flyers estáticos, fondos, mocks de producto</td></tr>\n    <tr><td>Edición asistida</td><td>CapCut, Descript, Opus Clip</td><td>Cortes automáticos, subtítulos, reformateo 9:16</td></tr>\n    <tr><td>Escritura de guion</td><td>Claude, ChatGPT</td><td>Hooks alternativos, variaciones de copy, traducción</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"flujo\">Flujo estándar de producción asistida por IA</h2>\n<ol>\n  <li><strong>Creativo base.</strong> Grabar un UGC humano de buena calidad: testimonio + demo + cierre.</li>\n  <li><strong>Multiplicación de hooks.</strong> Generar 5 hooks alternativos con IA (avatar o voz) y pegarlos al cuerpo del video original.</li>\n  <li><strong>Localización.</strong> Si la cuenta opera varios países, clonar voz para acentos: peruano, mexicano, colombiano.</li>\n  <li><strong>B-roll.</strong> Generar 3 a 6 planos cortos contextuales que se intercalan en el video.</li>\n  <li><strong>Subtítulos.</strong> Auto-subtitulado con CapCut o similar, revisión humana de errores y palabras clave.</li>\n  <li><strong>Master final.</strong> Exportar 9:16, 1080×1920, audio normalizado, sin marca de agua.</li>\n</ol>\n\n<h2 id=\"prompts\">Plantilla de prompt para guion IA</h2>\n<pre><code>Producto: [nombre]\nBeneficio principal: [resultado concreto]\nAudiencia: [perfil específico]\nTono: testimonio en primera persona, lenguaje hablado peruano\nRestricciones: no usar las palabras [milagroso, garantizado, cura]\nMencionar: paga al recibir, envío 24-72 h Lima\n\nGenerar 5 hooks de 3 segundos cada uno, distintos entre sí:\n1. Pregunta directa\n2. Situación reconocible\n3. Confesión personal\n4. Antes/después\n5. Curiosidad\n\nDevolver en bloques separados, sin numeración decorativa.</code></pre>\n\n<h2 id=\"riesgos\">Riesgos y políticas de TikTok</h2>\n<ul>\n  <li><strong>Disclosure de contenido sintético.</strong> TikTok exige declarar cuando un video es generado por IA o contiene elementos sintéticos significativos. Marcamos el toggle correspondiente al subir.</li>\n  <li><strong>Suplantación de identidad.</strong> No clonar voces ni rostros de personas sin consentimiento explícito por escrito. Es causa de bloqueo de cuenta.</li>\n  <li><strong>Antes/después médico generado.</strong> Imágenes médicas sintéticas se consideran engañosas. Solo se usan UGC reales con consentimiento.</li>\n  <li><strong>Audio musical.</strong> La música generada por IA debe tener licencia comercial. La biblioteca de TikTok Ads Manager es la opción segura.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Detección de IA por TikTok.</strong> La plataforma identifica progresivamente avatares y voces sintéticas. La consecuencia más común es entrega reducida, no bloqueo. Por eso operamos siempre con base humana y la IA queda como capa de variación, nunca como pilar único de la cuenta.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/produccion-ugc\" data-route=\"produccion-ugc\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Producción UGC</span>\n  </a>\n  <a class=\"next\" href=\"#/briefs-creativos\" data-route=\"briefs-creativos\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Briefs creativos</span>\n  </a>\n</div>\n","briefs-creativos":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Briefs</span>\n</div>\n\n<h1>Briefs creativos: plantilla y proceso</h1>\n<p class=\"lead\">El brief es el documento que traduce la estrategia comercial en instrucciones para el creador, editor o herramienta de IA. Un brief débil produce videos genéricos; un brief sobreescrito produce videos rígidos. Esta página define la plantilla intermedia que aplicamos.</p>\n\n<h2 id=\"plantilla\">Plantilla de brief — campos obligatorios</h2>\n<table>\n  <thead><tr><th>Campo</th><th>Detalle</th><th>Extensión sugerida</th></tr></thead>\n  <tbody>\n    <tr><td>Código del brief</td><td>BRF-{producto}-{mes}-{n}</td><td>1 línea</td></tr>\n    <tr><td>Producto</td><td>Nombre, SKU, precio, oferta, USP</td><td>3 a 5 líneas</td></tr>\n    <tr><td>Objetivo del video</td><td>Lead, retargeting, recordación, escala</td><td>1 línea</td></tr>\n    <tr><td>Audiencia</td><td>Perfil demográfico, problema, momento de uso</td><td>3 líneas</td></tr>\n    <tr><td>Mensaje principal</td><td>Una sola idea, en menos de 12 palabras</td><td>1 línea</td></tr>\n    <tr><td>Hooks (3 a 5)</td><td>Frases para los primeros 3 segundos</td><td>3 a 5 líneas</td></tr>\n    <tr><td>Estructura</td><td>Hook → problema → demo → testimonio → CTA</td><td>5 líneas</td></tr>\n    <tr><td>Mandatorios</td><td>Claims a incluir, oferta, condiciones COD</td><td>3 líneas</td></tr>\n    <tr><td>Prohibiciones</td><td>Palabras y claims que TikTok rechaza para la categoría</td><td>3 líneas</td></tr>\n    <tr><td>Referencias</td><td>2 a 4 videos similares que rinden bien</td><td>Links</td></tr>\n    <tr><td>Specs técnicas</td><td>9:16, 1080×1920, 20 a 35 s, audio limpio</td><td>1 línea</td></tr>\n    <tr><td>Entregables</td><td>Master + variantes, fecha tope</td><td>2 líneas</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Una idea por brief.</strong> Cada brief vehicula un solo ángulo de mensaje. Si el producto se puede comunicar de tres ángulos (precio, conveniencia, resultado), se hacen tres briefs distintos, no un brief con tres mensajes.</p>\n  </div>\n</div>\n\n<h2 id=\"proceso\">Proceso de aprobación</h2>\n<ol>\n  <li><strong>Strategist.</strong> Redacta el brief a partir de aprendizajes del mes anterior y del calendario comercial.</li>\n  <li><strong>Account manager.</strong> Lo valida con el cliente: oferta, claims, fecha de salida.</li>\n  <li><strong>Creador o editor.</strong> Recibe el brief, hace 1 ronda de preguntas si quedan dudas.</li>\n  <li><strong>Revisión interna.</strong> Antes de subir, el strategist revisa cumplimiento de hooks, estructura y CTA.</li>\n  <li><strong>Subida y testing.</strong> Se publica con naming consistente y entra a la matriz de testing.</li>\n</ol>\n\n<h2 id=\"ejemplo\">Ejemplo de brief llenado</h2>\n<pre><code>BRF-COL-001 — Colágeno Holistic\nObjetivo: lead, testing\nAudiencia: mujeres 35-55, Lima, preocupación por arrugas y cabello\nMensaje principal: Resultados visibles en 30 días, paga al recibir\nHooks:\n  1. \"A los 40 mi piel cambió, hasta que probé esto\"\n  2. \"Mi mamá dejó de gastar en cremas caras desde que toma esto\"\n  3. \"30 días de esto y mira lo que pasó\"\nEstructura:\n  0-3 hook\n  3-10 problema (arrugas, cansancio, cabello)\n  10-22 demo del producto + cómo se toma\n  22-30 testimonio personal\n  30-35 oferta + \"paga al recibir, llega en 24h Lima\"\nMandatorios: precio S/ 89, envío 24-72h, paga al recibir\nProhibiciones: \"cura\", \"milagroso\", \"garantizado\", reclamos médicos\nReferencias: [link 1], [link 2]\nSpecs: 9:16, 1080x1920, 28-32s, voz natural peruana, sin música licenciada</code></pre>\n\n<h2 id=\"banco\">Banco de briefs y aprendizaje</h2>\n<p>Cada brief usado se archiva con métricas del creativo resultante: CPL, CTR, tasa de confirmación, tasa de entrega. Trimestralmente se cruzan briefs de alto rendimiento para identificar patrones reutilizables: qué hooks repiten, qué estructuras escalan mejor, qué mandatorios bajan el rendimiento cuando se omiten.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/creativos-ia\" data-route=\"creativos-ia\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Creativos con IA</span>\n  </a>\n  <a class=\"next\" href=\"#/hooks\" data-route=\"hooks\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Hooks y guiones</span>\n  </a>\n</div>\n","hooks":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Hooks</span>\n</div>\n\n<h1>Hooks y guiones</h1>\n<p class=\"lead\">El hook decide si el video se ve o se desliza. En COD, además, filtra qué tipo de usuario llega al formulario. Un hook genérico atrae lead barato pero baja calidad; un hook específico levanta CPL pero sube tasa de confirmación.</p>\n\n<h2 id=\"categorias\">Categorías de hook</h2>\n<table>\n  <thead><tr><th>Tipo</th><th>Patrón</th><th>Cuándo usarlo</th></tr></thead>\n  <tbody>\n    <tr><td>Pregunta directa</td><td>\"¿Tienes [problema X]?\"</td><td>Audiencia amplia, segmentación broad</td></tr>\n    <tr><td>Situación cotidiana</td><td>\"Esto le pasa a todas las que…\"</td><td>Identificación demográfica clara</td></tr>\n    <tr><td>Antes/después</td><td>\"Mira lo que pasó en 14 días\"</td><td>Productos con resultado visible</td></tr>\n    <tr><td>Confesión</td><td>\"Llevo 3 meses usando esto y…\"</td><td>UGC con creador con autoridad</td></tr>\n    <tr><td>Curiosidad</td><td>\"Nadie te dice esto sobre [categoría]\"</td><td>Productos nuevos o desconocidos</td></tr>\n    <tr><td>Oferta directa</td><td>\"Lo conseguí por [precio]\"</td><td>Cuentas maduras con audiencia caliente</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"estructura-guion\">Estructura del guion</h2>\n<pre><code>[0:00–0:03]  Hook visual + audio\n[0:03–0:08]  Contexto del problema\n[0:08–0:18]  Producto en uso, beneficios concretos\n[0:18–0:25]  Prueba social o demostración\n[0:25–0:32]  Oferta + CTA + condiciones COD\n[0:32–0:35]  Cierre con tagline</code></pre>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Hook scrollable.</strong> Probar siempre 3 a 5 hooks distintos sobre el mismo cuerpo del video. Es la variación más eficiente: cambia los primeros 3 segundos sin reproducir todo el video.</p>\n  </div>\n</div>\n\n<h2 id=\"reglas\">Reglas de redacción</h2>\n<ul>\n  <li>Frases cortas, máximo 8 palabras por línea de subtítulo.</li>\n  <li>Vocabulario hablado, no publicitario.</li>\n  <li>Evitar adjetivos absolutos (\"increíble\", \"milagroso\").</li>\n  <li>Mencionar siempre el modelo COD: \"paga cuando llegue\", \"envío contra entrega\".</li>\n  <li>Cierre con CTA específico: \"deja tus datos y te llamamos hoy\", no \"haz clic aquí\".</li>\n</ul>\n\n<h2 id=\"iteracion\">Iteración rápida</h2>\n<p>Producir hooks más rápido que videos completos es clave para sostener escala. Operativamente:</p>\n<ol>\n  <li>Identificar el cuerpo (segundo 3 al 35) del creativo ganador.</li>\n  <li>Generar 5 hooks alternativos para los primeros 3 segundos.</li>\n  <li>Editar 5 versiones distintas conservando el mismo cuerpo.</li>\n  <li>Probar las 5 versiones en testing y promover la ganadora.</li>\n</ol>\n\n<div class=\"pagination\">\n  <a href=\"#/briefs-creativos\" data-route=\"briefs-creativos\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Briefs creativos</span>\n  </a>\n  <a class=\"next\" href=\"#/testing-creativos\" data-route=\"testing-creativos\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Testing creativo</span>\n  </a>\n</div>\n","testing-creativos":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Creativos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Testing</span>\n</div>\n\n<h1>Matriz de testing creativo</h1>\n<p class=\"lead\">Sin un proceso de testing definido, una cuenta de TikTok consume creativos sin extraer aprendizaje. Esta página describe la matriz que aplicamos por defecto en cuentas COD.</p>\n\n<h2 id=\"objetivo\">Objetivo del testing</h2>\n<p>Validar tres dimensiones independientes: hook, oferta y formato. Aislar cada variable evita atribuir el éxito de un anuncio a la combinación equivocada y permite reusar el ganador en variaciones futuras.</p>\n\n<h2 id=\"matriz\">Matriz tipo</h2>\n<table>\n  <thead><tr><th>Variable</th><th>Niveles a probar</th><th>Mantener fijo</th></tr></thead>\n  <tbody>\n    <tr><td>Hook</td><td>3 a 5 hooks</td><td>Cuerpo del video, oferta, CTA</td></tr>\n    <tr><td>Oferta</td><td>2 a 3 ofertas (precio único, 2x1, descuento)</td><td>Hook ganador, formato</td></tr>\n    <tr><td>Formato</td><td>UGC vs producción, talking head vs demo</td><td>Hook y oferta ganadores</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"presupuesto\">Presupuesto de testing</h2>\n<ul>\n  <li>Por creativo en testing: 3 a 5 veces el CPL objetivo.</li>\n  <li>Ventana de evaluación: 3 días o 50 conversiones del evento de optimización.</li>\n  <li>Si en ese plazo no alcanza el CPL, se pausa y queda como descartado.</li>\n  <li>Si alcanza CPL, pasa a observación 7 días para validar consistencia.</li>\n  <li>Si tras 7 días sostiene CPL ≤ objetivo, promueve a campaña de escala.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Validación COD.</strong> Un creativo no se considera ganador solo por CPL. Antes de escalar, cruzamos sus leads con la cobranza del courier para confirmar que mantiene tasa de entrega ≥ 55%. Un creativo \"barato\" que entrega 30% es peor que uno \"caro\" que entrega 70%.</p>\n  </div>\n</div>\n\n<h2 id=\"tabla-decision\">Tabla de decisión</h2>\n<table>\n  <thead><tr><th>Resultado a 3 días</th><th>Acción</th></tr></thead>\n  <tbody>\n    <tr><td>CPL ≤ objetivo, CTR ≥ 1%</td><td>Mantener; revisar a 7 días</td></tr>\n    <tr><td>CPL ≤ objetivo, CTR &lt; 1%</td><td>Sostener pero con vigilancia: hook funciona pero la entrega del algoritmo no es óptima</td></tr>\n    <tr><td>CPL 100%–130% objetivo</td><td>Mantener 2 días más, descartar si no mejora</td></tr>\n    <tr><td>CPL &gt; 130% objetivo</td><td>Descartar</td></tr>\n    <tr><td>CPL ≤ objetivo pero confirmación &lt; 50%</td><td>Revisar coincidencia anuncio-landing y calidad de lead</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"archivo\">Archivo de aprendizaje</h2>\n<p>Cada creativo testeado se registra con CPL, CTR, CVR landing, tasa de confirmación, tasa de entrega, hook, oferta y formato. El archivo se revisa quincenalmente para detectar patrones: qué hooks rinden mejor, qué tipo de creador funciona, qué oferta convierte mejor por categoría.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/hooks\" data-route=\"hooks\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Hooks</span>\n  </a>\n  <a class=\"next\" href=\"#/flyers-diseno\" data-route=\"flyers-diseno\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Diseño y flyers</span>\n  </a>\n</div>\n","flyers-diseno":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Servicios complementarios</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Diseño y flyers</span>\n</div>\n\n<h1>Diseño de creativos y flyers</h1>\n<p class=\"lead\">Servicio complementario de diseño gráfico para anunciantes que necesitan piezas estáticas o de video corto sin contratar un equipo creativo dedicado. Trabajamos sobre brief del cliente y entregamos en formato listo para publicar.</p>\n\n<h2 id=\"alcance\">Alcance del servicio</h2>\n<table>\n  <thead><tr><th>Pieza</th><th>Formato</th><th>Tiempo estándar</th></tr></thead>\n  <tbody>\n    <tr><td>Flyer estático</td><td>1080×1920 (TikTok), 1080×1350 (IG), 1080×1080 (FB)</td><td>24 a 48 h</td></tr>\n    <tr><td>Carrusel</td><td>3 a 10 slides 1080×1350</td><td>48 a 72 h</td></tr>\n    <tr><td>Video corto editado</td><td>9:16, 15 a 30 s, sobre material entregado por el cliente</td><td>72 h</td></tr>\n    <tr><td>Banner web</td><td>Cualquier ratio común</td><td>24 h</td></tr>\n    <tr><td>Logotipo y identidad básica</td><td>Logo + paleta + tipografías</td><td>5 a 7 días</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"modelo\">Modelo comercial</h2>\n<ul>\n  <li>Bolsa de horas mensual o pago por pieza.</li>\n  <li>Bolsa estándar de 20 horas: cubre alrededor de 12 a 15 piezas estáticas o 4 a 6 videos cortos.</li>\n  <li>Pago por pieza: tarifa fija publicada por categoría.</li>\n  <li>Las bolsas no consumidas en el mes vencen al cierre.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Insumos del cliente.</strong> Para piezas eficientes necesitamos brief, foto de producto en alta resolución, identidad de marca (logo en vector, paleta), referencias visuales y, en caso de video, footage o UGC ya grabado. Sin estos insumos los tiempos se duplican.</p>\n  </div>\n</div>\n\n<h2 id=\"rondas\">Rondas de revisión</h2>\n<ul>\n  <li>Cada pieza incluye 2 rondas de cambios menores (texto, color, ajustes pequeños).</li>\n  <li>Cambios mayores (concepto, layout, copy completo) se cuentan como pieza nueva.</li>\n  <li>El cliente recibe la pieza en formato JPG/PNG/MP4. Los archivos editables (PSD, AI, AEP) se entregan solo si se contrata como adicional.</li>\n</ul>\n\n<h2 id=\"produccion\">Producción de creativo en video</h2>\n<p>El servicio cubre edición sobre material existente. No incluye:</p>\n<ul>\n  <li>Filmación con creadores ni casting de UGC.</li>\n  <li>Locutación profesional (sí asistencia con voiceover IA o sintético).</li>\n  <li>Compra de stock premium o licencias musicales.</li>\n</ul>\n<p>Estos servicios pueden gestionarse aparte bajo presupuesto puntual.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/testing-creativos\" data-route=\"testing-creativos\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Testing creativo</span>\n  </a>\n  <a class=\"next\" href=\"#/consultoria\" data-route=\"consultoria\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Consultoría</span>\n  </a>\n</div>\n","consultoria":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Servicios complementarios</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Consultoría</span>\n</div>\n\n<h1>Consultoría de marketing digital</h1>\n<p class=\"lead\">Servicio de asesoría puntual para anunciantes que operan su propia cuenta o gestionan equipo interno. Pensado para resolver problemas específicos: diagnóstico de cuenta, estructura, plan de escalado, transición a CAPI, expansión a nuevos países.</p>\n\n<h2 id=\"modalidades\">Modalidades</h2>\n<table>\n  <thead><tr><th>Modalidad</th><th>Duración</th><th>Cuándo aplica</th></tr></thead>\n  <tbody>\n    <tr><td>Auditoría puntual</td><td>1 sesión, informe escrito</td><td>Cuenta con problemas y se busca diagnóstico</td></tr>\n    <tr><td>Mentoría mensual</td><td>4 sesiones de 60 min/mes</td><td>Equipo interno que necesita acompañamiento</td></tr>\n    <tr><td>Consultoría de proyecto</td><td>Alcance y plazo definidos</td><td>Lanzamiento de producto, expansión, integración</td></tr>\n    <tr><td>Sesión específica</td><td>1 hora</td><td>Problema concreto: pixel, política, escalado</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"auditoria\">Auditoría de cuenta</h2>\n<p>Revisión integral de una cuenta TikTok Ads existente. Entregables:</p>\n<ul>\n  <li>Diagnóstico de estructura de campañas, audiencias y eventos.</li>\n  <li>Revisión de pixel, CAPI, calidad de match.</li>\n  <li>Análisis del funnel COD: CPL, confirmación, entrega, CPA real.</li>\n  <li>Identificación de los 5 problemas con mayor impacto.</li>\n  <li>Plan de acción priorizado por costo y dificultad.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Acceso requerido.</strong> Para una auditoría útil necesitamos acceso de Analyst al Business Center o Ads Manager, acceso al Events Manager, exportación de cobranza del courier de los últimos 90 días y acceso de lectura al CRM o plataforma COD.</p>\n  </div>\n</div>\n\n<h2 id=\"mentoria\">Mentoría a equipo interno</h2>\n<p>Sesiones semanales con el equipo del anunciante. Cubre formación operativa, revisión de KPIs y resolución de bloqueos. Pensado para anunciantes que prefieren operar in-house pero quieren acompañamiento experto.</p>\n\n<h2 id=\"proyecto\">Consultoría de proyecto</h2>\n<p>Ejemplos de proyectos:</p>\n<ul>\n  <li>Migración de Meta a TikTok como canal principal.</li>\n  <li>Expansión de Perú a otros países LATAM.</li>\n  <li>Implementación de CAPI con valor real cobrado.</li>\n  <li>Definición de matriz creativa y plan de producción mensual.</li>\n  <li>Integración de TikTok Shop sobre operación COD existente.</li>\n</ul>\n\n<h2 id=\"modelo-comercial\">Modelo comercial</h2>\n<p>Tarifa por hora, por sesión o por proyecto cerrado, según modalidad. La consultoría es independiente del programa de suscripción y de la línea de crédito: puede contratarse sin ser cliente activo en otros servicios.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/flyers-diseno\" data-route=\"flyers-diseno\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Diseño y flyers</span>\n  </a>\n  <a class=\"next\" href=\"#/metricas-tiktok\" data-route=\"metricas-tiktok\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Métricas de TikTok Ads</span>\n  </a>\n</div>\n","metricas-tiktok":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Métricas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Glosario de métricas</span>\n</div>\n\n<h1>Métricas de TikTok Ads: glosario operativo</h1>\n<p class=\"lead\">Catálogo de métricas que aparecen en el Ads Manager de TikTok, con su definición, cómo se calculan y cómo las usamos en la operación diaria de cuentas COD.</p>\n\n<h2 id=\"entrega\">Métricas de entrega</h2>\n<table>\n  <thead><tr><th>Métrica</th><th>Definición</th><th>Uso operativo</th></tr></thead>\n  <tbody>\n    <tr><td>Impresiones</td><td>Veces que el anuncio se mostró en pantalla</td><td>Tamaño de exposición; baja prioridad</td></tr>\n    <tr><td>Alcance (Reach)</td><td>Usuarios únicos alcanzados</td><td>Saturación de audiencia</td></tr>\n    <tr><td>Frecuencia</td><td>Impresiones / Alcance</td><td>Señal de fatiga sobre 3 en 7 días</td></tr>\n    <tr><td>CPM</td><td>Costo por mil impresiones</td><td>Salud de la subasta y la creatividad</td></tr>\n    <tr><td>Gasto</td><td>Inversión consumida</td><td>Control diario de presupuesto</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"interaccion\">Métricas de interacción</h2>\n<table>\n  <thead><tr><th>Métrica</th><th>Definición</th><th>Uso operativo</th></tr></thead>\n  <tbody>\n    <tr><td>Clicks (CTR destination)</td><td>Clicks al enlace del anuncio</td><td>Disposición real a visitar la landing</td></tr>\n    <tr><td>CTR</td><td>Clicks / Impresiones</td><td>Salud del hook + segmentación</td></tr>\n    <tr><td>CPC</td><td>Costo por click</td><td>Eficiencia del paso impresión → click</td></tr>\n    <tr><td>Likes, comments, shares</td><td>Interacciones orgánicas dentro del anuncio</td><td>Lectura cualitativa del creativo</td></tr>\n    <tr><td>Saves</td><td>Veces que el video se guardó</td><td>Indicador secundario de interés profundo</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"video\">Métricas de video</h2>\n<table>\n  <thead><tr><th>Métrica</th><th>Definición</th><th>Uso operativo</th></tr></thead>\n  <tbody>\n    <tr><td>Video views (2s)</td><td>Reproducciones de al menos 2 segundos</td><td>Enganche del hook</td></tr>\n    <tr><td>Video views (6s)</td><td>Reproducciones de al menos 6 segundos</td><td>Retención del problema</td></tr>\n    <tr><td>Video completions</td><td>Reproducciones hasta el final</td><td>Calidad estructural del video</td></tr>\n    <tr><td>Hold rate</td><td>(Views 6s / Views 2s) — métrica calculada</td><td>Diagnóstico de caída entre hook y cuerpo</td></tr>\n    <tr><td>Average watch time</td><td>Segundos promedio de reproducción</td><td>Salud general del creativo</td></tr>\n    <tr><td>Watch time per impression</td><td>Tiempo total / Impresiones</td><td>Lectura combinada de duración y enganche</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Hold rate como diagnóstico.</strong> Cuando el hold rate cae bajo 35%, el problema está en el segundo 4 al 8 del video: la transición del hook al problema no engancha. Hold rate sano ronda 45% a 60% en COD.</p>\n  </div>\n</div>\n\n<h2 id=\"conversion\">Métricas de conversión</h2>\n<table>\n  <thead><tr><th>Métrica</th><th>Definición</th><th>Uso operativo</th></tr></thead>\n  <tbody>\n    <tr><td>Conversions</td><td>Eventos del evento de optimización</td><td>Volumen de output del ad group</td></tr>\n    <tr><td>Cost per conversion</td><td>Gasto / Conversiones</td><td>Eficiencia base — equivalente a CPL si optimiza a Lead</td></tr>\n    <tr><td>Conversion rate</td><td>Conversiones / Clicks</td><td>Calidad de tráfico vs landing</td></tr>\n    <tr><td>Total conversion value</td><td>Suma de valores enviados al evento</td><td>Necesario para ROAS in-platform</td></tr>\n    <tr><td>ROAS</td><td>Valor / Gasto</td><td>Solo confiable si CAPI envía valor real cobrado</td></tr>\n    <tr><td>Result rate</td><td>Conversiones / Impresiones</td><td>Eficiencia end-to-end del ad group</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"cod\">Métricas COD (no nativas en Ads Manager)</h2>\n<p>Estas métricas no aparecen en TikTok. Se calculan cruzando datos de TikTok con la liquidación del courier y el CRM:</p>\n<table>\n  <thead><tr><th>Métrica</th><th>Cálculo</th><th>Significado</th></tr></thead>\n  <tbody>\n    <tr><td>Tasa de confirmación</td><td>Leads confirmados / Leads totales</td><td>Calidad del lead generado por el creativo</td></tr>\n    <tr><td>Tasa de entrega</td><td>Pedidos entregados / Pedidos confirmados</td><td>Salud logística + fidelidad de la oferta</td></tr>\n    <tr><td>CPA real</td><td>Gasto / Pedidos entregados</td><td>Costo por venta cobrada</td></tr>\n    <tr><td>Margen de contribución</td><td>(Ticket − producto − logística − ad spend) / Ticket</td><td>Rentabilidad de la cuenta</td></tr>\n    <tr><td>ROAS real</td><td>Ingreso cobrado / Gasto</td><td>Único ROAS que importa en COD</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"jerarquia\">Jerarquía de lectura</h2>\n<ol>\n  <li><strong>CPA real y ROAS real</strong> — la última palabra. Si están en objetivo, el resto es secundario.</li>\n  <li><strong>Tasa de entrega y tasa de confirmación</strong> — leading indicators del CPA real.</li>\n  <li><strong>CPL y CTR</strong> — útiles para diagnóstico, no para decisión final.</li>\n  <li><strong>Hold rate, watch time, frecuencia</strong> — diagnóstico creativo.</li>\n  <li><strong>CPM</strong> — contexto de subasta, baja prioridad.</li>\n</ol>\n\n<div class=\"pagination\">\n  <a href=\"#/consultoria\" data-route=\"consultoria\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Consultoría</span>\n  </a>\n  <a class=\"next\" href=\"#/ads-manager\" data-route=\"ads-manager\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Lectura del Ads Manager</span>\n  </a>\n</div>\n","ads-manager":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Métricas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Ads Manager</span>\n</div>\n\n<h1>Cómo leer el Ads Manager de TikTok</h1>\n<p class=\"lead\">El Ads Manager muestra cientos de métricas. La diferencia entre una cuenta operada con criterio y una operada por reflejo es saber qué columnas mirar, en qué orden y con qué ventana de atribución.</p>\n\n<h2 id=\"vistas\">Vistas estándar que configuramos</h2>\n<table>\n  <thead><tr><th>Vista</th><th>Columnas</th><th>Cuándo se usa</th></tr></thead>\n  <tbody>\n    <tr><td>Vista de salud</td><td>Gasto · CPM · CTR · Conversiones · CPL · Frecuencia</td><td>Pulso diario</td></tr>\n    <tr><td>Vista creativa</td><td>Gasto · Hold rate · Watch time · CTR · CPL</td><td>Diagnóstico de creativo</td></tr>\n    <tr><td>Vista de funnel</td><td>Impresiones · Clicks · Lead · CompleteRegistration · CompletePayment</td><td>Auditoría de pixel y CAPI</td></tr>\n    <tr><td>Vista financiera</td><td>Gasto · Conversiones · Valor total · ROAS · CPA</td><td>Reporte semanal y mensual</td></tr>\n    <tr><td>Vista de testing</td><td>Gasto · Conversiones · CPL · CTR · Hold rate · Frecuencia</td><td>Decisión de cortar o sostener creativo</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"atribucion\">Ventanas de atribución</h2>\n<p>TikTok permite seleccionar la ventana en la que un click o impresión cuentan como conversión. La elección cambia los números reportados sin cambiar el negocio real.</p>\n<table>\n  <thead><tr><th>Ventana</th><th>Cuándo se usa</th></tr></thead>\n  <tbody>\n    <tr><td>Click 1 día (1D-CTC)</td><td>Estricta: solo conversiones inmediatas. Subestima el impacto.</td></tr>\n    <tr><td>Click 7 días (7D-CTC)</td><td>Estándar para ecommerce; balance entre realismo y rigor.</td></tr>\n    <tr><td>Click 7 días + view 1 día (7D-CTC + 1D-VTA)</td><td>Default de TikTok; sobreestima conversiones.</td></tr>\n    <tr><td>View through 1 día (1D-VTA)</td><td>Solo branding; no usar para optimizar performance.</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Estándar interno.</strong> Reportamos siempre con 7D-CTC. Es la ventana que mejor correlaciona con la cobranza real del courier y evita inflar resultados con view-through. El cliente recibe ambos números: in-platform 7D-CTC y delivery rate cruzado.</p>\n  </div>\n</div>\n\n<h2 id=\"filtros\">Filtros que aplicamos por defecto</h2>\n<ul>\n  <li>Excluir campañas pausadas con menos de 3 días sin tráfico (ruido).</li>\n  <li>Excluir ad groups en aprendizaje activo si la lectura es de eficiencia (los datos no son estables).</li>\n  <li>Filtrar por moneda y país cuando hay multi-cuenta para evitar mezclas.</li>\n  <li>Cuando hay ABO + CBO, separar las vistas: las decisiones cambian.</li>\n</ul>\n\n<h2 id=\"alertas\">Alertas y umbrales</h2>\n<p>Configuramos alertas internas (no las nativas de TikTok) que disparan revisión manual:</p>\n<table>\n  <thead><tr><th>Alerta</th><th>Umbral</th><th>Acción</th></tr></thead>\n  <tbody>\n    <tr><td>CPL fuera de banda</td><td>±30% sobre objetivo en 24 h</td><td>Pausa el ad group y diagnóstico</td></tr>\n    <tr><td>Frecuencia alta</td><td>≥ 3.5 en 7 días</td><td>Renovación creativa inmediata</td></tr>\n    <tr><td>Caída de CTR</td><td>−25% semana sobre semana</td><td>Diagnóstico de fatiga</td></tr>\n    <tr><td>Spike de CPM</td><td>+40% día sobre día</td><td>Revisar quality score y políticas</td></tr>\n    <tr><td>Gasto fuera de plan</td><td>±15% sobre presupuesto diario</td><td>Pausar y revalidar pacing</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"exportacion\">Exportación y cruce</h2>\n<p>El Ads Manager exporta CSV por nivel (campaña, ad group, ad). Para reporting COD cruzamos:</p>\n<ul>\n  <li>CSV diario de TikTok por ad group y por ad.</li>\n  <li>Reporte de leads del CRM o plataforma COD.</li>\n  <li>Reporte de confirmación del call center.</li>\n  <li>Liquidación semanal del courier (entregados, devueltos, en tránsito).</li>\n</ul>\n<p>Sin ese cruce el Ads Manager por sí solo es ciego al desempeño real de la cuenta.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/metricas-tiktok\" data-route=\"metricas-tiktok\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Métricas de TikTok Ads</span>\n  </a>\n  <a class=\"next\" href=\"#/benchmarks\" data-route=\"benchmarks\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Benchmarks por categoría</span>\n  </a>\n</div>\n","benchmarks":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Métricas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Benchmarks</span>\n</div>\n\n<h1>Benchmarks de TikTok Ads para COD</h1>\n<p class=\"lead\">Rangos de referencia que aplicamos en cuentas que operamos en Perú y LATAM. Son guías, no metas absolutas: el rendimiento depende del producto, ticket, oferta y cobertura logística. Los benchmarks se actualizan trimestralmente con datos internos.</p>\n\n<h2 id=\"generales\">Benchmarks generales (Perú, ticket S/ 80 a S/ 200)</h2>\n<table>\n  <thead><tr><th>Métrica</th><th>Bajo</th><th>Medio</th><th>Alto</th></tr></thead>\n  <tbody>\n    <tr><td>CPM</td><td>S/ 12 – 18</td><td>S/ 18 – 28</td><td>S/ 28 – 45</td></tr>\n    <tr><td>CTR</td><td>0.7% – 1.0%</td><td>1.0% – 1.6%</td><td>1.6% – 2.5%</td></tr>\n    <tr><td>CPC</td><td>S/ 0.30 – 0.60</td><td>S/ 0.60 – 1.00</td><td>S/ 1.00 – 1.60</td></tr>\n    <tr><td>Hold rate (6s/2s)</td><td>30% – 40%</td><td>40% – 55%</td><td>55% – 70%</td></tr>\n    <tr><td>CVR landing</td><td>5% – 8%</td><td>8% – 14%</td><td>14% – 22%</td></tr>\n    <tr><td>CPL</td><td>S/ 18 – 25</td><td>S/ 10 – 18</td><td>S/ 6 – 10</td></tr>\n    <tr><td>Tasa de confirmación</td><td>45% – 55%</td><td>55% – 70%</td><td>70% – 80%</td></tr>\n    <tr><td>Tasa de entrega</td><td>40% – 55%</td><td>55% – 70%</td><td>70% – 85%</td></tr>\n    <tr><td>CPA real / ticket</td><td>50% – 70%</td><td>30% – 50%</td><td>15% – 30%</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Lectura combinada.</strong> Un solo indicador no define salud. Una cuenta con CPL alto pero tasa de entrega del 80% puede ser más rentable que otra con CPL bajo y entrega de 45%. Siempre evaluar el conjunto.</p>\n  </div>\n</div>\n\n<h2 id=\"categorias\">Benchmarks por categoría</h2>\n<table>\n  <thead><tr><th>Categoría</th><th>CPL típico</th><th>Tasa de entrega</th><th>Notas</th></tr></thead>\n  <tbody>\n    <tr><td>Belleza y cuidado personal</td><td>S/ 8 – 14</td><td>60% – 75%</td><td>Alta competencia, creativo es el diferencial</td></tr>\n    <tr><td>Suplementos y bienestar</td><td>S/ 12 – 22</td><td>55% – 70%</td><td>Restricciones de claims; UGC manda</td></tr>\n    <tr><td>Hogar y utilitarios</td><td>S/ 6 – 12</td><td>65% – 80%</td><td>Demos visuales rinden mejor</td></tr>\n    <tr><td>Moda y accesorios</td><td>S/ 10 – 18</td><td>55% – 70%</td><td>Devoluciones por talla afectan entrega</td></tr>\n    <tr><td>Tecnología y gadgets</td><td>S/ 14 – 25</td><td>50% – 65%</td><td>Ticket alto compensa CPL</td></tr>\n    <tr><td>Productos para mascotas</td><td>S/ 10 – 16</td><td>60% – 75%</td><td>Audiencias estables, fatiga lenta</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"paises\">Diferencias por país</h2>\n<table>\n  <thead><tr><th>País</th><th>CPM relativo</th><th>CPL relativo</th><th>Tasa de entrega típica</th></tr></thead>\n  <tbody>\n    <tr><td>Perú</td><td>Base</td><td>Base</td><td>55% – 75%</td></tr>\n    <tr><td>Colombia</td><td>+10% a +20%</td><td>+5% a +15%</td><td>50% – 70%</td></tr>\n    <tr><td>Ecuador</td><td>−10% a 0%</td><td>−10% a 0%</td><td>50% – 65%</td></tr>\n    <tr><td>México</td><td>+30% a +60%</td><td>+20% a +40%</td><td>55% – 70%</td></tr>\n    <tr><td>Bolivia</td><td>−20% a −10%</td><td>−15% a 0%</td><td>45% – 60%</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"estacionalidad\">Estacionalidad relevante</h2>\n<ul>\n  <li><strong>Enero a febrero:</strong> CPM bajo, audiencia disponible, oportunidad de testing barato.</li>\n  <li><strong>Marzo a junio:</strong> rango medio, condiciones estables.</li>\n  <li><strong>Julio (Fiestas Patrias en Perú):</strong> spike de CPM 15% a 30%, alta intención de compra.</li>\n  <li><strong>Octubre y noviembre (CyberDay y Black Friday):</strong> CPM más alto del año, +40% a +70%; el ticket sube y compensa.</li>\n  <li><strong>Diciembre:</strong> tasa de entrega cae 5 a 10 puntos por saturación logística.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Sobre los benchmarks.</strong> Los rangos publicados no son garantía. Un anunciante con producto saturado, oferta débil o landing lenta puede operar fuera de banda durante semanas. El benchmark sirve para detectar desvíos y diagnosticar, no para fijar metas comerciales.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/ads-manager\" data-route=\"ads-manager\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Lectura del Ads Manager</span>\n  </a>\n  <a class=\"next\" href=\"#/atribucion-modelado\" data-route=\"atribucion-modelado\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Atribución y modelado</span>\n  </a>\n</div>\n","atribucion-modelado":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Métricas</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Atribución</span>\n</div>\n\n<h1>Atribución y modelado en TikTok Ads</h1>\n<p class=\"lead\">Cuando una cuenta corre tráfico en varios canales (TikTok, Meta, Google) o cuando los pedidos pasan por WhatsApp y call center, atribuir cada venta al canal correcto deja de ser trivial. Esta página explica los modelos de atribución que aplicamos y cómo evitamos doble conteo.</p>\n\n<h2 id=\"problema\">El problema de atribución en COD</h2>\n<p>Un mismo usuario puede:</p>\n<ul>\n  <li>Ver el anuncio de TikTok pero buscar el producto en Google y comprar por ahí.</li>\n  <li>Ver el anuncio, dejar el formulario, no responder la llamada y volver tres días después por orgánico.</li>\n  <li>Recibir el lead por TikTok pero ser cerrado por el equipo de WhatsApp con un cupón distinto.</li>\n  <li>Convertir tras haber visto creativos de TikTok, Meta y Google en la misma semana.</li>\n</ul>\n<p>Cada plataforma se reclama la conversión. Sin un modelo claro, el reporte mensual sobreestima entre 30% y 80% del rendimiento.</p>\n\n<h2 id=\"modelos\">Modelos de atribución</h2>\n<table>\n  <thead><tr><th>Modelo</th><th>Cómo asigna</th><th>Cuándo se usa</th></tr></thead>\n  <tbody>\n    <tr><td>Last click</td><td>100% al último click antes de la conversión</td><td>Reporte simple, baja calidad para multicanal</td></tr>\n    <tr><td>First click</td><td>100% al primer click</td><td>Branding y descubrimiento</td></tr>\n    <tr><td>Linear</td><td>Reparte equitativamente entre touchpoints</td><td>Cuentas con funnel largo</td></tr>\n    <tr><td>Time decay</td><td>Más peso a touchpoints recientes</td><td>Funnels de 7 a 30 días</td></tr>\n    <tr><td>Data-driven</td><td>Algoritmo asigna según contribución estimada</td><td>Cuentas con volumen suficiente</td></tr>\n    <tr><td>Atribución por código de cupón</td><td>El usuario menciona código en el form</td><td>El método más limpio en COD</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Estándar operativo.</strong> Combinamos last click 7 días dentro de TikTok con cupón único por canal en el formulario. El cupón es la fuente de verdad para conciliar entre TikTok, Meta y orgánico.</p>\n  </div>\n</div>\n\n<h2 id=\"cupones\">Sistema de cupones por canal</h2>\n<p>Cada canal recibe un código distinto. El formulario de la landing pregunta \"¿de dónde nos conociste?\" o el código aparece pre-llenado en URLs con UTM:</p>\n<ul>\n  <li><code>TT24</code> — TikTok Ads campaña principal.</li>\n  <li><code>TT24A</code>, <code>TT24B</code> — variantes para A/B de creativo o audiencia.</li>\n  <li><code>MT24</code> — Meta Ads.</li>\n  <li><code>GG24</code> — Google Ads.</li>\n  <li><code>ORG</code> — orgánico, referidos, búsqueda directa.</li>\n</ul>\n<p>El equipo de confirmación registra el cupón en cada lead. La conciliación mensual cruza ese campo con la liquidación del courier.</p>\n\n<h2 id=\"capi-impacto\">Impacto del CAPI en la atribución</h2>\n<p>Sin CAPI, TikTok solo ve eventos del navegador. Con CAPI:</p>\n<ul>\n  <li>Los eventos de confirmación y entrega regresan al algoritmo y a las columnas de reporte.</li>\n  <li>El conteo de conversiones reportado por TikTok se acerca más al real cobrado.</li>\n  <li>Sigue habiendo desfase: TikTok atribuye con criterio de plataforma, no con criterio del negocio.</li>\n</ul>\n\n<h2 id=\"lift\">Estudios de incrementalidad</h2>\n<p>Para cuentas con presupuesto suficiente, recomendamos pruebas de incrementalidad geo:</p>\n<ol>\n  <li>Dividir el país en regiones comparables (control vs tratamiento).</li>\n  <li>Lanzar TikTok Ads solo en tratamiento durante 2 a 4 semanas.</li>\n  <li>Comparar pedidos totales del negocio (no solo los reportados por TikTok) entre las dos regiones.</li>\n  <li>El lift incremental es la diferencia atribuible al canal, libre de doble conteo.</li>\n</ol>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>El reporte de TikTok no es la verdad.</strong> Es una vista útil, parcial y siempre optimista. La verdad está en la conciliación entre cobranza real, cupones por canal y, cuando aplica, estudios de lift. El equipo de gestión presenta ambos números en el reporte mensual: in-platform y conciliado.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/benchmarks\" data-route=\"benchmarks\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Benchmarks</span>\n  </a>\n  <a class=\"next\" href=\"#/reportes-kpis\" data-route=\"reportes-kpis\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Reportes y KPIs</span>\n  </a>\n</div>\n","reportes-kpis":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Operación</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Reportes y KPIs</span>\n</div>\n\n<h1>Reportes y KPIs</h1>\n<p class=\"lead\">El reporte de un ecommerce COD no se lee igual que uno de un ecommerce prepago. Esta página define los KPIs que monitoreamos, el formato y la cadencia de los reportes que entregamos.</p>\n\n<h2 id=\"kpis\">KPIs primarios</h2>\n<table>\n  <thead><tr><th>KPI</th><th>Definición</th><th>Benchmark sano (Perú)</th></tr></thead>\n  <tbody>\n    <tr><td>CTR</td><td>Clicks / Impresiones</td><td>≥ 1.0%</td></tr>\n    <tr><td>CVR landing</td><td>Leads / Visitas</td><td>8% – 18%</td></tr>\n    <tr><td>CPL</td><td>Inversión / Leads</td><td>S/ 8 – S/ 25</td></tr>\n    <tr><td>Tasa de confirmación</td><td>Leads confirmados / Leads totales</td><td>55% – 75%</td></tr>\n    <tr><td>Tasa de entrega (delivery rate)</td><td>Pedidos entregados / Pedidos confirmados</td><td>55% – 80%</td></tr>\n    <tr><td>CPA real</td><td>Inversión / Pedidos entregados y cobrados</td><td>30% – 50% del ticket</td></tr>\n    <tr><td>Margen de contribución</td><td>(Ticket − producto − logística − ad spend) / Ticket</td><td>≥ 15%</td></tr>\n  </tbody>\n</table>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>KPI reina.</strong> Tasa de entrega multiplicada por ticket promedio es lo que define rentabilidad real. Un CPL de S/ 12 con delivery rate de 70% es mejor que un CPL de S/ 8 con delivery rate de 40%, aun cuando el segundo \"se ve\" mejor en TikTok Ads Manager.</p>\n  </div>\n</div>\n\n<h2 id=\"cadencia\">Cadencia de reportes</h2>\n<table>\n  <thead><tr><th>Reporte</th><th>Cadencia</th><th>Contenido</th></tr></thead>\n  <tbody>\n    <tr><td>Pulso diario</td><td>Diario, sin formato fijo</td><td>Inversión, leads, CPL, alertas</td></tr>\n    <tr><td>Reporte semanal</td><td>Cada lunes</td><td>KPIs primarios de la semana, lectura de creativos top y bottom, plan de la semana</td></tr>\n    <tr><td>Reporte mensual</td><td>Primera semana del mes siguiente</td><td>Resultado consolidado mes vs mes, evolución de delivery rate, recomendaciones</td></tr>\n    <tr><td>Cierre trimestral</td><td>Trimestral</td><td>Análisis de tendencia, fatiga de cuenta, propuestas de cambio</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"cruce\">Cruce con cobranza</h2>\n<p>El reporte mensual cruza datos de TikTok Ads con la liquidación del courier. Sin ese cruce, el reporte no es accionable: TikTok no sabe si la entrega ocurrió. La operación responsable de aportar el dato de delivery es el anunciante o su courier.</p>\n\n<h2 id=\"formato\">Formato</h2>\n<ul>\n  <li>Looker Studio o Google Sheets compartido, según preferencia del anunciante.</li>\n  <li>Vista por campaña, ad group y creativo, con filtros de fecha.</li>\n  <li>Comentarios escritos del operador con conclusiones y plan.</li>\n  <li>Acceso de lectura al cliente y al equipo interno designado.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Reporte no es panel.</strong> Un panel automático sin lectura humana es ruido. Cada reporte semanal incluye comentario del operador: qué pasó, qué cambiamos, qué proponemos para la siguiente semana.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/atribucion-modelado\" data-route=\"atribucion-modelado\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Atribución y modelado</span>\n  </a>\n  <a class=\"next\" href=\"#/sla\" data-route=\"sla\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">SLA</span>\n  </a>\n</div>\n","sla":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Operación</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>SLA</span>\n</div>\n\n<h1>Acuerdo de niveles de servicio</h1>\n<p class=\"lead\">Documento de referencia que consolida los compromisos de tiempo de respuesta, disponibilidad y entrega aplicables a todos los servicios de Holistic. Cada contrato puede precisar o ajustar estos valores.</p>\n\n<h2 id=\"horario\">Horario de operación</h2>\n<table>\n  <thead><tr><th>Día</th><th>Horario hábil</th><th>Horario extendido (best-effort)</th></tr></thead>\n  <tbody>\n    <tr><td>Lunes a viernes</td><td>9:00 – 19:00 PET</td><td>19:00 – 22:00 PET</td></tr>\n    <tr><td>Sábado</td><td>9:00 – 14:00 PET</td><td>14:00 – 18:00 PET</td></tr>\n    <tr><td>Domingo y feriados</td><td>Solo crítico</td><td>—</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"respuesta\">Tiempos de respuesta</h2>\n<table>\n  <thead><tr><th>Servicio</th><th>Crítico</th><th>Alto</th><th>Medio</th><th>Bajo</th></tr></thead>\n  <tbody>\n    <tr><td>Suscripción</td><td>1 h hábil</td><td>4 h hábiles</td><td>1 día hábil</td><td>2 días hábiles</td></tr>\n    <tr><td>Crédito publicitario</td><td>2 h hábiles</td><td>1 día hábil</td><td>2 días hábiles</td><td>3 días hábiles</td></tr>\n    <tr><td>Gestión de campañas</td><td>30 min hábiles</td><td>2 h hábiles</td><td>1 día hábil</td><td>2 días hábiles</td></tr>\n    <tr><td>Diseño y consultoría</td><td>—</td><td>1 día hábil</td><td>2 días hábiles</td><td>3 días hábiles</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"resolucion\">Tiempos de resolución</h2>\n<ul>\n  <li><strong>Bloqueo de cuenta por TikTok</strong> — apelación enviada en menos de 4 h, resolución sujeta a TikTok.</li>\n  <li><strong>Reposición de cuenta cuando aplica</strong> — 24 h hábiles.</li>\n  <li><strong>Anuncio rechazado</strong> — revisión y reedición en 4 h hábiles, salvo cambios mayores de creativo.</li>\n  <li><strong>Pixel no recibe eventos</strong> — diagnóstico en 4 h, fix coordinado con el cliente.</li>\n  <li><strong>Reporte semanal no entregado</strong> — entrega máximo 24 h después del lunes.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Dependencias externas.</strong> Algunos tiempos dependen de TikTok (revisión de anuncios, apelaciones, soporte de partner manager). En esos casos, comprometemos tiempo de gestión y comunicación, no resolución, dado que el ciclo lo controla la plataforma.</p>\n  </div>\n</div>\n\n<h2 id=\"canales\">Canales oficiales</h2>\n<ul>\n  <li>WhatsApp Business — línea dedicada por cliente, no es WhatsApp personal.</li>\n  <li>Correo de operaciones — para registro formal y documentación.</li>\n  <li>Reuniones programadas — semanal o quincenal, según contrato.</li>\n</ul>\n\n<h2 id=\"excepciones\">Excepciones</h2>\n<p>Los SLA no aplican durante:</p>\n<ul>\n  <li>Mantenimientos programados de TikTok Ads Manager o Business Center.</li>\n  <li>Caídas de la plataforma TikTok atribuibles a TikTok.</li>\n  <li>Eventos de fuerza mayor (cortes generalizados, desastres, decisiones regulatorias).</li>\n  <li>Períodos en que el cliente esté en mora con suscripción o crédito.</li>\n</ul>\n\n<div class=\"pagination\">\n  <a href=\"#/reportes-kpis\" data-route=\"reportes-kpis\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Reportes y KPIs</span>\n  </a>\n  <a class=\"next\" href=\"#/facturacion\" data-route=\"facturacion\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Facturación</span>\n  </a>\n</div>\n","facturacion":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Operación</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Facturación</span>\n</div>\n\n<h1>Facturación y cobros</h1>\n<p class=\"lead\">Resumen del esquema de facturación aplicable a cada línea de servicio. La facturación se realiza desde la entidad legal de Holistic Marketing en Perú o desde la entidad internacional, según el cliente.</p>\n\n<h2 id=\"conceptos\">Conceptos facturables</h2>\n<table>\n  <thead><tr><th>Concepto</th><th>Frecuencia</th><th>Día de emisión</th><th>Plazo de pago</th></tr></thead>\n  <tbody>\n    <tr><td>Inscripción a suscripción</td><td>Único</td><td>Día de firma</td><td>Inmediato</td></tr>\n    <tr><td>Mensualidad de suscripción</td><td>Mensual</td><td>Día 1 del mes</td><td>Día 1 al 7</td></tr>\n    <tr><td>Consumo de línea de crédito</td><td>Mensual</td><td>Día 1 del mes siguiente</td><td>Día 1 al 7</td></tr>\n    <tr><td>Fee de gestión de campañas</td><td>Mensual</td><td>Día 1 del mes</td><td>Día 1 al 7</td></tr>\n    <tr><td>Diseño por bolsa de horas</td><td>Mensual</td><td>Día 1 del mes</td><td>Día 1 al 7</td></tr>\n    <tr><td>Consultoría por proyecto</td><td>Hito</td><td>Al cumplir hito</td><td>Según contrato</td></tr>\n  </tbody>\n</table>\n\n<h2 id=\"comprobantes\">Comprobantes emitidos</h2>\n<ul>\n  <li><strong>Factura electrónica SUNAT</strong> para clientes peruanos con RUC.</li>\n  <li><strong>Boleta electrónica</strong> para personas naturales sin negocio.</li>\n  <li><strong>Invoice internacional</strong> para clientes fuera de Perú, con detalle de IGV exonerado cuando corresponde.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Tributación.</strong> Las operaciones se gravan según el régimen tributario peruano y el país del cliente. Los anunciantes son responsables de su propia tributación local sobre las ventas que generan; Holistic factura únicamente sus servicios.</p>\n  </div>\n</div>\n\n<h2 id=\"medios\">Medios de pago</h2>\n<ul>\n  <li>Transferencia interbancaria en PEN o USD (BCP, BBVA, Interbank, Scotiabank).</li>\n  <li>Transferencia internacional vía SWIFT.</li>\n  <li>USDT en redes TRC-20 o ERC-20.</li>\n  <li>Yape o Plin para mensualidades menores a S/ 500 (cuando aplica).</li>\n  <li>Pasarelas locales acordadas previamente.</li>\n</ul>\n\n<h2 id=\"moneda\">Moneda y tipo de cambio</h2>\n<p>Los servicios denominados en USD se facturan en USD. El pago en PEN se acepta al tipo de cambio venta SBS del día de emisión de la factura. Diferencias por fluctuación entre emisión y pago corren por cuenta del anunciante si superan el 2%.</p>\n\n<h2 id=\"recordatorios\">Recordatorios de pago</h2>\n<ul>\n  <li>Día 1: emisión y envío del comprobante.</li>\n  <li>Día 5: recordatorio amistoso.</li>\n  <li>Día 7: alerta de vencimiento.</li>\n  <li>Día 8: notificación formal de mora.</li>\n</ul>\n\n<div class=\"callout callout-warning\">\n  <i class=\"fa-solid fa-triangle-exclamation\"></i>\n  <div>\n    <p><strong>Pagos parciales.</strong> Los pagos parciales se aplican primero a mora vigente, luego a mensualidad de suscripción y al final a consumo de crédito. El anunciante puede solicitar imputación distinta por escrito antes de transferir.</p>\n  </div>\n</div>\n\n<div class=\"pagination\">\n  <a href=\"#/sla\" data-route=\"sla\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">SLA</span>\n  </a>\n  <a class=\"next\" href=\"#/glosario\" data-route=\"glosario\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Glosario</span>\n  </a>\n</div>\n","glosario":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Recursos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Glosario</span>\n</div>\n\n<h1>Glosario</h1>\n<p class=\"lead\">Términos recurrentes en la operación de TikTok Ads para ecommerce COD. Las definiciones priorizan claridad operativa sobre rigor académico.</p>\n\n<h2 id=\"comercial\">Términos comerciales</h2>\n<dl>\n  <p><strong>Suscripción.</strong> Servicio recurrente de acceso a cuentas publicitarias de agencia. Cobro mensual, renovación automática, condicionada al pago.</p>\n  <p><strong>Línea de crédito publicitario.</strong> Límite en USD de inversión publicitaria que el anunciante consume durante el mes y cancela al inicio del mes siguiente.</p>\n  <p><strong>Fee de gestión.</strong> Honorarios por operar la cuenta del anunciante. Independiente de la suscripción y de la línea de crédito.</p>\n  <p><strong>Mora.</strong> Atraso superior a 7 días en el pago de cualquier concepto facturable.</p>\n</dl>\n\n<h2 id=\"cod\">Términos del modelo COD</h2>\n<dl>\n  <p><strong>COD (Cash on Delivery).</strong> Contra entrega. El cliente final paga al recibir el producto, no en checkout.</p>\n  <p><strong>Lead.</strong> Usuario que dejó datos en el formulario. Aún no validado por call center.</p>\n  <p><strong>Lead confirmado.</strong> Lead que respondió la llamada o WhatsApp y aceptó el pedido.</p>\n  <p><strong>Tasa de confirmación.</strong> Leads confirmados sobre leads totales.</p>\n  <p><strong>Tasa de entrega (delivery rate).</strong> Pedidos entregados sobre pedidos confirmados.</p>\n  <p><strong>CPA real.</strong> Inversión publicitaria dividida por pedidos entregados y cobrados, no por leads.</p>\n  <p><strong>Liquidación.</strong> Depósito del courier al anunciante con el efectivo recolectado de las entregas.</p>\n</dl>\n\n<h2 id=\"tiktok\">Términos de TikTok Ads</h2>\n<dl>\n  <p><strong>Business Center.</strong> Estructura administrativa que agrupa cuentas publicitarias, pixeles y catálogos.</p>\n  <p><strong>Pixel.</strong> Snippet de código que registra eventos del navegador.</p>\n  <p><strong>CAPI (Conversions API).</strong> Envío de eventos desde el servidor del anunciante a TikTok, sin depender del navegador.</p>\n  <p><strong>ABO.</strong> Ad Group Budget Optimization. Presupuesto a nivel de ad group.</p>\n  <p><strong>CBO.</strong> Campaign Budget Optimization. Presupuesto a nivel de campaña.</p>\n  <p><strong>Spark Ad.</strong> Anuncio basado en un post orgánico autorizado.</p>\n  <p><strong>Lookalike.</strong> Audiencia generada por TikTok a partir de una semilla de usuarios.</p>\n  <p><strong>Custom audience.</strong> Audiencia subida por el anunciante (lista de teléfonos, emails) o construida por interacción.</p>\n  <p><strong>Fase de aprendizaje.</strong> Período inicial en el que el algoritmo recopila datos antes de estabilizar entrega.</p>\n</dl>\n\n<h2 id=\"kpis\">KPIs frecuentes</h2>\n<dl>\n  <p><strong>CTR.</strong> Click-Through Rate. Clicks sobre impresiones.</p>\n  <p><strong>CVR.</strong> Conversion Rate. Conversiones sobre clicks o sesiones, según contexto.</p>\n  <p><strong>CPL.</strong> Costo por lead.</p>\n  <p><strong>CPA.</strong> Costo por adquisición. En COD, el CPA \"real\" se calcula sobre entregas, no sobre leads.</p>\n  <p><strong>ROAS.</strong> Return on Ad Spend. Ingreso sobre inversión publicitaria.</p>\n  <p><strong>Frecuencia.</strong> Promedio de impresiones por usuario único en una ventana de tiempo.</p>\n</dl>\n\n<div class=\"pagination\">\n  <a href=\"#/facturacion\" data-route=\"facturacion\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Facturación</span>\n  </a>\n  <a class=\"next\" href=\"#/changelog\" data-route=\"changelog\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Changelog</span>\n  </a>\n</div>\n","changelog":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Recursos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Changelog</span>\n</div>\n\n<h1>Changelog</h1>\n<p class=\"lead\">Registro de cambios en políticas, procedimientos y condiciones de servicio. Los cambios significativos se comunican adicionalmente por correo a los suscriptores activos con al menos 15 días de anticipación.</p>\n\n<h2 id=\"2026-05\">Mayo 2026</h2>\n<ul>\n  <li>Reorganización del centro de documentación: secciones separadas para suscripción, crédito publicitario, gestión de campañas y servicios complementarios.</li>\n  <li>Definición formal del SLA por categoría de incidente.</li>\n  <li>Publicación del procedimiento estándar de evaluación de líneas de crédito.</li>\n</ul>\n\n<h2 id=\"2026-04\">Abril 2026</h2>\n<ul>\n  <li>Ajuste del benchmark de tasa de entrega para Lima a 60% – 80% tras revisión con couriers.</li>\n  <li>Incorporación de USDT TRC-20 como medio de pago aceptado para mensualidades.</li>\n  <li>Actualización de la matriz de testing creativo: ahora incluye validación cruzada con cobranza antes de promover a escala.</li>\n</ul>\n\n<h2 id=\"2026-03\">Marzo 2026</h2>\n<ul>\n  <li>Lanzamiento del esquema de bolsa de horas para diseño y flyers.</li>\n  <li>Documentación inicial de CAPI con eventos CompleteRegistration y CompletePayment para COD.</li>\n  <li>Política de reposición de cuentas formalizada: 24 a 72 h según causal del bloqueo.</li>\n</ul>\n\n<h2 id=\"2026-02\">Febrero 2026</h2>\n<ul>\n  <li>Apertura de líneas de crédito publicitario con ventana de pago día 1 al 7 del mes siguiente.</li>\n  <li>Tarifas vigentes del programa de suscripción: USD 500 inscripción y USD 50 mensualidad.</li>\n</ul>\n\n<h2 id=\"historico\">Histórico anterior</h2>\n<p>El registro previo a febrero 2026 corresponde al periodo de operación bajo el modelo anterior (alcance distinto al actual) y se conserva internamente con fines de auditoría. No se publica aquí porque las condiciones, productos y procedimientos no son comparables con la operación vigente.</p>\n\n<div class=\"pagination\">\n  <a href=\"#/glosario\" data-route=\"glosario\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Glosario</span>\n  </a>\n  <a class=\"next\" href=\"#/contacto\" data-route=\"contacto\">\n    <span class=\"label\">Siguiente <i class=\"fa-solid fa-arrow-right\"></i></span>\n    <span class=\"title\">Contacto</span>\n  </a>\n</div>\n","contacto":"<div class=\"breadcrumbs\">\n  <a href=\"#/index\" data-route=\"index\">Documentación</a>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Recursos</span>\n  <i class=\"fa-solid fa-chevron-right\"></i>\n  <span>Contacto</span>\n</div>\n\n<h1>Contacto</h1>\n<p class=\"lead\">Canales oficiales para suscriptores activos, prospectos y proveedores. Las consultas que no caen en las categorías listadas pueden enviarse al correo general; serán derivadas internamente.</p>\n\n<h2 id=\"comercial\">Comercial y nuevos clientes</h2>\n<ul>\n  <li>Para evaluación de suscripción, línea de crédito o gestión de campañas.</li>\n  <li>Tiempo de respuesta inicial: 1 día hábil.</li>\n  <li>Solicitud habitual: información del producto, país de operación, volumen actual y deseado.</li>\n</ul>\n\n<h2 id=\"operaciones\">Operaciones y soporte</h2>\n<ul>\n  <li>Atención exclusiva para suscriptores activos.</li>\n  <li>Canales: WhatsApp Business dedicado y correo de operaciones.</li>\n  <li>Tiempos según categoría de incidente definidos en el SLA.</li>\n</ul>\n\n<h2 id=\"cobranzas\">Cobranzas y facturación</h2>\n<ul>\n  <li>Solicitud de comprobantes, conciliación de pagos, ajustes de factura.</li>\n  <li>Atención en horario hábil de lunes a viernes.</li>\n</ul>\n\n<h2 id=\"legal\">Legal y compliance</h2>\n<ul>\n  <li>Notificaciones formales, contratos, requerimientos regulatorios.</li>\n  <li>Las comunicaciones legales deben enviarse por correo, con copia al representante legal designado.</li>\n</ul>\n\n<h2 id=\"prensa\">Prensa y partnerships</h2>\n<ul>\n  <li>Solicitudes de prensa, colaboraciones con creadores y partnerships estratégicos.</li>\n  <li>Indicar empresa, propósito y plazo deseado de respuesta.</li>\n</ul>\n\n<div class=\"callout callout-info\">\n  <i class=\"fa-solid fa-circle-info\"></i>\n  <div>\n    <p><strong>Datos específicos.</strong> Los correos, números y direcciones se entregan al firmar contrato o al iniciar conversación comercial. No se publican en este documento para evitar uso indebido por terceros no relacionados con la operación.</p>\n  </div>\n</div>\n\n<h2 id=\"ubicacion\">Ubicación</h2>\n<ul>\n  <li>Oficina: Surquillo, Lima, Perú.</li>\n  <li>Operación remota distribuida con equipos en Perú, Colombia y México.</li>\n  <li>Atención presencial: solo bajo cita previa.</li>\n</ul>\n\n<div class=\"pagination\">\n  <a href=\"#/changelog\" data-route=\"changelog\">\n    <span class=\"label\"><i class=\"fa-solid fa-arrow-left\"></i> Anterior</span>\n    <span class=\"title\">Changelog</span>\n  </a>\n  <span></span>\n</div>\n"};
+
+const content = document.getElementById('content');
+const sidebar = document.querySelector('.sidebar');
+const backdrop = document.querySelector('.sidebar-backdrop');
+const subheaderLinks = document.querySelectorAll('.subheader a');
+
+function getRoute() {
+  const hash = window.location.hash || '#/index';
+  const slug = hash.replace(/^#\//, '') || 'index';
+  return PAGES[slug] ? slug : 'index';
+}
+
+function navigate(slug, push = true) {
+  if (!PAGES[slug]) slug = 'index';
+  // Smooth fade to prevent flash
+  content.classList.add('is-loading');
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      content.innerHTML = PAGES[slug];
+      // Update sidebar active state
+      document.querySelectorAll('.sidebar-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.route === slug);
+      });
+      // Update subheader active state
+      subheaderLinks.forEach(el => {
+        const r = el.dataset.route;
+        el.classList.toggle('active', r === slug || (r === 'index' && !['suscripcion','credito-publicitario','gestion-campanas','changelog'].includes(slug)));
+      });
+      // Wire copy buttons
+      content.querySelectorAll('.code-block-copy').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pre = btn.closest('.code-block').querySelector('pre');
+          navigator.clipboard.writeText(pre.innerText).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado';
+            setTimeout(() => { btn.innerHTML = original; }, 1500);
+          });
+        });
+      });
+      // Update URL
+      if (push) {
+        history.replaceState(null, '', '#/' + slug);
+      }
+      // Scroll to top of content area
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      content.classList.remove('is-loading');
+      // Close mobile sidebar
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('show');
+    }, 60);
+  });
+}
+
+// Intercept all data-route clicks
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('[data-route]');
+  if (!link) return;
+  e.preventDefault();
+  const slug = link.dataset.route;
+  navigate(slug);
+});
+
+// Handle browser back/forward
+window.addEventListener('hashchange', () => {
+  navigate(getRoute(), false);
+});
+
+// Mobile sidebar toggle
+document.querySelector('.mobile-toggle').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  backdrop.classList.toggle('show');
+});
+backdrop.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  backdrop.classList.remove('show');
+});
+
+// Search filter
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    const text = item.innerText.toLowerCase();
+    item.style.display = !q || text.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.sidebar-section').forEach(section => {
+    const visible = section.querySelectorAll('.sidebar-item:not([style*="display: none"])');
+    section.style.display = !q || visible.length ? '' : 'none';
+  });
+});
+
+// Cmd/Ctrl + K focuses search
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+});
+
+// Initial render
+navigate(getRoute(), false);
+</script>
+<script data-pplx-inline-edit>
+(function () {
+  if (window === window.top) return;
+
+  const allowedParentOrigins = ["https://www.hecom.club","https://hecom.club","https://www.perplexity.ai","https://perplexity.ai","https://testing.perplexity.ai","https://staging.perplexity.ai","https://*.preview.i.perplexity.ai","http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173"];
+  const MAX_FONT_BYTES = 500 * 1024;
+  const MAX_TOTAL_FONT_BYTES = 2 * 1024 * 1024;
+  let scrollForwarding = false;
+  let scrollRaf = 0;
+  let trustedTopOrigin = null;
+
+  // Allow entries like "https://*.preview.i.perplexity.ai" — the wildcard
+  // matches a single DNS label (no dots), so "https://*.foo" cannot stretch
+  // across multiple labels.
+  function matchesAllowedOrigin(origin) {
+    if (!origin) return false;
+    for (const entry of allowedParentOrigins) {
+      if (!entry.includes("*")) {
+        if (entry === origin) return true;
+        continue;
+      }
+      const pattern = new RegExp(
+        "^" +
+          entry.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^.]+") +
+          "$",
+      );
+      if (pattern.test(origin)) return true;
+    }
+    return false;
+  }
+
+  // Trust decision: when the sender is same-origin-visible (event.origin is a
+  // real origin like https://www.perplexity.ai) we trust event.origin directly.
+  // When event.origin is "null" (opaque broker srcdoc), we fall back to the
+  // broker's stamped `parentOrigin` to identify the top window. The fallback
+  // is claim-only — we rely on the browser's native `targetOrigin` enforcement
+  // on the response path (see postToTrustedTop) to ensure replies can't be
+  // delivered to anyone but the actual top window of that claimed origin.
+  function getTrustedParentOrigin(event) {
+    const forwardedParentOrigin =
+      typeof event.data.parentOrigin === "string" ? event.data.parentOrigin : null;
+    const parentOrigin = event.origin === "null" ? forwardedParentOrigin : event.origin;
+    return matchesAllowedOrigin(parentOrigin) ? parentOrigin : null;
+  }
+
+  // All responses go to window.top with targetOrigin = the allowlisted origin.
+  // An attacker that iframes us inside their own null-origin broker can claim
+  // any parentOrigin they like, but the browser will drop the reply whenever
+  // the real top's origin doesn't match — so the screenshot never leaves.
+  function postToTrustedTop(message) {
+    if (!trustedTopOrigin) return;
+    try {
+      window.top.postMessage(message, trustedTopOrigin);
+    } catch (_error) {}
+  }
+
+  function inlineAll(original, clone) {
+    if (original.nodeType !== 1 || clone.nodeType !== 1) return;
+
+    try {
+      const computedStyle = getComputedStyle(original);
+      // cssText on a computed style is the serialized declaration in modern
+      // Chromium/Safari — a single read beats enumerating ~400 longhand
+      // properties. Firefox returns "" here, so we fall back on empty.
+      const serialized = computedStyle.cssText;
+      if (serialized) {
+        clone.style.cssText = serialized;
+      } else {
+        const parts = new Array(computedStyle.length);
+        for (let index = 0; index < computedStyle.length; index += 1) {
+          const property = computedStyle[index];
+          parts[index] = `${property}:${computedStyle.getPropertyValue(property)};`;
+        }
+        clone.style.cssText = parts.join("");
+      }
+    } catch (_error) {}
+
+    const originalChildren = original.children;
+    const clonedChildren = clone.children;
+    for (
+      let index = 0;
+      index < originalChildren.length && index < clonedChildren.length;
+      index += 1
+    ) {
+      inlineAll(originalChildren[index], clonedChildren[index]);
+    }
+  }
+
+  function extractFontUrl(srcValue) {
+    const matches = [
+      ...srcValue.matchAll(
+        /url\(["']?([^"')]+)["']?\)(?:\s*format\(["']?([^"')]+)["']?\))?/gi,
+      ),
+    ];
+    if (matches.length === 0) return null;
+    const woff2 = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff2"));
+    if (woff2) return woff2[1];
+    const woff = matches.find((m) => m[2] && m[2].toLowerCase().includes("woff"));
+    if (woff) return woff[1];
+    return matches[0][1];
+  }
+
+  // Cache resolved font URL -> data URI across captures. Fonts on a page
+  // essentially never change, and a batch run emits multiple captures back to
+  // back — without this we'd refetch + re-base64 every time.
+  const fontDataUriCache = new Map();
+  const SRC_DECLARATION_RE = /src\s*:\s*[^;}]+/i;
+
+  async function fetchAsDataUri(url) {
+    if (fontDataUriCache.has(url)) return fontDataUriCache.get(url);
+    let dataUri = null;
+    try {
+      const response = await fetch(url, { mode: "cors", credentials: "omit" });
+      if (response.ok) {
+        const blob = await response.blob();
+        if (blob.size <= MAX_FONT_BYTES) {
+          dataUri = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve(typeof reader.result === "string" ? reader.result : null);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      }
+    } catch (_error) {
+      dataUri = null;
+    }
+    fontDataUriCache.set(url, dataUri);
+    return dataUri;
+  }
+
+  function collectFontFaceRuleTexts() {
+    const rules = [];
+    for (const sheet of document.styleSheets) {
+      let cssRules;
+      try {
+        cssRules = sheet.cssRules;
+      } catch (_error) {
+        continue;
+      }
+      if (!cssRules) continue;
+      for (const rule of cssRules) {
+        const cssText = rule.cssText || "";
+        if (cssText.startsWith("@font-face")) rules.push(cssText);
+      }
+    }
+    return rules;
+  }
+
+  async function buildInlinedFontCss() {
+    const ruleTexts = collectFontFaceRuleTexts();
+    if (ruleTexts.length === 0) return null;
+
+    const resolved = ruleTexts.map((cssText) => {
+      if (!SRC_DECLARATION_RE.test(cssText)) return null;
+      const srcMatch = cssText.match(/src\s*:\s*([^;}]+)[;}]/i);
+      if (!srcMatch) return null;
+      const url = extractFontUrl(srcMatch[1]);
+      if (!url) return null;
+      try {
+        return { cssText, url: new URL(url, document.baseURI).href };
+      } catch (_error) {
+        return null;
+      }
+    });
+
+    const dataUris = await Promise.all(
+      resolved.map((entry) => (entry ? fetchAsDataUri(entry.url) : Promise.resolve(null))),
+    );
+
+    const inlined = [];
+    let totalBytes = 0;
+    for (let index = 0; index < resolved.length; index += 1) {
+      const entry = resolved[index];
+      const dataUri = dataUris[index];
+      if (!entry || !dataUri) continue;
+      const approxBytes = dataUri.length * 0.75;
+      if (totalBytes + approxBytes > MAX_TOTAL_FONT_BYTES) break;
+      totalBytes += approxBytes;
+      inlined.push(entry.cssText.replace(SRC_DECLARATION_RE, `src: url("${dataUri}")`));
+    }
+    return inlined.length > 0 ? inlined.join("\n") : null;
+  }
+
+  function stripExternal(clone) {
+    const images = clone.querySelectorAll("img");
+    for (let index = 0; index < images.length; index += 1) {
+      const src = images[index].getAttribute("src");
+      if (src && !src.startsWith("data:")) images[index].removeAttribute("src");
+    }
+
+    const elements = clone.querySelectorAll("*");
+    for (let index = 0; index < elements.length; index += 1) {
+      const style = elements[index].style.cssText;
+      if (style && style.includes("url(")) {
+        elements[index].style.cssText = style.replace(
+          /url\(["']?(?!data:)[^)"']*["']?\)/gi,
+          "none",
+        );
+      }
+    }
+  }
+
+  function emitScroll() {
+    scrollRaf = 0;
+    if (!scrollForwarding) return;
+    postToTrustedTop({
+      type: "INLINE_EDIT_SCROLL",
+      scrollX: window.scrollX,
+      scrollY: window.scrollY,
+    });
+  }
+
+  window.addEventListener(
+    "scroll",
+    function () {
+      if (!scrollForwarding || scrollRaf) return;
+      scrollRaf = requestAnimationFrame(emitScroll);
+    },
+    { passive: true, capture: true },
+  );
+
+  async function handleCaptureRequest(event) {
+    const requestId = event.data.requestId;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    function postResult(dataUrl) {
+      postToTrustedTop({
+        type: "INLINE_EDIT_SCREENSHOT_RESULT",
+        requestId,
+        dataUrl,
+        scrollX,
+        scrollY,
+      });
+    }
+
+    try {
+      // Wait for any pending web fonts to resolve so both inline metrics and
+      // the @font-face inlining below see the same loaded faces.
+      if (document.fonts && document.fonts.ready) {
+        try {
+          await document.fonts.ready;
+        } catch (_error) {}
+      }
+
+      const clone = document.documentElement.cloneNode(true);
+      inlineAll(document.documentElement, clone);
+
+      const removedNodes = clone.querySelectorAll("script,link[rel=\"stylesheet\"],style");
+      for (let index = 0; index < removedNodes.length; index += 1) {
+        removedNodes[index].remove();
+      }
+
+      stripExternal(clone);
+
+      // Re-embed web fonts as data-URI @font-face rules so the SVG rasterizer
+      // can resolve them — external font URLs aren't fetched during
+      // foreignObject rendering, which would otherwise force a fallback face
+      // and change text metrics.
+      const inlinedFontCss = await buildInlinedFontCss();
+      if (inlinedFontCss) {
+        const styleEl = document.createElement("style");
+        styleEl.textContent = inlinedFontCss;
+        const head = clone.querySelector("head");
+        if (head) head.appendChild(styleEl);
+        else clone.insertBefore(styleEl, clone.firstChild);
+      }
+
+      const html = new XMLSerializer().serializeToString(clone);
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">` +
+        '<foreignObject width="100%" height="100%">' +
+        `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;overflow:hidden">` +
+        `<div style="transform:translate(-${scrollX}px,-${scrollY}px);transform-origin:top left">` +
+        html +
+        "</div></div></foreignObject></svg>";
+      const svgUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+      const image = new Image();
+      image.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0);
+        postResult(canvas.toDataURL("image/png"));
+      };
+      image.onerror = function () {
+        postResult(null);
+      };
+      image.src = svgUrl;
+    } catch (_error) {
+      postResult(null);
+    }
+  }
+
+  window.addEventListener("message", function (event) {
+    if (!event.data) return;
+    // Only accept messages from the direct parent frame. Blocks sibling /
+    // unrelated-window postMessage senders that could otherwise reach us.
+    if (event.source !== window.parent) return;
+
+    const trustedParentOrigin = getTrustedParentOrigin(event);
+    if (!trustedParentOrigin) return;
+    trustedTopOrigin = trustedParentOrigin;
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_START") {
+      scrollForwarding = true;
+      emitScroll();
+      return;
+    }
+
+    if (event.data.type === "INLINE_EDIT_SCROLL_STOP") {
+      scrollForwarding = false;
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = 0;
+      return;
+    }
+
+    if (event.data.type !== "INLINE_EDIT_CAPTURE_REQUEST") return;
+
+    handleCaptureRequest(event);
+  });
+})();
+
+
+</script></body>
+</html>
