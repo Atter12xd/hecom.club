@@ -49,6 +49,8 @@
     { "source": "/creativos/:path*", "destination": "/creativos/:path*" },
     { "source": "/finanzas", "destination": "/finanzas/index.html" },
     { "source": "/finanzas/:path*", "destination": "/finanzas/:path*" },
+    { "source": "/finanzas-personales", "destination": "/finanzas-personales/index.html" },
+    { "source": "/finanzas-personales/:path*", "destination": "/finanzas-personales/:path*" },
     { "source": "/acceso-pendientes", "destination": "/acceso-pendientes/index.html" },
     { "source": "/acceso-creativos", "destination": "/acceso-creativos/index.html" },
     { "source": "/acceso-finanzas", "destination": "/acceso-finanzas/index.html" },
@@ -123,6 +125,12 @@
     },
     {
       "source": "/finanzas",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/finanzas-personales",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
       ]
