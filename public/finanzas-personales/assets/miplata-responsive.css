@@ -1,54 +1,110 @@
 /*
-  MiPlata (finanzas-personales): responsive sin tocar el bundle React.
-  El layout original es fila: aside 232px + main. En móvil eso deja el contenido
-  apretado; aquí apilamos column-reverse para ver primero el contenido y el menú abajo.
+  MiPlata (/finanzas-personales): layout móvil sin tocar el bundle.
+  IMPORTANTE: bajo #root hay proveedores (React Query, etc.); el shell real
+  (flex + aside + main) suele estar anidado, NO como hijo directo de #root.
 */
 
 @media (max-width: 767.98px) {
-  #root > div.flex:first-of-type {
-    flex-direction: column-reverse;
-    height: auto !important;
-    min-height: 100svh;
-    max-height: none;
+  html {
     overflow-x: hidden;
-    overflow-y: auto;
+  }
+
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Shell de la app: flex row → columna invertida (contenido primero, menú debajo) */
+  #root div.flex.h-screen.overflow-hidden.bg-background {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    height: auto !important;
+    min-height: 100svh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 
-  #root > div.flex:first-of-type > aside {
+  /* Aside fijo ~232px: ancho completo en columna */
+  #root div.flex.h-screen.overflow-hidden.bg-background > aside {
     width: 100% !important;
-    flex-shrink: 0;
-    max-height: min(340px, 42svh);
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box;
+    max-height: min(360px, 44svh);
     overflow-y: auto;
     border-top: 1px solid hsl(var(--sidebar-border) / 1);
   }
 
-  #root > div.flex:first-of-type > main {
+  /* Contenido al 100% del ancho */
+  #root div.flex.h-screen.overflow-hidden.bg-background > main {
     flex: 1 1 auto !important;
     width: 100% !important;
     min-width: 0 !important;
+    max-width: 100vw !important;
+    box-sizing: border-box;
     overflow-x: hidden;
   }
 
-  /* Contenedor interior (clase generada por Tailwind en el build) */
+  /* Contenedor interior max-w-[1120px] + paddings grandes */
   #root main div.max-w-\[1120px\] {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
   }
 
-  /* Fila título + selector de periodo: varias líneas si hace falta */
+  /* Cabeceras de página tipo título + botón / filtros */
   #root main div.flex.items-center.justify-between {
     flex-wrap: wrap !important;
     align-items: flex-start !important;
     gap: 0.75rem !important;
   }
 
-  /* KPIs: en teléfonos muy angostos una sola columna */
-  @media (max-width: 420px) {
-    #root main div.grid.grid-cols-2.lg\:grid-cols-4 {
-      grid-template-columns: 1fr !important;
-    }
+  /* Tarjetas resumen dos columnas (Dashboard, Gastos, Préstamos, etc.) → una columna */
+  #root main div.grid.grid-cols-2.gap-4 {
+    grid-template-columns: 1fr !important;
+    min-width: 0;
+  }
+
+  /*
+    Tablas con columnas tipo grid-cols-[1fr_100px_...]:
+    permite desplazar horizontalmente en lugar de recortar.
+  */
+  #root main div.grid[class*="1fr_100px"][class*="grid-cols-\["],
+  #root main div.grid[class*="1fr_120px"][class*="grid-cols-\["],
+  #root main div[class*="grid-cols-\[1fr"] {
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  /*
+    Dashboard KPIs: clase grid-cols-2 lg:grid-cols-4 → una columna muy angosta
+    (selectores Tailwind incluyen punto escapado en el DOM como parte del token lg:...)
+  */
+  #root main div.grid.grid-cols-2[class*="lg:grid-cols-4"] {
+    grid-template-columns: 1fr !important;
+    min-width: 0;
+  }
+
+  /*
+    Tarjetas de préstamos: filas con 4 métricas (grid-cols-4)
+  */
+  #root main div.grid.grid-cols-4.gap-3 {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  #root main div.grid.grid-cols-4.gap-3 {
+    grid-template-columns: 1fr !important;
   }
 }
