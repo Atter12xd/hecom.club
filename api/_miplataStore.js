@@ -33,6 +33,26 @@ function inRange(dateStr, from, to) {
   return d >= String(from) && d <= String(to);
 }
 
+/** Próximos pagos (tarjeta del dashboard): préstamos activos con fecha. */
+function buildNextPayments(st) {
+  var out = [];
+  (st.loans || []).forEach(function (row) {
+    if (String(row.status) !== "activo") return;
+    var d = String(row.nextPaymentDate || "").trim();
+    if (!d) return;
+    out.push({
+      id: row.id,
+      lenderName: row.lenderName || "Préstamo",
+      nextPaymentDate: d,
+      monthlyPayment: parseNum(row.monthlyPayment),
+    });
+  });
+  out.sort(function (a, b) {
+    return String(a.nextPaymentDate).localeCompare(String(b.nextPaymentDate));
+  });
+  return out.slice(0, 30);
+}
+
 function buildSummary(from, to) {
   var st = getStore();
   var monthlyIncome = {};
@@ -86,6 +106,7 @@ function buildSummary(from, to) {
     totalLoansRemaining: totalLoansRemaining,
     activeLoansCount: activeLoansCount,
     balance: totalIncome - totalExpenses,
+    nextPayments: buildNextPayments(st),
   };
 }
 
