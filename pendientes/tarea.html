@@ -8306,7 +8306,11 @@ function openEditClient(id) {
         </button>
       </div>
     </div>`;
-  footer.innerHTML = `<button class="btn-secondary" onclick="closeModal(null,true);_editingClientId=null">Cancelar</button><button class="btn-primary" onclick="updateClient()">Guardar</button>`;
+  var canDelClient = tareasEffectivePerms().admin && c.id;
+  var delClientBtn = canDelClient
+    ? `<button type="button" class="btn-primary" style="background:var(--red);border-color:var(--red)" onclick="deleteClient('${String(c.id).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}')">Eliminar</button>`
+    : '';
+  footer.innerHTML = `<div style="display:flex;width:100%;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between"><span>${delClientBtn}</span><span style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto"><button class="btn-secondary" onclick="closeModal(null,true);_editingClientId=null">Cancelar</button><button class="btn-primary" onclick="updateClient()">Guardar</button></span></div>`;
   var ovEdit = document.getElementById('modalOverlay');
   if (ovEdit) ovEdit.setAttribute('data-tareas-backdrop-lock', '1');
   var modalEdit = document.querySelector('#modalOverlay .modal');
@@ -8656,17 +8660,28 @@ function updateClient() {
 }
 function deleteClient(id) {
   if (!tareasEffectivePerms().admin) { alert('Solo los administradores pueden eliminar clientes.'); return; }
-  if (!confirm('¿Eliminar este cliente? Esta acción no se puede deshacer.')) return;
+  var sid = String(id || '').trim();
+  if (!sid) return;
+  var row = clients.find(function(x){ return String(x.id) === sid; });
+  var nm = row ? String(row.n || '').trim() : '';
+  var idTail = sid.length > 10 ? sid.slice(-8) : sid;
+  var msg = '¿Eliminar este registro en Pendientes?\n\n'
+    + (nm ? 'Cliente: "' + nm + '"\n' : '')
+    + 'ID interno (solo esta fila): …' + idTail + '\n\n'
+    + 'No borra otros clientes con el mismo nombre ni registros en Crédito. Esta acción no se puede deshacer.';
+  if (!confirm(msg)) return;
   if (supabase) {
-    supabase.from('tareas_clientes').delete().eq('id', id).then(function(r) {
+    supabase.from('tareas_clientes').delete().eq('id', sid).then(function(r) {
       if (r.error) { alert('Error al eliminar: ' + (r.error.message||'')); return; }
+      _editingClientId = null;
       reloadTareasData();
-      closeModal();
+      closeModal(null, true);
     });
   } else {
-    clients = clients.filter(function(c){ return c.id !== id; });
+    clients = clients.filter(function(c){ return String(c.id) !== sid; });
+    _editingClientId = null;
     renderers.clients(); updateBadges();
-    closeModal();
+    closeModal(null, true);
   }
 }
 
