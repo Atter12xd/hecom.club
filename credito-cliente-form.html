@@ -633,6 +633,7 @@
           <div id="draft-info-banner" style="display:none;margin-bottom:8px;padding:13px 14px;border-radius:14px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;line-height:1.45;font-size:13px">
             Tu envío llega como <strong>borrador</strong>. Un gerente lo revisará antes de registrarlo en tu cuenta.
           </div>
+          <div id="resultado-banner" role="status" style="display:none;margin-bottom:8px;padding:13px 14px;border-radius:14px;line-height:1.45;font-size:13px"></div>
           <div class="section">
             <div class="section-head">
               <div class="ico">
@@ -747,6 +748,20 @@
       var isResubmit = false;
 
       var $ = function (id) { return document.getElementById(id); };
+      function escapeHtmlText(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function decodeMotivoUrl(m) {
+        if (!m) return "";
+        try {
+          return decodeURIComponent(String(m).replace(/\+/g, " "));
+        } catch (_) {
+          return String(m || "");
+        }
+      }
       var form = $("client-form");
       var clientMeta = $("client-meta");
       var clientNameSide = $("client-name-side");
@@ -795,6 +810,36 @@
       (function showDraftInfo() {
         var b = $("draft-info-banner");
         if (b && clientId && !submissionId) b.style.display = "block";
+      })();
+      (function showResultadoClienteParam() {
+        var rb = $("resultado-banner");
+        var res = ((qs.get("resultado") || qs.get("result") || "") + "").trim().toLowerCase();
+        /* Links de corrección llevan submissionId; no mezclar con avisos aprobado/rechazado */
+        if (submissionId) return;
+        if (!rb || !clientId || !res) return;
+        var mot = decodeMotivoUrl(qs.get("motivo") || qs.get("razon") || "");
+        var di = $("draft-info-banner");
+        if (di) di.style.display = "none";
+        if (res === "aprobado" || res === "approved" || res === "ok") {
+          rb.style.display = "block";
+          rb.style.background = "#ecfdf5";
+          rb.style.border = "1px solid #86efac";
+          rb.style.color = "#14532d";
+          rb.innerHTML = "<strong>Aprobado.</strong> Tu envío quedó registrado. Gracias.";
+          return;
+        }
+        if (res === "rechazado" || res === "rejected" || res === "no") {
+          rb.style.display = "block";
+          rb.style.background = "#fef2f2";
+          rb.style.border = "1px solid #fecaca";
+          rb.style.color = "#991b1b";
+          rb.innerHTML =
+            "<strong>Este envío fue rechazado.</strong>" +
+            (mot
+              ? "<span style='display:block;margin-top:8px'>" + escapeHtmlText(mot) + "</span>"
+              : "<span style='display:block;margin-top:8px;opacity:.9'>Si aplica, podés enviar un nuevo pago con el mismo formulario.</span>");
+          return;
+        }
       })();
       if (clientNameSide) clientNameSide.textContent = clientName || "(sin nombre)";
       if (clientIdSide) clientIdSide.textContent = "ID: " + (clientId || "-");

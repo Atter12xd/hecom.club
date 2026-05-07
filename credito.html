@@ -783,13 +783,57 @@
         if (name) u.searchParams.set("clientName", name);
         return u.toString();
       }
-      function buildClientCorrectLink(clientId, submissionId) {
+      function buildClienteFormNoticeUrl(opts) {
+        opts = opts || {};
         var u = new URL("/credito-cliente-form", window.location.origin);
-        u.searchParams.set("clientId", clientId);
-        if (submissionId) u.searchParams.set("submissionId", submissionId);
-        var name = readClientName();
-        if (name) u.searchParams.set("clientName", name);
+        u.searchParams.set("clientId", opts.clientId || "");
+        if (opts.clientName) u.searchParams.set("clientName", opts.clientName);
+        if (opts.resultado) u.searchParams.set("resultado", opts.resultado);
+        if (opts.motivo && String(opts.motivo).trim()) {
+          var mo = String(opts.motivo).replace(/\s+/g, " ").trim();
+          if (mo.length > 480) mo = mo.slice(0, 480) + "…";
+          u.searchParams.set("motivo", mo);
+        }
+        if (opts.submissionId) u.searchParams.set("submissionId", opts.submissionId);
         return u.toString();
+      }
+      function textoMensajeCliente(kind, primeraLineaCliente, textoExtra, url) {
+        var p = primeraLineaCliente ? String(primeraLineaCliente).trim() : "";
+        var hola = p ? "Hola " + p + " — " : "Hola — ";
+        var u = String(url || "");
+        if (kind === "accepted") {
+          return (
+            hola +
+            "tu envío del formulario Holistic fue APROBADO y ya quedó registrado. Gracias.\n\n" +
+            "Link con el detalle:\n" +
+            u
+          );
+        }
+        if (kind === "rejected") {
+          var mot = String(textoExtra || "").trim() || "(sin motivo detallado)";
+          return (
+            hola +
+            "lamentablemente ese envío fue RECHAZADO.\n\n" +
+            "Motivo:\n" +
+            mot +
+            "\n\n" +
+            "Si corresponde, podés enviar un pago nuevo desde este link:\n" +
+            u
+          );
+        }
+        if (kind === "correction") {
+          var ins = String(textoExtra || "").trim() || "(revisá los datos del formulario)";
+          return (
+            hola +
+            "necesitamos que corrijas tu envío antes de registrarlo.\n\n" +
+            "Indicaciones del equipo:\n" +
+            ins +
+            "\n\n" +
+            "Abrí este enlace para corregir y reenviar:\n" +
+            u
+          );
+        }
+        return u;
       }
       function escapeHtmlQuick(s) {
         return String(s || "")
@@ -979,12 +1023,49 @@
               return out;
             }
 
-            if (act === "link_edit") {
-              if (!submissionId || !cid) return;
-              var linkLe = buildClientCorrectLink(cid, submissionId);
-              var copiedLe = await copyText(linkLe);
-              if (copiedLe) showToast("Link de corrección copiado");
-              else window.prompt("Copiá y enviá al cliente:", linkLe);
+            if (act === "notice_copy") {
+              if (!cid) return;
+              var nk = btn.getAttribute("data-notice-kind") || "";
+              var sidN = btn.getAttribute("data-submission-id") || "";
+              var mfEnc = btn.getAttribute("data-manager-fb") || "";
+              var mf = "";
+              try {
+                mf = decodeURIComponent(mfEnc.replace(/\+/g, "%20"));
+              } catch (_) {
+                mf = "";
+              }
+              var nombreCliente = (cnm || "").trim();
+              if (nk === "correction" && !sidN) return;
+              var urlNotice = "";
+              var bloque = "";
+              if (nk === "accepted") {
+                urlNotice = buildClienteFormNoticeUrl({
+                  clientId: cid,
+                  clientName: nombreCliente,
+                  resultado: "aprobado",
+                });
+                bloque = textoMensajeCliente("accepted", nombreCliente, "", urlNotice);
+              } else if (nk === "rejected") {
+                urlNotice = buildClienteFormNoticeUrl({
+                  clientId: cid,
+                  clientName: nombreCliente,
+                  resultado: "rechazado",
+                  motivo: mf,
+                });
+                bloque = textoMensajeCliente("rejected", nombreCliente, mf, urlNotice);
+              } else if (nk === "correction") {
+                urlNotice = buildClienteFormNoticeUrl({
+                  clientId: cid,
+                  clientName: nombreCliente,
+                  submissionId: sidN,
+                });
+                bloque = textoMensajeCliente("correction", nombreCliente, mf, urlNotice);
+              } else {
+                return;
+              }
+              var cpo = await copyText(bloque);
+              if (cpo) showToast("Texto para el cliente copiado");
+              else window.prompt("Copiá este mensaje para enviar al cliente:", bloque);
               return;
             }
             if (act === "reqedit_open") {
@@ -1034,7 +1115,7 @@
               }
               try {
                 await postAction("request_edit", rqNote);
-                showToast("Pedido guardado. Usá «Pasar link de corrección» para compartir el enlace.");
+                showToast('Pedido guardado. En ese mismo envío tocá «Copiar aviso (corrección)» para texto + link.');
                 await openFormsModal(cid, cnm);
               } catch (e2) {
                 showToast((e2 && e2.message) ? e2.message : "No se pudo guardar.", "error");
@@ -1049,7 +1130,7 @@
               }
               try {
                 await postAction("reject", rjn || null);
-                showToast("Marcado rechazado");
+                showToast('Rechazado. Usá «Copiar mensaje (rechazado)» en ese envío para avisar al cliente.');
                 await openFormsModal(cid, cnm);
               } catch (e3) {
                 showToast((e3 && e3.message) ? e3.message : "No se pudo guardar.", "error");
@@ -1060,7 +1141,7 @@
             if (act === "accept") {
               try {
                 await postAction("accept", null);
-                showToast("Aceptado y registrado");
+                showToast('Aprobado y registrado. Usá «Copiar mensaje (aprobado)» en ese envío para avisar al cliente.');
                 await openFormsModal(cid, cnm);
               } catch (e4) {
                 showToast((e4 && e4.message) ? e4.message : "No se pudo guardar.", "error");
@@ -1176,10 +1257,26 @@
                   + "<button type='button' data-hm-form-act='reqedit_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
                   + "</div></div>";
             } else if (st === "credito_client_form_submissions" && ap === "needs_client_edit" && it.submissionId) {
+              var mfCor = String(it.managerFeedback != null ? it.managerFeedback : "");
               actionsHtml +=
                 "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
-                  + "<button type='button' data-hm-form-act='link_edit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Pasar link de corrección</button>"
+                  + "<button type='button' data-hm-form-act='notice_copy' data-notice-kind='correction' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "data-manager-fb=\"" + encodeURIComponent(mfCor.slice(0, 1500)) + "\" "
+                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Copiar aviso (corrección)</button>"
+                  + "</div>";
+            } else if (st === "credito_client_form_submissions" && ap === "accepted" && it.submissionId) {
+              actionsHtml +=
+                "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
+                  + "<button type='button' data-hm-form-act='notice_copy' data-notice-kind='accepted' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #16a34a;background:#f0fdf4;color:#15803d;font-weight:700;font-size:12px;cursor:pointer'>Copiar mensaje (aprobado)</button>"
+                  + "</div>";
+            } else if (st === "credito_client_form_submissions" && ap === "rejected" && it.submissionId) {
+              var mfRej = String(it.managerFeedback != null ? it.managerFeedback : "");
+              actionsHtml +=
+                "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
+                  + "<button type='button' data-hm-form-act='notice_copy' data-notice-kind='rejected' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "data-manager-fb=\"" + encodeURIComponent(mfRej.slice(0, 1500)) + "\" "
+                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #dc2626;background:#fef2f2;color:#991b1b;font-weight:700;font-size:12px;cursor:pointer'>Copiar mensaje (rechazado)</button>"
                   + "</div>";
             }
             return ""

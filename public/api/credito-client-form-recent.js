@@ -110,35 +110,34 @@ module.exports = async function handler(req, res) {
       }
     } catch (_) {}
 
-    try {
-      var forms = await fetchRows(
-        supabaseUrl,
-        serviceKey,
-        "credito_client_form_submissions",
-        "select=id,client_id,tipo,monto,fecha_pago,detalle,comprobante_url,created_at,approval_status,manager_feedback&client_id=" +
-          safeClient +
-          "&order=created_at.desc&limit=16"
-      );
-      for (var k = 0; k < forms.length; k += 1) {
-        var ap = forms[k].approval_status || "pending_review";
-        var feedback = forms[k].manager_feedback ? String(forms[k].manager_feedback) : "";
-        var noteParts = [];
-        if (feedback) noteParts.push("Gestor: " + feedback);
-        if (forms[k].detalle) noteParts.push(String(forms[k].detalle));
-        all.push({
-          kind: forms[k].tipo || "formulario",
-          amount: Number(forms[k].monto || 0),
-          date: forms[k].fecha_pago || forms[k].created_at || null,
-          note: noteParts.join(" · ") || "",
-          proof: forms[k].comprobante_url || null,
-          source: "credito_client_form_submissions",
-          submissionId: forms[k].id || null,
-          approvalStatus: ap,
-          approvalLabel: statusLabel(ap),
-          actionable: ap === "pending_review",
-        });
-      }
-    } catch (_) {}
+    var forms = await fetchRows(
+      supabaseUrl,
+      serviceKey,
+      "credito_client_form_submissions",
+      "select=id,client_id,tipo,monto,fecha_pago,detalle,comprobante_url,created_at,approval_status,manager_feedback&client_id=" +
+        safeClient +
+        "&order=created_at.desc&limit=24"
+    );
+    for (var k = 0; k < forms.length; k += 1) {
+      var ap = forms[k].approval_status || "pending_review";
+      var feedback = forms[k].manager_feedback ? String(forms[k].manager_feedback) : "";
+      var noteParts = [];
+      if (feedback) noteParts.push("Gestor: " + feedback);
+      if (forms[k].detalle) noteParts.push(String(forms[k].detalle));
+      all.push({
+        kind: forms[k].tipo || "formulario",
+        amount: Number(forms[k].monto || 0),
+        date: forms[k].fecha_pago || forms[k].created_at || null,
+        note: noteParts.join(" · ") || "",
+        proof: forms[k].comprobante_url || null,
+        source: "credito_client_form_submissions",
+        submissionId: forms[k].id || null,
+        approvalStatus: ap,
+        approvalLabel: statusLabel(ap),
+        actionable: ap === "pending_review",
+        managerFeedback: feedback || null,
+      });
+    }
 
     all.sort(function (a, b) {
       var ta = a && a.date ? new Date(a.date).getTime() : 0;

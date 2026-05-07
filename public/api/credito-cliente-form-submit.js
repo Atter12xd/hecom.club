@@ -22,6 +22,41 @@ function parseDataUrl(dataUrl) {
   return { mime: m[1].toLowerCase(), b64: m[2] };
 }
 
+/** Vercel a veces entrega el body como string o Buffer; unificar a objeto. */
+function parseRequestBody(req) {
+  var b = req.body;
+  if (b === undefined || b === null) return {};
+  if (Buffer.isBuffer(b)) {
+    try {
+      return b.length ? JSON.parse(b.toString("utf8")) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  if (typeof b === "string") {
+    try {
+      return b ? JSON.parse(b) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  if (typeof b === "object") return b;
+  return {};
+}
+
+/** Un solo canal de tipos en negocio: recarga | amortizacion; mapea legacy y acentos. */
+function normalizeCreditoClienteTipo(raw) {
+  var s = String(raw || "").trim().toLowerCase();
+  try {
+    s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  } catch (_) {}
+  if (s === "recarga") return "recarga";
+  if (s === "amortizacion") return "amortizacion";
+  var legacyToAmort = { garantia: 1, cobro: 1, gasto_ads: 1, otro: 1 };
+  if (legacyToAmort[s]) return "amortizacion";
+  return "recarga";
+}
+
 async function uploadToBucket(supabaseUrl, serviceKey, bucket, path, buffer, mimeType) {
   var u = supabaseUrl.replace(/\/$/, "") + "/storage/v1/object/" + encodeURIComponent(bucket) + "/" + path;
   var r = await fetch(u, {
@@ -110,15 +145,11 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    var body = req.body || {};
+    var body = parseRequestBody(req);
     var clientId = sanitizeText(body.client_id, 80);
     if (!clientId) return json(res, 400, { ok: false, error: "client_id es requerido." });
 
-    var tipo = sanitizeText(body.tipo, 40) || "recarga";
-    var allowedTipos = ["recarga", "amortizacion"];
-    if (allowedTipos.indexOf(tipo) < 0) {
-      return json(res, 400, { ok: false, error: "Tipo debe ser recarga o amortización." });
-    }
+    var tipo = normalizeCreditoClienteTipo(body.tipo);
     var fechaPago = sanitizeText(body.fecha_pago, 24);
     var clientName = sanitizeText(body.client_name, 140);
     var telefono = sanitizeText(body.telefono, 40);
