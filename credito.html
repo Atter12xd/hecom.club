@@ -753,6 +753,8 @@
   <script>
     (function () {
       var BTN_ID = "hm-client-pass-link-btn";
+      var BTN_VIEW_ID = "hm-client-forms-view-btn";
+      var MODAL_ID = "hm-client-forms-modal";
       var OBS_KEY = "__HM_CLIENT_LINK_OBS__";
       function parseClientIdFromHash() {
         try {
@@ -808,7 +810,7 @@
         } catch (_) {}
         return false;
       }
-      function showCopyToast(message) {
+      function showToast(message, kind) {
         var id = "hm-client-link-toast";
         var t = document.getElementById(id);
         if (!t) {
@@ -819,19 +821,21 @@
             "right:18px",
             "bottom:18px",
             "z-index:999999",
-            "background:linear-gradient(135deg,#16a34a,#22c55e)",
             "color:#fff",
             "padding:11px 14px",
             "border-radius:12px",
             "font:600 13px/1.3 Inter,system-ui,-apple-system,Segoe UI,sans-serif",
-            "box-shadow:0 12px 28px rgba(22,163,74,.28)",
+            "box-shadow:0 12px 28px rgba(15,23,42,.28)",
             "opacity:0",
             "transform:translateY(8px)",
             "transition:opacity .18s ease,transform .18s ease"
           ].join(";");
           document.body.appendChild(t);
         }
-        t.textContent = message || "Copiado";
+        t.style.background = kind === "error"
+          ? "linear-gradient(135deg,#b91c1c,#dc2626)"
+          : "linear-gradient(135deg,#16a34a,#22c55e)";
+        t.textContent = message || "Listo";
         t.style.opacity = "1";
         t.style.transform = "translateY(0)";
         clearTimeout(window.__HM_COPY_TOAST_TIMER__);
@@ -840,59 +844,149 @@
           t.style.transform = "translateY(8px)";
         }, 1700);
       }
-      function ensurePassLinkButton() {
+      function ensureModal() {
+        var modal = document.getElementById(MODAL_ID);
+        if (modal) return modal;
+        modal = document.createElement("div");
+        modal.id = MODAL_ID;
+        modal.style.cssText = "position:fixed;inset:0;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:1000001;padding:16px;";
+        modal.innerHTML = ""
+          + "<div style='width:min(760px,96vw);max-height:84vh;overflow:auto;background:#fff;border-radius:14px;border:1px solid #e2e8f0;box-shadow:0 24px 60px rgba(15,23,42,.35)'>"
+          + "  <div style='padding:14px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;gap:12px;'>"
+          + "    <div>"
+          + "      <div style='font-size:15px;font-weight:800;color:#0f172a;'>Formularios del cliente</div>"
+          + "      <div id='hm-client-forms-sub' style='font-size:12px;color:#64748b;'>Cargando...</div>"
+          + "    </div>"
+          + "    <button id='hm-client-forms-close' type='button' style='height:34px;padding:0 12px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;font-weight:700;cursor:pointer'>Cerrar</button>"
+          + "  </div>"
+          + "  <div id='hm-client-forms-body' style='padding:14px 16px;display:grid;gap:10px;'></div>"
+          + "</div>";
+        modal.addEventListener("click", function (ev) {
+          if (ev.target === modal) modal.style.display = "none";
+        });
+        document.body.appendChild(modal);
+        var close = document.getElementById("hm-client-forms-close");
+        if (close) close.addEventListener("click", function () { modal.style.display = "none"; });
+        return modal;
+      }
+      function fmtDate(s) {
+        if (!s) return "—";
+        try { return new Date(s).toLocaleString("es", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }); }
+        catch (_) { return String(s); }
+      }
+      function fmtMoney(v) {
+        var n = Number(v || 0);
+        if (!n) return "—";
+        try { return n.toLocaleString("en-US", { style: "currency", currency: "USD" }); }
+        catch (_) { return "$" + n.toFixed(2); }
+      }
+      function typeBadge(type) {
+        var map = {
+          cobro: ["#eff6ff", "#1d4ed8"],
+          recarga: ["#f0f9ff", "#0369a1"],
+          garantia: ["#ecfdf5", "#047857"],
+          formulario: ["#fff7ed", "#9a3412"]
+        };
+        var c = map[type] || ["#f8fafc", "#334155"];
+        return "<span style='display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700;background:" + c[0] + ";color:" + c[1] + ";text-transform:uppercase;'>" + type + "</span>";
+      }
+      async function openFormsModal(clientId, clientName) {
+        if (!clientId) return;
+        var modal = ensureModal();
+        modal.style.display = "flex";
+        var sub = document.getElementById("hm-client-forms-sub");
+        var body = document.getElementById("hm-client-forms-body");
+        if (sub) sub.textContent = (clientName || "Cliente") + " · " + clientId;
+        if (body) body.innerHTML = "<div style='font-size:13px;color:#64748b'>Cargando historial...</div>";
+        try {
+          var url = "/api/credito-client-form-recent?clientId=" + encodeURIComponent(clientId);
+          var res = await fetch(url, { cache: "no-store" });
+          var out = await res.json().catch(function () { return {}; });
+          if (!res.ok || !out.ok) throw new Error((out && out.error) || ("HTTP " + res.status));
+          var items = Array.isArray(out.items) ? out.items : [];
+          if (!items.length) {
+            if (body) body.innerHTML = "<div style='font-size:13px;color:#64748b'>No hay formularios/cobros/garantias para este cliente aun.</div>";
+            return;
+          }
+          if (!body) return;
+          body.innerHTML = items.map(function (it) {
+            var note = it.note ? String(it.note) : "";
+            return ""
+              + "<article style='border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px;background:#fff;'>"
+              + "  <div style='display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;'>"
+              + "    <div style='display:flex;align-items:center;gap:8px;'>" + typeBadge(it.kind || "formulario") + "<strong style='font-size:13px;color:#0f172a'>" + fmtMoney(it.amount) + "</strong></div>"
+              + "    <span style='font-size:12px;color:#64748b'>" + fmtDate(it.date) + "</span>"
+              + "  </div>"
+              + "  <div style='margin-top:8px;font-size:12px;color:#475569;line-height:1.45;'>" + (note ? note.replace(/</g, "&lt;") : "Sin detalle") + "</div>"
+              + "  <div style='margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;'>"
+              + "    <span style='font-size:11px;color:#94a3b8'>Fuente: " + String(it.source || "—") + "</span>"
+              + "    " + (it.proof ? "<a href='" + String(it.proof) + "' target='_blank' rel='noopener' style='font-size:12px;font-weight:700;color:#0ea5e9;text-decoration:none'>Ver comprobante</a>" : "")
+              + "  </div>"
+              + "</article>";
+          }).join("");
+        } catch (err) {
+          if (body) body.innerHTML = "<div style='font-size:13px;color:#b91c1c'>No se pudo cargar el historial: " + (err && err.message ? err.message : "error") + "</div>";
+        }
+      }
+      function ensureActionButtons() {
         var clientId = parseClientIdFromHash();
-        var current = document.getElementById(BTN_ID);
+        var passBtn = document.getElementById(BTN_ID);
+        var viewBtn = document.getElementById(BTN_VIEW_ID);
         if (!clientId) {
-          if (current && current.parentNode) current.parentNode.removeChild(current);
+          if (passBtn && passBtn.parentNode) passBtn.parentNode.removeChild(passBtn);
+          if (viewBtn && viewBtn.parentNode) viewBtn.parentNode.removeChild(viewBtn);
           return;
         }
-        if (current) {
-          current.dataset.clientId = clientId;
-          current.dataset.clientLink = buildClientFormLink(clientId);
+        if (passBtn && viewBtn) {
+          var name0 = readClientName();
+          passBtn.dataset.clientId = clientId;
+          passBtn.dataset.clientLink = buildClientFormLink(clientId);
+          viewBtn.dataset.clientId = clientId;
+          viewBtn.dataset.clientName = name0 || "";
           return;
         }
         var anchor = findActionAnchor();
         if (!anchor || !anchor.parentElement) return;
-        var btn = document.createElement("button");
-        btn.id = BTN_ID;
-        btn.type = "button";
-        btn.textContent = "Pasar link";
-        btn.dataset.clientId = clientId;
-        btn.dataset.clientLink = buildClientFormLink(clientId);
-        btn.style.cssText = [
-          "height:36px",
-          "padding:0 14px",
-          "border-radius:10px",
-          "border:1px solid #d0d7e2",
-          "background:#eef6ff",
-          "color:#1358b5",
-          "font-weight:700",
-          "font-size:13px",
-          "cursor:pointer",
-          "white-space:nowrap",
-          "margin-left:8px"
-        ].join(";");
-        btn.addEventListener("click", async function () {
-          var link = btn.dataset.clientLink || buildClientFormLink(btn.dataset.clientId || "");
-          if (!link) return;
-          var copied = await copyText(link);
-          if (copied) {
-            showCopyToast("Link copiado para este cliente");
-          } else {
-            window.prompt("Copiá y pasá este link al cliente:", link);
-          }
-        });
-        anchor.parentElement.appendChild(btn);
+        if (!passBtn) {
+          passBtn = document.createElement("button");
+          passBtn.id = BTN_ID;
+          passBtn.type = "button";
+          passBtn.textContent = "Pasar link";
+          passBtn.style.cssText = "height:36px;padding:0 14px;border-radius:10px;border:1px solid #d0d7e2;background:#eef6ff;color:#1358b5;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;margin-left:8px";
+          passBtn.addEventListener("click", async function () {
+            var link = passBtn.dataset.clientLink || buildClientFormLink(passBtn.dataset.clientId || "");
+            if (!link) return;
+            var copied = await copyText(link);
+            if (copied) showToast("Link copiado para este cliente");
+            else window.prompt("Copiá y pasá este link al cliente:", link);
+          });
+          anchor.parentElement.appendChild(passBtn);
+        }
+        if (!viewBtn) {
+          viewBtn = document.createElement("button");
+          viewBtn.id = BTN_VIEW_ID;
+          viewBtn.type = "button";
+          viewBtn.textContent = "Ver formularios";
+          viewBtn.style.cssText = "height:36px;padding:0 14px;border-radius:10px;border:1px solid #d0d7e2;background:#f8fafc;color:#0f172a;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;margin-left:8px";
+          viewBtn.addEventListener("click", function () {
+            openFormsModal(viewBtn.dataset.clientId || "", viewBtn.dataset.clientName || "");
+          });
+          anchor.parentElement.appendChild(viewBtn);
+        }
+        var name = readClientName();
+        passBtn.dataset.clientId = clientId;
+        passBtn.dataset.clientLink = buildClientFormLink(clientId);
+        viewBtn.dataset.clientId = clientId;
+        viewBtn.dataset.clientName = name || "";
       }
       function install() {
-        ensurePassLinkButton();
-        window.addEventListener("hashchange", ensurePassLinkButton);
-        window.addEventListener("popstate", ensurePassLinkButton);
-        setInterval(ensurePassLinkButton, 1200);
+        ensureActionButtons();
+        window.addEventListener("hashchange", ensureActionButtons);
+        window.addEventListener("popstate", ensureActionButtons);
+        setInterval(ensureActionButtons, 1200);
         if (!window[OBS_KEY]) {
           window[OBS_KEY] = new MutationObserver(function () {
-            ensurePassLinkButton();
+            ensureActionButtons();
           });
           window[OBS_KEY].observe(document.documentElement, { childList: true, subtree: true });
         }

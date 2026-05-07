@@ -80,22 +80,14 @@ module.exports = async function handler(req, res) {
     var clientId = sanitizeText(body.client_id, 80);
     if (!clientId) return json(res, 400, { ok: false, error: "client_id es requerido." });
 
-    var row = {
-      client_id: clientId,
-      client_name: sanitizeText(body.client_name, 140),
-      tipo: sanitizeText(body.tipo, 40) || "garantia",
-      monto: Number(body.monto || 0),
-      fecha_pago: sanitizeText(body.fecha_pago, 24),
-      telefono: sanitizeText(body.telefono, 40),
-      detalle: sanitizeText(body.detalle, 1200),
-      comprobante_url: null,
-      source: "credito_cliente_form",
-      payload: {
-        ua: sanitizeText(req.headers["user-agent"], 220),
-        ip: sanitizeText(req.headers["x-forwarded-for"], 220),
-      },
-    };
-    if (!row.fecha_pago || !(row.monto > 0)) {
+    var tipo = sanitizeText(body.tipo, 40) || "garantia";
+    var monto = Number(body.monto || 0);
+    var fechaPago = sanitizeText(body.fecha_pago, 24);
+    var clientName = sanitizeText(body.client_name, 140);
+    var telefono = sanitizeText(body.telefono, 40);
+    var detalle = sanitizeText(body.detalle, 1200);
+    var comprobanteUrl = null;
+    if (!fechaPago || !(monto > 0)) {
       return json(res, 400, { ok: false, error: "Completa fecha y monto valido." });
     }
 
@@ -112,27 +104,70 @@ module.exports = async function handler(req, res) {
       }
       var ext = mime.indexOf("png") >= 0 ? "png" : (mime.indexOf("webp") >= 0 ? "webp" : "jpg");
       var filePath = "cliente-" + clientId + "/" + Date.now() + "-comprobante." + ext;
-      var buckets = ["comprobantes_clientes", "comprobantes", "garantias_comprobantes"];
+      var buckets = ["comprobantes_clientes", "comprobantes", "garantias_comprobantes", "avatars"];
       var uploadErr = null;
       for (var i = 0; i < buckets.length; i += 1) {
         try {
-          row.comprobante_url = await uploadToBucket(supabaseUrl, serviceKey, buckets[i], filePath, fileBuffer, mime);
+          comprobanteUrl = await uploadToBucket(supabaseUrl, serviceKey, buckets[i], filePath, fileBuffer, mime);
           break;
         } catch (e) {
           uploadErr = e;
         }
       }
-      if (!row.comprobante_url && uploadErr) {
+      if (!comprobanteUrl && uploadErr) {
         return json(res, 500, { ok: false, error: "No se pudo subir comprobante: " + uploadErr.message });
       }
     }
 
-    var tables = ["credito_client_form_submissions", "cliente_form_submissions", "garantias"];
+    var commonRow = {
+      client_id: clientId,
+      client_name: clientName,
+      tipo: tipo,
+      monto: monto,
+      fecha_pago: fechaPago,
+      telefono: telefono,
+      detalle: detalle,
+      comprobante_url: comprobanteUrl,
+      source: "credito_cliente_form",
+      payload: {
+        ua: sanitizeText(req.headers["user-agent"], 220),
+        ip: sanitizeText(req.headers["x-forwarded-for"], 220),
+      },
+    };
+
+    var attempts = [];
+    if (tipo === "cobro" || tipo === "recarga") {
+      attempts.push({
+        table: "cobros",
+        row: {
+          client_id: clientId,
+          fecha: fechaPago,
+          monto: monto,
+          metodo: tipo === "recarga" ? "recarga_cliente_form" : "cliente_form",
+          codigo: detalle,
+          comprobante_urls: comprobanteUrl ? [comprobanteUrl] : [],
+        },
+      });
+    } else if (tipo === "garantia") {
+      attempts.push({
+        table: "garantias",
+        row: {
+          client_id: clientId,
+          valor: monto,
+          estado: "pendiente",
+        },
+      });
+    }
+    attempts.push({ table: "credito_client_form_submissions", row: commonRow });
+    attempts.push({ table: "cliente_form_submissions", row: commonRow });
+
     var inserted = null;
+    var usedTable = null;
     var insertErr = null;
-    for (var t = 0; t < tables.length; t += 1) {
+    for (var t = 0; t < attempts.length; t += 1) {
       try {
-        inserted = await insertRow(supabaseUrl, serviceKey, tables[t], row);
+        inserted = await insertRow(supabaseUrl, serviceKey, attempts[t].table, attempts[t].row);
+        usedTable = attempts[t].table;
         break;
       } catch (e2) {
         insertErr = e2;
@@ -141,11 +176,11 @@ module.exports = async function handler(req, res) {
     if (!inserted) {
       return json(res, 500, {
         ok: false,
-        error: "No se pudo guardar en Supabase. Crea tabla 'credito_client_form_submissions' o ajusta endpoint.",
+        error: "No se pudo guardar en Supabase. Revisa tablas de destino para el tipo enviado.",
         detail: insertErr ? insertErr.message : null,
       });
     }
-    return json(res, 200, { ok: true, id: inserted.id || null, data: inserted });
+    return json(res, 200, { ok: true, id: inserted.id || null, table: usedTable, data: inserted });
   } catch (err) {
     return json(res, 500, { ok: false, error: err && err.message ? err.message : "internal error" });
   }
