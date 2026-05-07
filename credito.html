@@ -750,6 +750,128 @@
       min-width: 140px;
     }
   </style>
+  <script>
+    (function () {
+      var BTN_ID = "hm-client-pass-link-btn";
+      var OBS_KEY = "__HM_CLIENT_LINK_OBS__";
+      function parseClientIdFromHash() {
+        try {
+          var m = String(window.location.hash || "").match(/#client-detail-([a-z0-9-]+)/i);
+          return m && m[1] ? m[1] : "";
+        } catch (_) {
+          return "";
+        }
+      }
+      function readClientName() {
+        try {
+          var all = document.querySelectorAll("h1,h2,h3,[data-client-name]");
+          for (var i = 0; i < all.length; i += 1) {
+            var txt = String((all[i].textContent || "")).trim();
+            if (!txt) continue;
+            if (txt.toLowerCase().indexOf("clientes") === 0) continue;
+            if (txt.length >= 4) return txt;
+          }
+        } catch (_) {}
+        return "";
+      }
+      function buildClientFormLink(clientId) {
+        var u = new URL("/credito-cliente-form.html", window.location.origin);
+        u.searchParams.set("clientId", clientId);
+        var name = readClientName();
+        if (name) u.searchParams.set("clientName", name);
+        return u.toString();
+      }
+      function norm(s) {
+        return String(s || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+      function findActionAnchor() {
+        var actions = document.querySelectorAll("button,a");
+        var want = { editar: true, gasto: true, cobro: true };
+        for (var i = 0; i < actions.length; i += 1) {
+          var txt = norm(actions[i].textContent);
+          if (!txt) continue;
+          if (want[txt]) return actions[i];
+        }
+        return null;
+      }
+      async function copyText(txt) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(txt);
+            return true;
+          }
+        } catch (_) {}
+        return false;
+      }
+      function ensurePassLinkButton() {
+        var clientId = parseClientIdFromHash();
+        var current = document.getElementById(BTN_ID);
+        if (!clientId) {
+          if (current && current.parentNode) current.parentNode.removeChild(current);
+          return;
+        }
+        if (current) {
+          current.dataset.clientId = clientId;
+          current.dataset.clientLink = buildClientFormLink(clientId);
+          return;
+        }
+        var anchor = findActionAnchor();
+        if (!anchor || !anchor.parentElement) return;
+        var btn = document.createElement("button");
+        btn.id = BTN_ID;
+        btn.type = "button";
+        btn.textContent = "Pasar link";
+        btn.dataset.clientId = clientId;
+        btn.dataset.clientLink = buildClientFormLink(clientId);
+        btn.style.cssText = [
+          "height:36px",
+          "padding:0 14px",
+          "border-radius:10px",
+          "border:1px solid #d0d7e2",
+          "background:#eef6ff",
+          "color:#1358b5",
+          "font-weight:700",
+          "font-size:13px",
+          "cursor:pointer",
+          "white-space:nowrap",
+          "margin-left:8px"
+        ].join(";");
+        btn.addEventListener("click", async function () {
+          var link = btn.dataset.clientLink || buildClientFormLink(btn.dataset.clientId || "");
+          if (!link) return;
+          var copied = await copyText(link);
+          if (copied) {
+            alert("Link copiado para este cliente.");
+          } else {
+            window.prompt("Copiá y pasá este link al cliente:", link);
+          }
+        });
+        anchor.parentElement.appendChild(btn);
+      }
+      function install() {
+        ensurePassLinkButton();
+        window.addEventListener("hashchange", ensurePassLinkButton);
+        window.addEventListener("popstate", ensurePassLinkButton);
+        setInterval(ensurePassLinkButton, 1200);
+        if (!window[OBS_KEY]) {
+          window[OBS_KEY] = new MutationObserver(function () {
+            ensurePassLinkButton();
+          });
+          window[OBS_KEY].observe(document.documentElement, { childList: true, subtree: true });
+        }
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", install);
+      } else {
+        install();
+      }
+    })();
+  </script>
   <link rel="icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
   <link rel="shortcut icon" type="image/png" href="/credito-app/favicon/favicon.png?v=3" />
 </head>
