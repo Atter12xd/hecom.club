@@ -833,6 +833,58 @@ h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.2; font-family: var(
   padding: var(--sp-1) 0;
 }
 
+#dashboard-activity .dashboard-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-height: 340px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+}
+#dashboard-activity .dashboard-activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  width: 100%;
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+#dashboard-activity .dashboard-activity-row:hover {
+  background: var(--color-surface);
+  border-color: var(--color-primary);
+}
+#dashboard-activity .dashboard-activity-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+#dashboard-activity .dashboard-activity-name {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+#dashboard-activity .dashboard-activity-meta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#dashboard-activity .dashboard-activity-pill {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+}
+
 /* ══════════════════════════════════════════════
    CLIENTS VIEW
 ══════════════════════════════════════════════ */
@@ -5420,6 +5472,7 @@ function reloadTareasData(thenRender) {
     /* Siempre repintar vistas: si solo se ejecutaba thenRender (p. ej. closeModal tras borrar),
        antes no se llamaba renderers.kanban/tickets y el tablero seguía mostrando filas ya borradas en BD. */
     renderers.clients?.();
+    renderers.dashboard?.();
     if (typeof marketingDemoRefreshAudience === 'function' && document.getElementById('view-marketing') && document.getElementById('view-marketing').classList.contains('active')) {
       marketingDemoRefreshAudience();
     }
@@ -5436,6 +5489,7 @@ function reloadTareasData(thenRender) {
   }).catch(function(err) {
     console.error('[Pendientes] reloadTareasData falló (catch)', err && err.message ? err.message : err, err);
     renderers.clients?.();
+    renderers.dashboard?.();
     if (thenRender && typeof thenRender === 'function') thenRender();
   });
 }
@@ -5755,6 +5809,45 @@ function applyClientListRowVisibility() {
   });
   refreshClientsCountBadge();
 }
+
+function applyDashboardActivityRowVisibility() {
+  var inp = document.getElementById('globalSearch');
+  var q = (inp && inp.value || '').toLowerCase();
+  document.querySelectorAll('#dashboard-activity .dashboard-search-row').forEach(function(r) {
+    var searchOk = !q || r.textContent.toLowerCase().includes(q);
+    r.style.display = searchOk ? '' : 'none';
+  });
+}
+
+renderers.dashboard = function() {
+  updateDashboardStats();
+  var wrap = document.getElementById('dashboard-activity');
+  if (!wrap) return;
+  if (!clients || !clients.length) {
+    wrap.innerHTML = '<p class="empty-state" style="color:var(--color-text-muted);font-size:0.875rem;margin:0">No hay clientes aún. Agregálos desde Seguimiento de Clientes.</p>';
+    applyDashboardActivityRowVisibility();
+    return;
+  }
+  var hint = '<p class="dashboard-activity-help" style="font-size:var(--text-xs);color:var(--color-text-muted);margin:0 0 var(--sp-3) 0">Usá el mismo buscador del encabezado que en <strong style="font-weight:600;color:var(--color-text-muted)">Clientes</strong> para filtrar por nombre, correo, teléfono o próxima acción.</p>';
+  var parts = [];
+  parts.push(hint);
+  parts.push('<div class="dashboard-activity-list" role="list">');
+  clients.forEach(function(c, ci) {
+    var stRaw = c.status || '';
+    var stLabel = stRaw === 'top' ? 'Top' : (stRaw === 'bueno' ? 'Bueno' : 'Potencial');
+    var igShown = (c.ig && String(c.ig).trim()) ? 'IG' : '';
+    var line2Bits = [c.tp, c.email ? tareasFormatEmailsDisplay(c.email) : '', c.phone, igShown, c.nextAction].filter(function(x) { return x != null && String(x).trim() !== ''; });
+    var line2 = line2Bits.length ? line2Bits.join(' · ') : '—';
+    parts.push('<button type="button" class="dashboard-activity-row dashboard-search-row fade-in visible" role="listitem" data-client-index="' + ci + '" onclick="openClientFromList(' + ci + ')" title="Abrir cliente">');
+    parts.push('<span class="dashboard-activity-main"><span class="dashboard-activity-name">' + escTareas(c.n || '—') + '</span>');
+    parts.push('<span class="dashboard-activity-meta">' + escTareas(line2) + '</span></span>');
+    parts.push('<span class="pill dashboard-activity-pill pill-' + (stRaw === 'top' ? 'green' : (stRaw === 'bueno' ? 'orange' : 'orange2')) + '">' + escTareas(stLabel) + '</span>');
+    parts.push('</button>');
+  });
+  parts.push('</div>');
+  wrap.innerHTML = parts.join('');
+  applyDashboardActivityRowVisibility();
+};
 
 renderers.clients = function() {
   const grid = document.getElementById('clientsGrid');
@@ -9655,6 +9748,7 @@ function globalSearch() {
   document.querySelectorAll('.kanban-card,.attendance-card,.workflow-card').forEach(c => {
     c.style.display = c.textContent.toLowerCase().includes(q) ? '' : 'none';
   });
+  applyDashboardActivityRowVisibility();
   applyClientListRowVisibility();
   document.querySelectorAll('.ticket-row').forEach(r => {
     if (!r.dataset.st) return;
@@ -9870,6 +9964,7 @@ function initViews() {
       setTimeout(function() { el.classList.add('visible'); }, i * 55);
     });
   }, 100);
+  renderers.dashboard?.();
   renderers.clients?.();
   renderers.kanban?.();
   renderers.tickets?.();
