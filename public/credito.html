@@ -1111,8 +1111,8 @@
             if (act === "reject_open") {
               if (!art) return;
               var prx = art.querySelector(".hm-panel-reject");
-              var prq2 = art.querySelector(".hm-panel-reqedit");
-              if (prq2) prq2.style.display = "none";
+              var pmgH = art.querySelector(".hm-panel-mgr-edit");
+              if (pmgH) pmgH.style.display = "none";
               if (prx) {
                 prx.style.display = "block";
                 var tr = prx.querySelector(".hm-reject-msg");
@@ -1120,45 +1120,102 @@
               }
               return;
             }
-            if (act === "reqedit_cancel" || act === "reject_cancel") {
+            if (act === "mgr_edit_open") {
               if (!art) return;
-              var a = art.querySelector(".hm-panel-reject");
-              var bpan = art.querySelector(".hm-panel-reqedit");
-              if (a) a.style.display = "none";
-              if (bpan) bpan.style.display = "none";
+              var prxj = art.querySelector(".hm-panel-reject");
+              var pmgj = art.querySelector(".hm-panel-mgr-edit");
+              if (prxj) prxj.style.display = "none";
+              if (pmgj) {
+                pmgj.style.display = "block";
+                var fi = pmgj.querySelector(".hm-mgr-monto,.hm-mgr-tipo");
+                if (fi) fi.focus();
+              }
+              return;
+            }
+            if (act === "reject_cancel" || act === "mgr_edit_cancel") {
+              if (!art) return;
+              var arj = art.querySelector(".hm-panel-reject");
+              var bmg = art.querySelector(".hm-panel-mgr-edit");
+              if (arj) arj.style.display = "none";
+              if (bmg) bmg.style.display = "none";
+              return;
+            }
+
+            if (act === "reject_copy_notice") {
+              if (!cid || !art) return;
+              var txc = art.querySelector(".hm-reject-msg");
+              var mtc = txc ? String(txc.value || "").trim() : "";
+              if (!mtc) {
+                showToast("Escribí el motivo del rechazo y después copiá el aviso.", "error");
+                return;
+              }
+              var nomC = (cnm || "").trim();
+              var urlC = buildClienteFormNoticeUrl({
+                clientId: cid,
+                clientName: nomC,
+                resultado: "rechazado",
+                motivo: mtc,
+              });
+              var bloC = textoMensajeCliente("rejected", nomC, mtc, urlC);
+              var okC = await copyText(bloC);
+              if (okC) showToast("Mensaje de rechazo + link copiados");
+              else window.prompt("Copiá para el cliente:", bloC);
+              return;
+            }
+
+            if (act === "mgr_edit_save") {
+              if (!submissionId || !cid || !art) return;
+              var peg = art.querySelector(".hm-panel-mgr-edit");
+              if (!peg) return;
+              var tipoE = peg.querySelector(".hm-mgr-tipo");
+              var montoE = peg.querySelector(".hm-mgr-monto");
+              var fechaE = peg.querySelector(".hm-mgr-fecha");
+              var telE = peg.querySelector(".hm-mgr-tel");
+              var detE = peg.querySelector(".hm-mgr-detalle");
+              var payloadE = {
+                id: submissionId,
+                tipo: tipoE ? String(tipoE.value || "").trim() : "recarga",
+                monto: Number((montoE && montoE.value) || 0),
+                fecha_pago: fechaE ? String(fechaE.value || "").trim() : "",
+                telefono: telE ? String(telE.value || "").trim() : "",
+                detalle: detE ? String(detE.value || "").trim() : "",
+              };
+              if (!payloadE.fecha_pago || !(payloadE.monto > 0)) {
+                showToast("Completá monto válido y fecha.", "error");
+                return;
+              }
+              try {
+                var rex = await fetch("/api/credito-client-form-manager-update", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payloadE),
+                });
+                var oex = await rex.json().catch(function () { return {}; });
+                if (!rex.ok || !oex.ok) throw new Error((oex && oex.error) || ("HTTP " + rex.status));
+                showToast("Cambios guardados por gerencia.");
+                peg.style.display = "none";
+                await openFormsModal(cid, cnm);
+              } catch (eM) {
+                showToast((eM && eM.message) ? eM.message : "No se pudo guardar.", "error");
+              }
               return;
             }
 
             if (!submissionId || !cid) return;
 
-            if (act === "request_edit_submit") {
-              var rqNote = "";
-              if (art) {
-                var txe = art.querySelector(".hm-reqedit-msg");
-                rqNote = txe ? String(txe.value || "").trim() : "";
-              }
-              if (!rqNote) {
-                showToast("Escribí qué debe corregir el cliente.", "error");
-                return;
-              }
-              try {
-                await postAction("request_edit", rqNote);
-                showToast('Pedido guardado. En ese mismo envío tocá «Copiar aviso (corrección)» para texto + link.');
-                await openFormsModal(cid, cnm);
-              } catch (e2) {
-                showToast((e2 && e2.message) ? e2.message : "No se pudo guardar.", "error");
-              }
-              return;
-            }
             if (act === "reject_submit") {
               var rjn = "";
               if (art) {
                 var txr = art.querySelector(".hm-reject-msg");
                 rjn = txr ? String(txr.value || "").trim() : "";
               }
+              if (!rjn) {
+                showToast("Escribí por qué se rechaza antes de confirmar.", "error");
+                return;
+              }
               try {
-                await postAction("reject", rjn || null);
-                showToast('Rechazado. Usá «Copiar mensaje (rechazado)» en ese envío para avisar al cliente.');
+                await postAction("reject", rjn);
+                showToast('Rechazado. Ya podés usar «Copiar mensaje (rechazado)» o copiaste el aviso antes.');
                 await openFormsModal(cid, cnm);
               } catch (e3) {
                 showToast((e3 && e3.message) ? e3.message : "No se pudo guardar.", "error");
@@ -1203,6 +1260,16 @@
         if (raw === "amortizacion") show = "amortización";
         var c = map[raw] || ["#f8fafc", "#334155"];
         return "<span style='display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700;background:" + c[0] + ";color:" + c[1] + ";text-transform:uppercase;'>" + escapeHtmlQuick(show) + "</span>";
+      }
+      function toIsoDateInput(val) {
+        if (!val) return "";
+        try {
+          var d = new Date(val);
+          if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+        } catch (_) {}
+        var s = String(val);
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+        return "";
       }
       async function openFormsModal(clientId, clientName) {
         if (!clientId) return;
@@ -1256,41 +1323,84 @@
                   + "Ver comprobante</button>";
             }
             var actionsHtml = "";
-            if (it.actionable && it.submissionId) {
-              actionsHtml +=
-                "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
-                  + "<button type='button' data-hm-form-act='accept' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:32px;padding:0 12px;border-radius:8px;border:none;background:#16a34a;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Aceptar</button>"
-                  + "<button type='button' data-hm-form-act='reject_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;font-weight:700;font-size:12px;cursor:pointer'>Rechazar</button>"
-                  + "<button type='button' data-hm-form-act='reqedit_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;font-weight:700;font-size:12px;cursor:pointer'>Pedir corregir</button>"
-                  + "</div>"
-                  + "<div class='hm-panel-reject' style='display:none;margin-top:10px;padding:12px;border-radius:10px;background:#fef2f2;border:1px solid #fecaca'>"
-                  + "<label style='display:block;font-size:12px;font-weight:700;color:#991b1b;margin-bottom:6px'>Motivo del rechazo (opcional)</label>"
-                  + "<textarea class='hm-reject-msg' rows='2' placeholder='Ej. comprobante ilegible, monto no coincide…' "
-                  + "style='width:100%;box-sizing:border-box;border:1px solid #fca5a5;border-radius:8px;padding:8px;font-size:13px;resize:vertical'></textarea>"
-                  + "<div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px'>"
-                  + "<button type='button' data-hm-form-act='reject_submit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:32px;padding:0 14px;border-radius:8px;border:none;background:#991b1b;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Confirmar rechazo</button>"
-                  + "<button type='button' data-hm-form-act='reject_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
-                  + "</div></div>"
-                  + "<div class='hm-panel-reqedit' style='display:none;margin-top:10px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0'>"
-                  + "<label style='display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px'>Qué debe corregir el cliente</label>"
-                  + "<textarea class='hm-reqedit-msg' rows='3' placeholder='Ej. subir comprobante más claro, corregir monto o fecha…' "
-                  + "style='width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font-size:13px;resize:vertical'></textarea>"
-                  + "<div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px'>"
-                  + "<button type='button' data-hm-form-act='request_edit_submit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:32px;padding:0 14px;border-radius:8px;border:none;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Enviar pedido al cliente</button>"
-                  + "<button type='button' data-hm-form-act='reqedit_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
-                  + "</div></div>";
-            } else if (st === "credito_client_form_submissions" && ap === "needs_client_edit" && it.submissionId) {
+            var canAR = it.actionable && it.submissionId;
+            var canEditPanel = it.actionableEdit && it.submissionId && st === "credito_client_form_submissions";
+            var tipoEd = String(it.kind || "recarga").toLowerCase();
+            if (tipoEd !== "recarga" && tipoEd !== "amortizacion") tipoEd = "amortizacion";
+            var feIso = toIsoDateInput(it.date);
+            var amtStr = String(Number(it.amount || 0) || "");
+            var telStr = escapeHtmlQuick(it.telefonoCliente ? String(it.telefonoCliente) : "");
+            var detStr = escapeHtmlQuick(it.detalleCliente ? String(it.detalleCliente) : "");
+
+            function buildMgrPanel(subIdAttr) {
+              return ""
+                + "<div class='hm-panel-mgr-edit' style='display:none;margin-top:10px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0'>"
+                + "<div style='font-size:12px;font-weight:800;color:#0f172a;margin-bottom:8px'>Editar envío (gerente)</div>"
+                + "<div style='display:grid;gap:10px'>"
+                + "<label style='font-size:11px;font-weight:700;color:#475569;display:block'>Tipo"
+                + "<select class='hm-mgr-tipo' style='margin-top:4px;display:block;width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1'>"
+                + "<option value='recarga'" + (tipoEd === "recarga" ? " selected" : "") + ">Recarga</option>"
+                + "<option value='amortizacion'" + (tipoEd === "amortizacion" ? " selected" : "") + ">Amortización</option>"
+                + "</select></label>"
+                + "<label style='font-size:11px;font-weight:700;color:#475569;display:block'>Monto (USD)"
+                + "<input class='hm-mgr-monto' type='number' min='0.01' step='0.01' value='" + escapeHtmlQuick(amtStr) + "' "
+                + "style='margin-top:4px;display:block;width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1' /></label>"
+                + "<label style='font-size:11px;font-weight:700;color:#475569;display:block'>Fecha de pago"
+                + "<input class='hm-mgr-fecha' type='date' value='" + escapeHtmlQuick(feIso) + "' "
+                + "style='margin-top:4px;display:block;width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1' /></label>"
+                + "<label style='font-size:11px;font-weight:700;color:#475569;display:block'>Teléfono"
+                + "<input class='hm-mgr-tel' type='text' value='" + telStr + "' placeholder='+1 …' "
+                + "style='margin-top:4px;display:block;width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1' /></label>"
+                + "<label style='font-size:11px;font-weight:700;color:#475569;display:block'>Detalle / nota"
+                + "<textarea class='hm-mgr-detalle' rows='2' placeholder='Referencia…' "
+                + "style='margin-top:4px;display:block;width:100%;padding:8px;border-radius:8px;border:1px solid #cbd5e1;resize:vertical'>" + detStr + "</textarea></label>"
+                + "</div>"
+                + "<div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px'>"
+                + "<button type='button' data-hm-form-act='mgr_edit_save' data-submission-id='" + escapeHtmlQuick(subIdAttr) + "' "
+                + "style='height:32px;padding:0 14px;border-radius:8px;border:none;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Guardar cambios</button>"
+                + "<button type='button' data-hm-form-act='mgr_edit_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
+                + "</div></div>";
+            }
+
+            if (canEditPanel) {
+              if (canAR) {
+                actionsHtml +=
+                  "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
+                    + "<button type='button' data-hm-form-act='accept' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                    + "style='height:32px;padding:0 12px;border-radius:8px;border:none;background:#16a34a;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Aceptar</button>"
+                    + "<button type='button' data-hm-form-act='reject_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                    + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;font-weight:700;font-size:12px;cursor:pointer'>Rechazar</button>"
+                    + "<button type='button' data-hm-form-act='mgr_edit_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                    + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;font-weight:700;font-size:12px;cursor:pointer'>Editar</button>"
+                    + "</div>"
+                    + "<div class='hm-panel-reject' style='display:none;margin-top:10px;padding:12px;border-radius:10px;background:#fef2f2;border:1px solid #fecaca'>"
+                    + "<label style='display:block;font-size:12px;font-weight:700;color:#991b1b;margin-bottom:6px'>¿Por qué se rechaza? <span style='opacity:.85'>(requerido)</span></label>"
+                    + "<textarea class='hm-reject-msg' rows='3' placeholder='Explicación clara para el cliente…' "
+                    + "style='width:100%;box-sizing:border-box;border:1px solid #fca5a5;border-radius:8px;padding:8px;font-size:13px;resize:vertical'></textarea>"
+                    + "<div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px'>"
+                    + "<button type='button' data-hm-form-act='reject_copy_notice' "
+                    + "style='height:32px;padding:0 14px;border-radius:8px;border:1px solid #0ea5e9;background:#eff6ff;color:#0369a1;font-weight:700;font-size:12px;cursor:pointer'>Copiar aviso para el cliente</button>"
+                    + "<button type='button' data-hm-form-act='reject_submit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                    + "style='height:32px;padding:0 14px;border-radius:8px;border:none;background:#991b1b;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Confirmar rechazo</button>"
+                    + "<button type='button' data-hm-form-act='reject_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
+                    + "</div></div>"
+                  + buildMgrPanel(it.submissionId);
+              } else {
+                actionsHtml +=
+                  "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
+                    + "<button type='button' data-hm-form-act='mgr_edit_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                    + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #334155;background:#fff;color:#0f172a;font-weight:700;font-size:12px;cursor:pointer'>Editar datos</button>"
+                    + "</div>"
+                  + buildMgrPanel(it.submissionId);
+              }
+            }
+            if (!canAR && st === "credito_client_form_submissions" && ap === "needs_client_edit" && it.submissionId) {
               var mfCor = String(it.managerFeedback != null ? it.managerFeedback : "");
               actionsHtml +=
                 "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
                   + "<button type='button' data-hm-form-act='notice_copy' data-notice-kind='correction' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
                   + "data-manager-fb=\"" + encodeURIComponent(mfCor.slice(0, 1500)) + "\" "
-                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Copiar aviso (corrección)</button>"
+                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Copiar aviso al cliente</button>"
                   + "</div>";
             } else if (st === "credito_client_form_submissions" && ap === "accepted" && it.submissionId) {
               actionsHtml +=

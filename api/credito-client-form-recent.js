@@ -114,7 +114,7 @@ module.exports = async function handler(req, res) {
       supabaseUrl,
       serviceKey,
       "credito_client_form_submissions",
-      "select=id,client_id,tipo,monto,fecha_pago,detalle,comprobante_url,created_at,approval_status,manager_feedback&client_id=" +
+      "select=id,client_id,tipo,monto,fecha_pago,telefono,detalle,comprobante_url,created_at,approval_status,manager_feedback&client_id=" +
         safeClient +
         "&order=created_at.desc&limit=24"
     );
@@ -135,7 +135,10 @@ module.exports = async function handler(req, res) {
         approvalStatus: ap,
         approvalLabel: statusLabel(ap),
         actionable: ap === "pending_review",
+        actionableEdit: ap === "pending_review" || ap === "needs_client_edit",
         managerFeedback: feedback || null,
+        telefonoCliente: forms[k].telefono != null ? String(forms[k].telefono) : "",
+        detalleCliente: forms[k].detalle != null ? String(forms[k].detalle) : "",
       });
     }
 
