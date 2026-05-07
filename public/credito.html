@@ -775,7 +775,7 @@
         return "";
       }
       function buildClientFormLink(clientId) {
-        var u = new URL("/credito-cliente-form.html", window.location.origin);
+        var u = new URL("/credito-cliente-form", window.location.origin);
         u.searchParams.set("clientId", clientId);
         var name = readClientName();
         if (name) u.searchParams.set("clientName", name);

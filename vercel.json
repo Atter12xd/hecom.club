@@ -62,7 +62,10 @@
     { "source": "/borrador-correo-formal", "destination": "https://www.marketingconholistic.com/borrador-correo-formal" },
     { "source": "/borrador-correo-formal.html", "destination": "https://www.marketingconholistic.com/borrador-correo-formal.html" },
     { "source": "/backup-dashboard", "destination": "/backup-dashboard/index.html" },
-    { "source": "/backup-dashboard/:path*", "destination": "/backup-dashboard/:path*" }
+    { "source": "/backup-dashboard/:path*", "destination": "/backup-dashboard/:path*" },
+    { "source": "/credito-cliente-form", "destination": "/credito-cliente-form.html" },
+    { "source": "/credito-cliente-form.html", "destination": "/credito-cliente-form.html" },
+    { "source": "/api/credito-cliente-form-submit", "destination": "/api/credito-cliente-form-submit" }
   ],
   "headers": [
     {
@@ -109,6 +112,18 @@
     },
     {
       "source": "/credito-app/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/credito-cliente-form",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/credito-cliente-form.html",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
       ]
