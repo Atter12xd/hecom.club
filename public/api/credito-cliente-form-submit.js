@@ -114,13 +114,22 @@ module.exports = async function handler(req, res) {
     var clientId = sanitizeText(body.client_id, 80);
     if (!clientId) return json(res, 400, { ok: false, error: "client_id es requerido." });
 
-    var tipo = sanitizeText(body.tipo, 40) || "garantia";
-    var monto = Number(body.monto || 0);
+    var tipo = sanitizeText(body.tipo, 40) || "recarga";
+    var allowedTipos = ["recarga", "amortizacion"];
+    if (allowedTipos.indexOf(tipo) < 0) {
+      return json(res, 400, { ok: false, error: "Tipo debe ser recarga o amortización." });
+    }
     var fechaPago = sanitizeText(body.fecha_pago, 24);
     var clientName = sanitizeText(body.client_name, 140);
     var telefono = sanitizeText(body.telefono, 40);
     var detalle = sanitizeText(body.detalle, 1200);
+    var monto = Number(body.monto || 0);
     var resubmitId = sanitizeText(body.submission_id || body.resubmit_id, 80);
+    var removeComprobante =
+      body.remove_comprobante === true ||
+      body.remove_comprobante === "true" ||
+      body.remove_comprobante === 1 ||
+      body.remove_comprobante === "1";
 
     if (!fechaPago || !(monto > 0)) {
       return json(res, 400, { ok: false, error: "Completa fecha y monto valido." });
@@ -187,6 +196,7 @@ module.exports = async function handler(req, res) {
         payload: Object.assign({}, prevP, basePayload, { client_resubmit_at: nowIso }),
       };
       if (comprobanteUrl) patch.comprobante_url = comprobanteUrl;
+      else if (removeComprobante) patch.comprobante_url = null;
       var patched = await patchRow(supabaseUrl, serviceKey, "credito_client_form_submissions", resubmitId, patch);
       return json(res, 200, {
         ok: true,

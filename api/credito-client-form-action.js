@@ -153,12 +153,18 @@ module.exports = async function handler(req, res) {
     if (row.comprobante_url) urls = [String(row.comprobante_url)];
     var detalle = row.detalle || null;
 
-    if (tipo === "cobro" || tipo === "recarga") {
+    if (tipo === "cobro" || tipo === "recarga" || tipo === "amortizacion") {
+      var metodo =
+        tipo === "recarga"
+          ? "Recarga cliente (formulario)"
+          : tipo === "amortizacion"
+          ? "Amortización cliente (formulario)"
+          : "Cobro cliente (formulario)";
       await sbInsert(supabaseUrl, serviceKey, "cobros", {
         client_id: clientId,
         fecha: fecha,
         monto: monto,
-        metodo: tipo === "recarga" ? "Recarga cliente (formulario)" : "Cobro cliente (formulario)",
+        metodo: metodo,
         codigo: detalle || "Formulario cliente",
         comprobante_urls: urls.length ? urls : null,
       });

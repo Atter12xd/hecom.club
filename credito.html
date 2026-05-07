@@ -869,6 +869,51 @@
           t.style.transform = "translateY(8px)";
         }, 1700);
       }
+      function ensureProofLightbox() {
+        var lb = document.getElementById("hm-proof-lightbox");
+        if (lb) return lb;
+        lb = document.createElement("div");
+        lb.id = "hm-proof-lightbox";
+        lb.style.cssText = "display:none;position:fixed;inset:0;z-index:10000050;background:rgba(15,23,42,.9);align-items:center;justify-content:center;padding:24px 16px;box-sizing:border-box;";
+        lb.innerHTML = ""
+          + "<button type='button' id='hm-proof-lightbox-x' aria-label='Cerrar' "
+          + "style='position:absolute;top:max(14px,env(safe-area-inset-top));right:max(14px,env(safe-area-inset-right));width:46px;height:46px;border:none;border-radius:14px;background:#fff;color:#0f172a;font-size:26px;font-weight:700;cursor:pointer;box-shadow:0 12px 32px rgba(0,0,0,.35);line-height:1'>×</button>"
+          + "<img alt='Comprobante' id='hm-proof-lightbox-img' decoding='async' "
+          + "style='max-width:min(96vw,960px);max-height:calc(100vh - 40px);width:auto;height:auto;object-fit:contain;border-radius:14px;box-shadow:0 28px 80px rgba(0,0,0,.5)'/>";
+        document.body.appendChild(lb);
+        function shutProof() {
+          lb.style.display = "none";
+          var im = document.getElementById("hm-proof-lightbox-img");
+          if (im) im.removeAttribute("src");
+        }
+        lb.addEventListener("click", function (ev) {
+          if (ev.target === lb) shutProof();
+        });
+        var xbtn = document.getElementById("hm-proof-lightbox-x");
+        if (xbtn) xbtn.addEventListener("click", function (ev) {
+          ev.stopPropagation();
+          shutProof();
+        });
+        document.addEventListener("keydown", function (ev) {
+          if (ev.key === "Escape" && lb.style.display === "flex") shutProof();
+        });
+        return lb;
+      }
+      function initProofLightboxOnce() {
+        if (window.__HM_PROOF_LB_DONE__) return;
+        window.__HM_PROOF_LB_DONE__ = 1;
+        document.addEventListener("click", function (ev) {
+          var trig = ev.target && ev.target.closest ? ev.target.closest("[data-hm-proof-preview]") : null;
+          if (!trig) return;
+          ev.preventDefault();
+          var u = trig.getAttribute("data-proof-url");
+          if (!u) return;
+          var box = ensureProofLightbox();
+          var img = document.getElementById("hm-proof-lightbox-img");
+          if (img) img.src = u;
+          box.style.display = "flex";
+        });
+      }
       function ensureModal() {
         var modal = document.getElementById(MODAL_ID);
         if (modal) return modal;
@@ -898,61 +943,128 @@
             var btn = ev.target && ev.target.closest ? ev.target.closest("button[data-hm-form-act]") : null;
             if (!btn) return;
             var act = btn.getAttribute("data-hm-form-act");
-            var submissionId = btn.getAttribute("data-submission-id");
+            var submissionId = btn.getAttribute("data-submission-id") || "";
             var cid = modal.dataset.ctxClientId || "";
             var cnm = modal.dataset.ctxClientName || "";
-            if (!submissionId || !cid) return;
+            var art = btn.closest ? btn.closest("article") : null;
             ev.preventDefault();
-            if (act === "link_edit") {
-              var link = buildClientCorrectLink(cid, submissionId);
-              var copied = await copyText(link);
-              if (copied) showToast("Link de correccion copiado");
-              else window.prompt("Copiá y enviá al cliente:", link);
-              return;
-            }
-            var note = "";
-            if (act === "reject") {
-              note = window.prompt("Motivo del rechazo (opcional):") || "";
-            } else if (act === "request_edit") {
-              note = window.prompt("Instrucciones para el cliente (obligatorio):") || "";
-              if (!String(note).trim()) {
-                showToast("Debés escribir el mensaje al cliente.", "error");
-                return;
-              }
-            }
-            var reviewedBy = "";
-            try {
-              var sb = window.__CREDITO_SHARED_SUPABASE__;
-              if (sb && sb.auth && sb.auth.getUser) {
-                var ur = await sb.auth.getUser();
-                if (ur && ur.data && ur.data.user && ur.data.user.email) {
-                  reviewedBy = String(ur.data.user.email).trim().toLowerCase();
+
+            async function reviewerEmail() {
+              var reviewedBy = "";
+              try {
+                var sb = window.__CREDITO_SHARED_SUPABASE__;
+                if (sb && sb.auth && sb.auth.getUser) {
+                  var ur = await sb.auth.getUser();
+                  if (ur && ur.data && ur.data.user && ur.data.user.email) {
+                    reviewedBy = String(ur.data.user.email).trim().toLowerCase();
+                  }
                 }
-              }
-            } catch (_) {}
-            try {
+              } catch (_) {}
+              return reviewedBy;
+            }
+
+            async function postAction(apiAct, note) {
               var res = await fetch("/api/credito-client-form-action", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   id: submissionId,
-                  action: act === "accept" ? "accept" : act === "reject" ? "reject" : "request_edit",
+                  action: apiAct,
                   note: note || null,
-                  reviewed_by: reviewedBy || null,
+                  reviewed_by: (await reviewerEmail()) || null,
                 }),
               });
               var out = await res.json().catch(function () { return {}; });
               if (!res.ok || !out.ok) throw new Error((out && out.error) || ("HTTP " + res.status));
-              if (act === "request_edit") {
-                var lk = buildClientCorrectLink(cid, submissionId);
-                await copyText(lk);
-                showToast("Guardado. Link de correccion copiado al portapapeles.");
-              } else {
-                showToast(act === "accept" ? "Aceptado y registrado" : "Marcado rechazado");
+              return out;
+            }
+
+            if (act === "link_edit") {
+              if (!submissionId || !cid) return;
+              var linkLe = buildClientCorrectLink(cid, submissionId);
+              var copiedLe = await copyText(linkLe);
+              if (copiedLe) showToast("Link de corrección copiado");
+              else window.prompt("Copiá y enviá al cliente:", linkLe);
+              return;
+            }
+            if (act === "reqedit_open") {
+              if (!art) return;
+              var prj = art.querySelector(".hm-panel-reject");
+              var prq = art.querySelector(".hm-panel-reqedit");
+              if (prj) prj.style.display = "none";
+              if (prq) {
+                prq.style.display = "block";
+                var tf = prq.querySelector(".hm-reqedit-msg");
+                if (tf) tf.focus();
               }
-              await openFormsModal(cid, cnm);
-            } catch (e2) {
-              showToast((e2 && e2.message) ? e2.message : "No se pudo guardar.", "error");
+              return;
+            }
+            if (act === "reject_open") {
+              if (!art) return;
+              var prx = art.querySelector(".hm-panel-reject");
+              var prq2 = art.querySelector(".hm-panel-reqedit");
+              if (prq2) prq2.style.display = "none";
+              if (prx) {
+                prx.style.display = "block";
+                var tr = prx.querySelector(".hm-reject-msg");
+                if (tr) tr.focus();
+              }
+              return;
+            }
+            if (act === "reqedit_cancel" || act === "reject_cancel") {
+              if (!art) return;
+              var a = art.querySelector(".hm-panel-reject");
+              var bpan = art.querySelector(".hm-panel-reqedit");
+              if (a) a.style.display = "none";
+              if (bpan) bpan.style.display = "none";
+              return;
+            }
+
+            if (!submissionId || !cid) return;
+
+            if (act === "request_edit_submit") {
+              var rqNote = "";
+              if (art) {
+                var txe = art.querySelector(".hm-reqedit-msg");
+                rqNote = txe ? String(txe.value || "").trim() : "";
+              }
+              if (!rqNote) {
+                showToast("Escribí qué debe corregir el cliente.", "error");
+                return;
+              }
+              try {
+                await postAction("request_edit", rqNote);
+                showToast("Pedido guardado. Usá «Pasar link de corrección» para compartir el enlace.");
+                await openFormsModal(cid, cnm);
+              } catch (e2) {
+                showToast((e2 && e2.message) ? e2.message : "No se pudo guardar.", "error");
+              }
+              return;
+            }
+            if (act === "reject_submit") {
+              var rjn = "";
+              if (art) {
+                var txr = art.querySelector(".hm-reject-msg");
+                rjn = txr ? String(txr.value || "").trim() : "";
+              }
+              try {
+                await postAction("reject", rjn || null);
+                showToast("Marcado rechazado");
+                await openFormsModal(cid, cnm);
+              } catch (e3) {
+                showToast((e3 && e3.message) ? e3.message : "No se pudo guardar.", "error");
+              }
+              return;
+            }
+
+            if (act === "accept") {
+              try {
+                await postAction("accept", null);
+                showToast("Aceptado y registrado");
+                await openFormsModal(cid, cnm);
+              } catch (e4) {
+                showToast((e4 && e4.message) ? e4.message : "No se pudo guardar.", "error");
+              }
             }
           });
         }
@@ -970,14 +1082,18 @@
         catch (_) { return "$" + n.toFixed(2); }
       }
       function typeBadge(type) {
+        var raw = String(type || "formulario").trim();
+        var show = raw;
         var map = {
           cobro: ["#eff6ff", "#1d4ed8"],
           recarga: ["#f0f9ff", "#0369a1"],
+          amortizacion: ["#fff7ed", "#c2410c"],
           garantia: ["#ecfdf5", "#047857"],
           formulario: ["#fff7ed", "#9a3412"]
         };
-        var c = map[type] || ["#f8fafc", "#334155"];
-        return "<span style='display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700;background:" + c[0] + ";color:" + c[1] + ";text-transform:uppercase;'>" + type + "</span>";
+        if (raw === "amortizacion") show = "amortización";
+        var c = map[raw] || ["#f8fafc", "#334155"];
+        return "<span style='display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:700;background:" + c[0] + ";color:" + c[1] + ";text-transform:uppercase;'>" + escapeHtmlQuick(show) + "</span>";
       }
       async function openFormsModal(clientId, clientName) {
         if (!clientId) return;
@@ -1019,22 +1135,51 @@
                 approvalPill(ap || "pending_review") +
                 "</div>";
             }
+            var proofBtn = "";
+            if (it.proof) {
+              var proofHref =
+                it.source === "credito_client_form_submissions" && it.submissionId
+                  ? "/api/credito-client-form-proof?submissionId=" + encodeURIComponent(it.submissionId) + "&clientId=" + encodeURIComponent(clientId)
+                  : encodeURI(String(it.proof));
+              proofBtn =
+                "<button type='button' data-hm-proof-preview='1' data-proof-url=\"" + escapeHtmlQuick(proofHref) + "\" "
+                  + "style='font-size:12px;font-weight:700;color:#0ea5e9;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;font-family:inherit'>"
+                  + "Ver comprobante</button>";
+            }
             var actionsHtml = "";
             if (it.actionable && it.submissionId) {
               actionsHtml +=
                 "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
                   + "<button type='button' data-hm-form-act='accept' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
                   + "style='height:32px;padding:0 12px;border-radius:8px;border:none;background:#16a34a;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Aceptar</button>"
-                  + "<button type='button' data-hm-form-act='reject' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "<button type='button' data-hm-form-act='reject_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
                   + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;font-weight:700;font-size:12px;cursor:pointer'>Rechazar</button>"
-                  + "<button type='button' data-hm-form-act='request_edit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "<button type='button' data-hm-form-act='reqedit_open' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
                   + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;font-weight:700;font-size:12px;cursor:pointer'>Pedir corregir</button>"
-                  + "</div>";
+                  + "</div>"
+                  + "<div class='hm-panel-reject' style='display:none;margin-top:10px;padding:12px;border-radius:10px;background:#fef2f2;border:1px solid #fecaca'>"
+                  + "<label style='display:block;font-size:12px;font-weight:700;color:#991b1b;margin-bottom:6px'>Motivo del rechazo (opcional)</label>"
+                  + "<textarea class='hm-reject-msg' rows='2' placeholder='Ej. comprobante ilegible, monto no coincide…' "
+                  + "style='width:100%;box-sizing:border-box;border:1px solid #fca5a5;border-radius:8px;padding:8px;font-size:13px;resize:vertical'></textarea>"
+                  + "<div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px'>"
+                  + "<button type='button' data-hm-form-act='reject_submit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "style='height:32px;padding:0 14px;border-radius:8px;border:none;background:#991b1b;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Confirmar rechazo</button>"
+                  + "<button type='button' data-hm-form-act='reject_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
+                  + "</div></div>"
+                  + "<div class='hm-panel-reqedit' style='display:none;margin-top:10px;padding:12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0'>"
+                  + "<label style='display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:6px'>Qué debe corregir el cliente</label>"
+                  + "<textarea class='hm-reqedit-msg' rows='3' placeholder='Ej. subir comprobante más claro, corregir monto o fecha…' "
+                  + "style='width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font-size:13px;resize:vertical'></textarea>"
+                  + "<div style='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px'>"
+                  + "<button type='button' data-hm-form-act='request_edit_submit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "style='height:32px;padding:0 14px;border-radius:8px;border:none;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Enviar pedido al cliente</button>"
+                  + "<button type='button' data-hm-form-act='reqedit_cancel' style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:12px;cursor:pointer'>Cancelar</button>"
+                  + "</div></div>";
             } else if (st === "credito_client_form_submissions" && ap === "needs_client_edit" && it.submissionId) {
               actionsHtml +=
                 "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
                   + "<button type='button' data-hm-form-act='link_edit' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
-                  + "style='height:32px;padding:0 12px;border-radius:8px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;font-weight:700;font-size:12px;cursor:pointer'>Copiar link al cliente</button>"
+                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #1d4ed8;background:#1d4ed8;color:#fff;font-weight:700;font-size:12px;cursor:pointer'>Pasar link de corrección</button>"
                   + "</div>";
             }
             return ""
@@ -1048,15 +1193,7 @@
               + "  <div style='margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;'>"
               + "    <span style='font-size:11px;color:#94a3b8'>Fuente: " + escapeHtmlQuick(String(it.source || "—")) + "</span>"
               + "    "
-              + (it.proof
-                ? "<a href='"
-                  + escapeHtmlQuick(
-                      it.source === "credito_client_form_submissions" && it.submissionId
-                        ? "/api/credito-client-form-proof?submissionId=" + encodeURIComponent(it.submissionId) + "&clientId=" + encodeURIComponent(clientId)
-                        : encodeURI(String(it.proof)),
-                    )
-                  + "' target='_blank' rel='noopener' style='font-size:12px;font-weight:700;color:#0ea5e9;text-decoration:none'>Ver comprobante</a>"
-                : "")
+              + proofBtn
               + "  </div>"
               + actionsHtml
               + "</article>";
@@ -1117,6 +1254,7 @@
         viewBtn.dataset.clientName = name || "";
       }
       function install() {
+        initProofLightboxOnce();
         ensureActionButtons();
         window.addEventListener("hashchange", ensureActionButtons);
         window.addEventListener("popstate", ensureActionButtons);

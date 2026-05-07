@@ -206,16 +206,10 @@
     .type-badge i {
       width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; display: inline-block;
     }
-    .type-badge[data-type="garantia"] { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
-    .type-badge[data-type="garantia"] i { background: #10b981; }
     .type-badge[data-type="recarga"] { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
     .type-badge[data-type="recarga"] i { background: #3b82f6; }
-    .type-badge[data-type="cobro"] { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
-    .type-badge[data-type="cobro"] i { background: #f97316; }
-    .type-badge[data-type="gasto_ads"] { background: #f5f3ff; border-color: #ddd6fe; color: #5b21b6; }
-    .type-badge[data-type="gasto_ads"] i { background: #8b5cf6; }
-    .type-badge[data-type="otro"] { background: #f1f5f9; border-color: #e2e8f0; color: #334155; }
-    .type-badge[data-type="otro"] i { background: #64748b; }
+    .type-badge[data-type="amortizacion"] { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+    .type-badge[data-type="amortizacion"] i { background: #f97316; }
 
     .side-help { display: flex; gap: 10px; align-items: flex-start; }
     .side-help-ico {
@@ -605,7 +599,7 @@
         <div class="side-body">
           <div class="side-card">
             <h4>Resumen</h4>
-            <div class="summary-row"><span class="lbl">Tipo</span><span class="val"><span class="type-badge" id="type-badge" data-type="garantia"><i></i><span>Garantia</span></span></span></div>
+            <div class="summary-row"><span class="lbl">Tipo</span><span class="val"><span class="type-badge" id="type-badge" data-type="recarga"><i></i><span>Recarga</span></span></span></div>
             <div class="summary-row"><span class="lbl">Monto</span><span class="val empty" id="sum-monto">-</span></div>
             <div class="summary-row"><span class="lbl">Fecha</span><span class="val empty" id="sum-fecha">-</span></div>
             <div class="summary-row"><span class="lbl">Comprobante</span><span class="val empty" id="sum-file">Sin adjuntar</span></div>
@@ -617,7 +611,7 @@
               </div>
               <div class="side-help-text">
                 <strong>Como llenar</strong>
-                Selecciona el tipo, ingresa monto y fecha de pago. Adjunta el comprobante (foto del depositos o transferencia).
+                Elegí recarga o amortización, montos y fecha. Adjuntá el comprobante (foto clara del depósito o transferencia).
               </div>
             </div>
           </div>
@@ -651,11 +645,8 @@
                 <label for="tipo">Tipo<span class="req">*</span></label>
                 <div class="select-wrap">
                   <select id="tipo" required>
-                    <option value="garantia">Garantia</option>
                     <option value="recarga">Recarga</option>
-                    <option value="cobro">Cobro</option>
-                    <option value="gasto_ads">Gasto Ads</option>
-                    <option value="otro">Otro</option>
+                    <option value="amortizacion">Amortización</option>
                   </select>
                 </div>
               </div>
@@ -671,7 +662,7 @@
                 <input id="fecha" type="date" required />
               </div>
               <div class="field">
-                <label for="telefono">Telefono</label>
+                <label for="telefono">Teléfono</label>
                 <input id="telefono" type="tel" placeholder="+1 809 000 0000" />
               </div>
             </div>
@@ -686,7 +677,7 @@
             </div>
             <div class="field">
               <label for="detalle">Mensaje (opcional)</label>
-              <textarea id="detalle" placeholder="Escribe aqui cualquier nota relevante, numero de operacion, banco emisor, etc."></textarea>
+              <textarea id="detalle" placeholder="Nota opcional: número de operación, banco, referencia…"></textarea>
             </div>
           </div>
 
@@ -780,6 +771,15 @@
       var card = document.querySelector(".card");
       var successOverlay = $("success-overlay");
       var selectedFile = null;
+      var savedProofPreviewUrl = null;
+      var userChoseRemoveProof = false;
+
+      function normalizeTipo(val) {
+        var x = String(val || "").trim().toLowerCase();
+        if (x === "recarga" || x === "amortizacion") return x;
+        if (x === "cobro" || x === "garantia" || x === "gasto_ads" || x === "otro") return "amortizacion";
+        return "recarga";
+      }
 
       var initials = (function () {
         var parts = (clientName || "Cliente").trim().split(/\s+/);
@@ -817,7 +817,9 @@
           }
           var s = o.submission;
           isResubmit = true;
-          if ($("tipo")) $("tipo").value = s.tipo || "garantia";
+          userChoseRemoveProof = false;
+          savedProofPreviewUrl = null;
+          if ($("tipo")) $("tipo").value = normalizeTipo(s.tipo);
           if (montoInput) montoInput.value = s.monto != null ? String(s.monto) : "";
           if (fechaInput) fechaInput.value = s.fecha_pago || "";
           if ($("telefono")) $("telefono").value = s.telefono || "";
@@ -833,6 +835,22 @@
           }
           var di = $("draft-info-banner");
           if (di) di.style.display = "none";
+          if (s.comprobante_url && submissionId && clientId) {
+            savedProofPreviewUrl =
+              "/api/credito-client-form-proof?submissionId=" +
+              encodeURIComponent(submissionId) +
+              "&clientId=" +
+              encodeURIComponent(clientId);
+            previewImg.src = savedProofPreviewUrl;
+            previewName.textContent = "Comprobante actual";
+            previewMeta.textContent = "Podés reemplazarlo o quitarlo";
+            preview.classList.add("show");
+            selectedFile = null;
+            if (sumFile) { sumFile.textContent = "Comprobante cargado"; sumFile.classList.remove("empty"); }
+          } else if (preview) {
+            preview.classList.remove("show");
+            previewImg.src = "";
+          }
         } catch (_) {
           showToast("No se pudo cargar el borrador para corregir.", true);
         }
@@ -877,7 +895,7 @@
       }
       function updateTypeBadge() {
         if (!typeBadge || !typeSelect) return;
-        var t = (typeSelect.value || "garantia").trim();
+        var t = (typeSelect.value || "recarga").trim();
         var lbl = typeSelect.options[typeSelect.selectedIndex] ? typeSelect.options[typeSelect.selectedIndex].textContent : t;
         typeBadge.dataset.type = t;
         var sp = typeBadge.querySelector("span:last-child");
@@ -918,9 +936,11 @@
           selectedFile = null;
           fileInput.value = "";
           preview.classList.remove("show");
+          if (previewImg) previewImg.removeAttribute("src");
           if (sumFile) { sumFile.textContent = "Sin adjuntar"; sumFile.classList.add("empty"); }
           return;
         }
+        userChoseRemoveProof = false;
         if (!/^image\//i.test(f.type || "")) {
           showToast("Formato no soportado. Sube una imagen.", true);
           return;
@@ -942,7 +962,26 @@
         setFile(f || null);
       });
       if (previewReplace) previewReplace.addEventListener("click", function () { fileInput.click(); });
-      if (previewRemove) previewRemove.addEventListener("click", function () { setFile(null); });
+      if (previewRemove) previewRemove.addEventListener("click", function () {
+        if (selectedFile) {
+          setFile(null);
+          if (isResubmit && savedProofPreviewUrl && !userChoseRemoveProof) {
+            previewImg.src = savedProofPreviewUrl;
+            previewName.textContent = "Comprobante actual";
+            previewMeta.textContent = "Podés reemplazarlo o quitarlo";
+            preview.classList.add("show");
+          }
+          return;
+        }
+        if (isResubmit && savedProofPreviewUrl) {
+          userChoseRemoveProof = true;
+          preview.classList.remove("show");
+          if (previewImg) previewImg.removeAttribute("src");
+          if (sumFile) { sumFile.textContent = "Sin adjuntar"; sumFile.classList.add("empty"); }
+          return;
+        }
+        setFile(null);
+      });
 
       ["dragenter", "dragover"].forEach(function (ev) {
         dropZone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); dropZone.classList.add("is-drag"); });
@@ -964,7 +1003,7 @@
       form.addEventListener("submit", async function (ev) {
         ev.preventDefault();
         if (!clientId) {
-          showToast("No se detecto el cliente en este link.", true);
+          showToast("No se detectó el cliente en este link.", true);
           return;
         }
         var payload = {
@@ -976,7 +1015,10 @@
           telefono: ($("telefono").value || "").trim() || null,
           detalle: ($("detalle").value || "").trim() || null
         };
-        if (isResubmit && submissionId) payload.submission_id = submissionId;
+        if (isResubmit && submissionId) {
+          payload.submission_id = submissionId;
+          if (!selectedFile && userChoseRemoveProof) payload.remove_comprobante = true;
+        }
         if (!payload.tipo || !payload.fecha_pago || !payload.monto || payload.monto <= 0) {
           showToast("Completa tipo, monto y fecha.", true);
           return;
