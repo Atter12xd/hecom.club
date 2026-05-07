@@ -1023,6 +1023,34 @@
               return out;
             }
 
+            if (act === "undo_accept") {
+              if (!submissionId || !cid) return;
+              var txtUndo =
+                "Se va a borrar el COBRO o GARANTÍA creados al aceptar este envío, y volverá a estado BORRADOR para que lo revises o rechaces.\n\n¿Continuar?";
+              if (!window.confirm(txtUndo)) return;
+              try {
+                var resU = await fetch("/api/credito-client-form-action", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    id: submissionId,
+                    action: "undo_accept",
+                    reviewed_by: (await reviewerEmail()) || null,
+                  }),
+                });
+                var outU = await resU.json().catch(function () { return {}; });
+                if (!resU.ok || !outU.ok) throw new Error((outU && outU.error) || ("HTTP " + resU.status));
+                if (outU.deleted_linked_row) {
+                  showToast("Listo: cobro/garantía eliminado. El envío volvió a borrador.");
+                } else {
+                  showToast("Envío revertido. Si el cobro sigue en finanzas, borralo a mano.", "error");
+                }
+                await openFormsModal(cid, cnm);
+              } catch (exU) {
+                showToast((exU && exU.message) ? exU.message : "No se pudo deshacer.", "error");
+              }
+              return;
+            }
             if (act === "notice_copy") {
               if (!cid) return;
               var nk = btn.getAttribute("data-notice-kind") || "";
@@ -1269,6 +1297,8 @@
                 "<div style='margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;'>"
                   + "<button type='button' data-hm-form-act='notice_copy' data-notice-kind='accepted' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
                   + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #16a34a;background:#f0fdf4;color:#15803d;font-weight:700;font-size:12px;cursor:pointer'>Copiar mensaje (aprobado)</button>"
+                  + "<button type='button' data-hm-form-act='undo_accept' data-submission-id='" + escapeHtmlQuick(it.submissionId) + "' "
+                  + "style='height:34px;padding:0 14px;border-radius:8px;border:1px solid #f59e0b;background:#fffbeb;color:#b45309;font-weight:700;font-size:12px;cursor:pointer'>Deshacer aceptación</button>"
                   + "</div>";
             } else if (st === "credito_client_form_submissions" && ap === "rejected" && it.submissionId) {
               var mfRej = String(it.managerFeedback != null ? it.managerFeedback : "");

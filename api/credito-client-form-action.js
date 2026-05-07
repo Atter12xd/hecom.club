@@ -74,6 +74,100 @@ async function sbInsert(supabaseUrl, serviceKey, table, row) {
   return Array.isArray(data) && data[0] ? data[0] : null;
 }
 
+function parseRequestBody(req) {
+  var b = req.body;
+  if (b === undefined || b === null) return {};
+  if (typeof Buffer !== "undefined" && Buffer.isBuffer(b)) {
+    try {
+      return b.length ? JSON.parse(b.toString("utf8")) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  if (typeof b === "string") {
+    try {
+      return b ? JSON.parse(b) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  if (typeof b === "object") return b;
+  return {};
+}
+
+async function sbDeleteById(supabaseUrl, serviceKey, table, rowId) {
+  if (!rowId) return false;
+  var u =
+    supabaseUrl.replace(/\/$/, "") +
+    "/rest/v1/" +
+    encodeURIComponent(table) +
+    "?id=eq." +
+    encodeURIComponent(String(rowId));
+  var r = await fetch(u, {
+    method: "DELETE",
+    headers: {
+      apikey: serviceKey,
+      Authorization: "Bearer " + serviceKey,
+      Prefer: "return=representation",
+    },
+  });
+  var txt = await r.text().catch(function () { return ""; });
+  if (!r.ok) throw new Error("DELETE " + table + ": " + txt);
+  return true;
+}
+
+/** Aceptaciones anteriores sin applied_row_id: buscar último cobro/garantía que coincida con el formulario. */
+async function findLegacyCobroFormulario(supabaseUrl, serviceKey, row) {
+  var cid = encodeURIComponent(row.client_id);
+  var fecha = encodeURIComponent(String(row.fecha_pago || ""));
+  var monto = Number(row.monto || 0);
+  if (!(monto > 0) || !fecha || !cid) return null;
+  var q =
+    "client_id=eq." +
+    cid +
+    "&fecha=eq." +
+    fecha +
+    "&monto=eq." +
+    monto +
+    "&select=id,metodo,codigo,created_at&order=created_at.desc&limit=15";
+  var u = supabaseUrl.replace(/\/$/, "") + "/rest/v1/cobros?" + q;
+  var r = await fetch(u, {
+    headers: { apikey: serviceKey, Authorization: "Bearer " + serviceKey, Accept: "application/json" },
+  });
+  if (!r.ok) return null;
+  var rows = await r.json().catch(function () { return []; });
+  if (!Array.isArray(rows)) return null;
+  for (var i = 0; i < rows.length; i += 1) {
+    var m = rows[i].metodo ? String(rows[i].metodo) : "";
+    if (/formulario/i.test(m)) return rows[i];
+  }
+  return null;
+}
+
+async function findLegacyGarantiaFormulario(supabaseUrl, serviceKey, row) {
+  var cid = encodeURIComponent(row.client_id);
+  var monto = Number(row.monto || 0);
+  if (!(monto > 0) || !cid) return null;
+  var q =
+    "client_id=eq." +
+    cid +
+    "&valor=eq." +
+    monto +
+    "&select=id,tipo,descripcion,created_at&order=created_at.desc&limit=15";
+  var u = supabaseUrl.replace(/\/$/, "") + "/rest/v1/garantias?" + q;
+  var r = await fetch(u, {
+    headers: { apikey: serviceKey, Authorization: "Bearer " + serviceKey, Accept: "application/json" },
+  });
+  if (!r.ok) return null;
+  var rows = await r.json().catch(function () { return []; });
+  if (!Array.isArray(rows)) return null;
+  for (var i = 0; i < rows.length; i += 1) {
+    var t = rows[i].tipo ? String(rows[i].tipo) : "";
+    if (/formulario/i.test(t)) return rows[i];
+  }
+  return null;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -89,16 +183,13 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    var body = req.body || {};
+    var body = parseRequestBody(req);
     var id = sanitizeText(body.id, 80);
-    var action = sanitizeText(body.action, 32);
+    var action = sanitizeText(body.action, 36);
     var note = sanitizeText(body.note, 2000);
     var reviewedBy = sanitizeText(body.reviewed_by, 200);
 
     if (!id) return json(res, 400, { ok: false, error: "id es requerido." });
-    if (!action || ["accept", "reject", "request_edit"].indexOf(action) < 0) {
-      return json(res, 400, { ok: false, error: "action debe ser accept, reject o request_edit." });
-    }
 
     var h = {
       apikey: serviceKey,
@@ -110,9 +201,77 @@ module.exports = async function handler(req, res) {
       "/rest/v1/credito_client_form_submissions?id=eq." +
       encodeURIComponent(id) +
       "&select=*";
-    var rows = await sbGet(base, h);
-    var row = Array.isArray(rows) && rows[0] ? rows[0] : null;
+    var rowsSel = await sbGet(base, h);
+    var row = Array.isArray(rowsSel) && rowsSel[0] ? rowsSel[0] : null;
     if (!row) return json(res, 404, { ok: false, error: "Borrador no encontrado." });
+
+    if (action === "undo_accept") {
+      var statU = row.approval_status || "";
+      if (statU !== "accepted") {
+        return json(res, 400, { ok: false, error: "Solo se puede deshacer un envío ya aceptado." });
+      }
+      var p = row.payload && typeof row.payload === "object" ? row.payload : {};
+      var tTable = p.applied_table ? String(p.applied_table).trim().toLowerCase() : "";
+      var tRowId = p.applied_row_id ? String(p.applied_row_id).trim() : "";
+      var nowU = new Date().toISOString();
+      var deleted = false;
+
+      if (tTable === "cobros" && tRowId) {
+        await sbDeleteById(supabaseUrl, serviceKey, "cobros", tRowId);
+        deleted = true;
+      } else if (tTable === "garantias" && tRowId) {
+        await sbDeleteById(supabaseUrl, serviceKey, "garantias", tRowId);
+        deleted = true;
+      } else {
+        var tipoR = row.tipo || "";
+        if (tipoR === "garantia") {
+          var lg = await findLegacyGarantiaFormulario(supabaseUrl, serviceKey, row);
+          if (lg && lg.id) {
+            await sbDeleteById(supabaseUrl, serviceKey, "garantias", lg.id);
+            deleted = true;
+          }
+        } else {
+          var lc = await findLegacyCobroFormulario(supabaseUrl, serviceKey, row);
+          if (lc && lc.id) {
+            await sbDeleteById(supabaseUrl, serviceKey, "cobros", lc.id);
+            deleted = true;
+          }
+        }
+      }
+
+      var nextPayloadU = Object.assign({}, p, {
+        undo_accept_at: nowU,
+        undone_by: reviewedBy || null,
+      });
+      delete nextPayloadU.applied_table;
+      delete nextPayloadU.applied_row_id;
+      delete nextPayloadU.applied_at;
+      delete nextPayloadU.applied_tipo;
+
+      await sbPatch(supabaseUrl, serviceKey, "credito_client_form_submissions", "id=eq." + encodeURIComponent(id), {
+        approval_status: "pending_review",
+        manager_feedback:
+          "Revertido tras aceptar por error. Volvé a revisar o rechazar." +
+          (deleted ? "" : " (No se encontró cobro/garantía automático: borrá el movimiento manual en finanzas si hace falta.)"),
+        reviewed_at: nowU,
+        reviewed_by: reviewedBy || row.reviewed_by || null,
+        updated_at: nowU,
+        payload: nextPayloadU,
+      });
+
+      return json(res, 200, {
+        ok: true,
+        approval_status: "pending_review",
+        deleted_linked_row: deleted,
+      });
+    }
+
+    if (!action || ["accept", "reject", "request_edit"].indexOf(action) < 0) {
+      return json(res, 400, {
+        ok: false,
+        error: "action debe ser accept, reject, request_edit o undo_accept.",
+      });
+    }
 
     var status = row.approval_status || "pending_review";
     if (status !== "pending_review") {
@@ -153,6 +312,8 @@ module.exports = async function handler(req, res) {
     if (row.comprobante_url) urls = [String(row.comprobante_url)];
     var detalle = row.detalle || null;
 
+    var inserted = null;
+    var appliedTable = null;
     if (tipo === "cobro" || tipo === "recarga" || tipo === "amortizacion") {
       var metodo =
         tipo === "recarga"
@@ -160,7 +321,7 @@ module.exports = async function handler(req, res) {
           : tipo === "amortizacion"
           ? "Amortización cliente (formulario)"
           : "Cobro cliente (formulario)";
-      await sbInsert(supabaseUrl, serviceKey, "cobros", {
+      inserted = await sbInsert(supabaseUrl, serviceKey, "cobros", {
         client_id: clientId,
         fecha: fecha,
         monto: monto,
@@ -168,18 +329,30 @@ module.exports = async function handler(req, res) {
         codigo: detalle || "Formulario cliente",
         comprobante_urls: urls.length ? urls : null,
       });
+      appliedTable = "cobros";
     } else if (tipo === "garantia") {
-      await sbInsert(supabaseUrl, serviceKey, "garantias", {
+      inserted = await sbInsert(supabaseUrl, serviceKey, "garantias", {
         client_id: clientId,
         tipo: "Formulario cliente",
         descripcion: detalle || "Garantía enviada por formulario",
         valor: monto,
         estado: "Vigente",
       });
+      appliedTable = "garantias";
     }
 
     var prevPayload = row.payload && typeof row.payload === "object" ? row.payload : {};
-    var nextPayload = Object.assign({}, prevPayload, { applied_at: now, applied_tipo: tipo });
+    var baseP = Object.assign({}, prevPayload);
+    delete baseP.applied_table;
+    delete baseP.applied_row_id;
+    delete baseP.applied_at;
+    delete baseP.applied_tipo;
+    var nextPayload = Object.assign({}, baseP, {
+      applied_at: now,
+      applied_tipo: tipo,
+      applied_table: appliedTable || null,
+      applied_row_id: inserted && inserted.id ? String(inserted.id) : null,
+    });
 
     await sbPatch(supabaseUrl, serviceKey, "credito_client_form_submissions", "id=eq." + encodeURIComponent(id), {
       approval_status: "accepted",
