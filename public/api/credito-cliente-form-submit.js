@@ -61,6 +61,40 @@ async function insertRow(supabaseUrl, serviceKey, table, row) {
   return Array.isArray(data) && data[0] ? data[0] : null;
 }
 
+async function patchRow(supabaseUrl, serviceKey, table, id, patch) {
+  var q = supabaseUrl.replace(/\/$/, "") + "/rest/v1/" + encodeURIComponent(table) + "?id=eq." + encodeURIComponent(id);
+  var r = await fetch(q, {
+    method: "PATCH",
+    headers: {
+      apikey: serviceKey,
+      Authorization: "Bearer " + serviceKey,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(patch),
+  });
+  if (!r.ok) {
+    var txt = await r.text().catch(function () { return ""; });
+    throw new Error("patch " + table + ": " + (txt || ("HTTP " + r.status)));
+  }
+  var data = await r.json().catch(function () { return []; });
+  return Array.isArray(data) && data[0] ? data[0] : null;
+}
+
+async function getRowById(supabaseUrl, serviceKey, id) {
+  var u =
+    supabaseUrl.replace(/\/$/, "") +
+    "/rest/v1/credito_client_form_submissions?id=eq." +
+    encodeURIComponent(id) +
+    "&select=*";
+  var r = await fetch(u, {
+    headers: { apikey: serviceKey, Authorization: "Bearer " + serviceKey, Accept: "application/json" },
+  });
+  if (!r.ok) return null;
+  var data = await r.json().catch(function () { return []; });
+  return Array.isArray(data) && data[0] ? data[0] : null;
+}
+
 module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -86,11 +120,13 @@ module.exports = async function handler(req, res) {
     var clientName = sanitizeText(body.client_name, 140);
     var telefono = sanitizeText(body.telefono, 40);
     var detalle = sanitizeText(body.detalle, 1200);
-    var comprobanteUrl = null;
+    var resubmitId = sanitizeText(body.submission_id || body.resubmit_id, 80);
+
     if (!fechaPago || !(monto > 0)) {
       return json(res, 400, { ok: false, error: "Completa fecha y monto valido." });
     }
 
+    var comprobanteUrl = null;
     if (body.file_data_url) {
       var parsed = parseDataUrl(body.file_data_url);
       if (!parsed) return json(res, 400, { ok: false, error: "Comprobante invalido." });
@@ -102,7 +138,7 @@ module.exports = async function handler(req, res) {
       if (fileBuffer.length > 4 * 1024 * 1024) {
         return json(res, 400, { ok: false, error: "Comprobante supera 4MB." });
       }
-      var ext = mime.indexOf("png") >= 0 ? "png" : (mime.indexOf("webp") >= 0 ? "webp" : "jpg");
+      var ext = mime.indexOf("png") >= 0 ? "png" : mime.indexOf("webp") >= 0 ? "webp" : "jpg";
       var filePath = "cliente-" + clientId + "/" + Date.now() + "-comprobante." + ext;
       var buckets = ["comprobantes_clientes", "comprobantes", "garantias_comprobantes", "avatars"];
       var uploadErr = null;
@@ -119,7 +155,51 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    var commonRow = {
+    var nowIso = new Date().toISOString();
+    var basePayload = {
+      ua: sanitizeText(req.headers["user-agent"], 220),
+      ip: sanitizeText(req.headers["x-forwarded-for"], 220),
+    };
+
+    /* Reenvío del cliente después de Pedir corrección */
+    if (resubmitId) {
+      var existing = await getRowById(supabaseUrl, serviceKey, resubmitId);
+      if (!existing || String(existing.client_id) !== String(clientId)) {
+        return json(res, 403, { ok: false, error: "No autorizado para actualizar este envío." });
+      }
+      var st = existing.approval_status || "";
+      if (st !== "needs_client_edit") {
+        return json(res, 400, { ok: false, error: "Este envío no está pendiente de corrección del cliente." });
+      }
+      var prevP = existing.payload && typeof existing.payload === "object" ? existing.payload : {};
+      var patch = {
+        tipo: tipo,
+        monto: monto,
+        fecha_pago: fechaPago,
+        telefono: telefono,
+        detalle: detalle,
+        client_name: clientName || existing.client_name,
+        approval_status: "pending_review",
+        manager_feedback: null,
+        reviewed_at: null,
+        reviewed_by: null,
+        updated_at: nowIso,
+        payload: Object.assign({}, prevP, basePayload, { client_resubmit_at: nowIso }),
+      };
+      if (comprobanteUrl) patch.comprobante_url = comprobanteUrl;
+      var patched = await patchRow(supabaseUrl, serviceKey, "credito_client_form_submissions", resubmitId, patch);
+      return json(res, 200, {
+        ok: true,
+        id: patched && patched.id ? patched.id : resubmitId,
+        table: "credito_client_form_submissions",
+        approval_status: "pending_review",
+        message: "Borrador reenviado. Un gerente lo revisará de nuevo.",
+        data: patched,
+      });
+    }
+
+    /** Nuevo borrador: siempre espera revisión gerente — no crear cobros/garantías hasta aceptación. */
+    var draftRow = {
       client_id: clientId,
       client_name: clientName,
       tipo: tipo,
@@ -129,58 +209,23 @@ module.exports = async function handler(req, res) {
       detalle: detalle,
       comprobante_url: comprobanteUrl,
       source: "credito_cliente_form",
-      payload: {
-        ua: sanitizeText(req.headers["user-agent"], 220),
-        ip: sanitizeText(req.headers["x-forwarded-for"], 220),
-      },
+      approval_status: "pending_review",
+      manager_feedback: null,
+      reviewed_at: null,
+      reviewed_by: null,
+      payload: basePayload,
     };
 
-    var attempts = [];
-    if (tipo === "cobro" || tipo === "recarga") {
-      attempts.push({
-        table: "cobros",
-        row: {
-          client_id: clientId,
-          fecha: fechaPago,
-          monto: monto,
-          metodo: tipo === "recarga" ? "recarga_cliente_form" : "cliente_form",
-          codigo: detalle,
-          comprobante_urls: comprobanteUrl ? [comprobanteUrl] : [],
-        },
-      });
-    } else if (tipo === "garantia") {
-      attempts.push({
-        table: "garantias",
-        row: {
-          client_id: clientId,
-          valor: monto,
-          estado: "pendiente",
-        },
-      });
-    }
-    attempts.push({ table: "credito_client_form_submissions", row: commonRow });
-    attempts.push({ table: "cliente_form_submissions", row: commonRow });
-
-    var inserted = null;
-    var usedTable = null;
-    var insertErr = null;
-    for (var t = 0; t < attempts.length; t += 1) {
-      try {
-        inserted = await insertRow(supabaseUrl, serviceKey, attempts[t].table, attempts[t].row);
-        usedTable = attempts[t].table;
-        break;
-      } catch (e2) {
-        insertErr = e2;
-      }
-    }
-    if (!inserted) {
-      return json(res, 500, {
-        ok: false,
-        error: "No se pudo guardar en Supabase. Revisa tablas de destino para el tipo enviado.",
-        detail: insertErr ? insertErr.message : null,
-      });
-    }
-    return json(res, 200, { ok: true, id: inserted.id || null, table: usedTable, data: inserted });
+    var inserted = await insertRow(supabaseUrl, serviceKey, "credito_client_form_submissions", draftRow);
+    return json(res, 200, {
+      ok: true,
+      id: inserted.id || null,
+      table: "credito_client_form_submissions",
+      approval_status: "pending_review",
+      message:
+        "Borrador guardado. Un gerente debe aceptar o solicitar cambios antes de registrar en cuenta.",
+      data: inserted,
+    });
   } catch (err) {
     return json(res, 500, { ok: false, error: err && err.message ? err.message : "internal error" });
   }

@@ -632,6 +632,13 @@
         </header>
 
         <form id="client-form" class="body" novalidate>
+          <div id="revision-banner" style="display:none;margin-bottom:8px;padding:13px 14px;border-radius:14px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;line-height:1.45">
+            <strong style="display:block;font-size:13px">Tu gerente pidió ajustes</strong>
+            <span id="revision-text" style="display:block;margin-top:8px;font-size:13px"></span>
+          </div>
+          <div id="draft-info-banner" style="display:none;margin-bottom:8px;padding:13px 14px;border-radius:14px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;line-height:1.45;font-size:13px">
+            Tu envío llega como <strong>borrador</strong>. Un gerente lo revisará antes de registrarlo en tu cuenta.
+          </div>
           <div class="section">
             <div class="section-head">
               <div class="ico">
@@ -736,7 +743,7 @@
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"></path></svg>
       </div>
       <h3>Formulario enviado</h3>
-      <p>Hemos recibido tus datos correctamente. Ya puedes cerrar esta ventana.</p>
+      <p id="success-msg">Hemos recibido tus datos correctamente. Ya puedes cerrar esta ventana.</p>
     </div>
   </div>
 
@@ -745,6 +752,8 @@
       var qs = new URLSearchParams(window.location.search || "");
       var clientId = (qs.get("clientId") || "").trim();
       var clientName = (qs.get("clientName") || "").trim();
+      var submissionId = (qs.get("submissionId") || "").trim();
+      var isResubmit = false;
 
       var $ = function (id) { return document.getElementById(id); };
       var form = $("client-form");
@@ -783,6 +792,10 @@
       clientMeta.textContent = clientId
         ? ("Cliente: " + (clientName || "(sin nombre)") + " — ID " + clientId.slice(0, 8) + "...")
         : "Link invalido: falta clientId.";
+      (function showDraftInfo() {
+        var b = $("draft-info-banner");
+        if (b && clientId && !submissionId) b.style.display = "block";
+      })();
       if (clientNameSide) clientNameSide.textContent = clientName || "(sin nombre)";
       if (clientIdSide) clientIdSide.textContent = "ID: " + (clientId || "-");
 
@@ -791,6 +804,39 @@
         var iso = today.toISOString().slice(0, 10);
         if (fechaInput && !fechaInput.value) fechaInput.value = iso;
       } catch (_) {}
+
+      (async function loadRevisionDraft() {
+        if (!submissionId || !clientId) return;
+        try {
+          var u = "/api/credito-client-form-draft?submissionId=" + encodeURIComponent(submissionId) + "&clientId=" + encodeURIComponent(clientId);
+          var r = await fetch(u, { cache: "no-store" });
+          var o = await r.json().catch(function () { return {}; });
+          if (!r.ok || !o.ok || !o.submission) {
+            showToast((o && o.error) || "No se pudo cargar el borrador.", true);
+            return;
+          }
+          var s = o.submission;
+          isResubmit = true;
+          if ($("tipo")) $("tipo").value = s.tipo || "garantia";
+          if (montoInput) montoInput.value = s.monto != null ? String(s.monto) : "";
+          if (fechaInput) fechaInput.value = s.fecha_pago || "";
+          if ($("telefono")) $("telefono").value = s.telefono || "";
+          if ($("detalle")) $("detalle").value = s.detalle || "";
+          if (s.client_name && clientNameSide) clientNameSide.textContent = s.client_name;
+          updateTypeBadge();
+          refreshSummary();
+          var ban = $("revision-banner");
+          var rtx = $("revision-text");
+          if (ban && rtx) {
+            rtx.textContent = s.manager_feedback || "Revisa los datos y vuelve a enviar.";
+            ban.style.display = "block";
+          }
+          var di = $("draft-info-banner");
+          if (di) di.style.display = "none";
+        } catch (_) {
+          showToast("No se pudo cargar el borrador para corregir.", true);
+        }
+      })();
 
       function fmtMoney(n) {
         var v = Number(n || 0);
@@ -930,6 +976,7 @@
           telefono: ($("telefono").value || "").trim() || null,
           detalle: ($("detalle").value || "").trim() || null
         };
+        if (isResubmit && submissionId) payload.submission_id = submissionId;
         if (!payload.tipo || !payload.fecha_pago || !payload.monto || payload.monto <= 0) {
           showToast("Completa tipo, monto y fecha.", true);
           return;
@@ -956,15 +1003,21 @@
           if (!res.ok || !out.ok) {
             throw new Error((out && out.error) || ("HTTP " + res.status));
           }
+          var sm = $("success-msg");
+          if (sm) sm.textContent = (out && out.message) ? String(out.message) : "Hemos recibido tus datos correctamente.";
           showSuccessOverlay();
-          showToast("Formulario enviado con exito.", false);
+          showToast((out && out.message) ? String(out.message) : "Enviado", false);
           setTimeout(function () {
-            form.reset();
-            setFile(null);
-            updateTypeBadge();
-            refreshSummary();
-            if (fechaInput) {
-              try { fechaInput.value = new Date().toISOString().slice(0, 10); } catch (_) {}
+            if (!isResubmit) {
+              form.reset();
+              setFile(null);
+              updateTypeBadge();
+              refreshSummary();
+              if (fechaInput) {
+                try { fechaInput.value = new Date().toISOString().slice(0, 10); } catch (_) {}
+              }
+            } else {
+              setFile(null);
             }
           }, 600);
         } catch (err) {
