@@ -1047,7 +1047,16 @@
               + "  <div style='margin-top:8px;font-size:12px;color:#475569;line-height:1.45;'>" + (note ? escapeHtmlQuick(note) : "Sin detalle") + "</div>"
               + "  <div style='margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;'>"
               + "    <span style='font-size:11px;color:#94a3b8'>Fuente: " + escapeHtmlQuick(String(it.source || "—")) + "</span>"
-              + "    " + (it.proof ? "<a href='" + encodeURI(String(it.proof)) + "' target='_blank' rel='noopener' style='font-size:12px;font-weight:700;color:#0ea5e9;text-decoration:none'>Ver comprobante</a>" : "")
+              + "    "
+              + (it.proof
+                ? "<a href='"
+                  + escapeHtmlQuick(
+                      it.source === "credito_client_form_submissions" && it.submissionId
+                        ? "/api/credito-client-form-proof?submissionId=" + encodeURIComponent(it.submissionId) + "&clientId=" + encodeURIComponent(clientId)
+                        : encodeURI(String(it.proof)),
+                    )
+                  + "' target='_blank' rel='noopener' style='font-size:12px;font-weight:700;color:#0ea5e9;text-decoration:none'>Ver comprobante</a>"
+                : "")
               + "  </div>"
               + actionsHtml
               + "</article>";

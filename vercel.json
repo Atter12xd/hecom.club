@@ -68,7 +68,8 @@
     { "source": "/api/credito-cliente-form-submit", "destination": "/api/credito-cliente-form-submit" },
     { "source": "/api/credito-client-form-recent", "destination": "/api/credito-client-form-recent" },
     { "source": "/api/credito-client-form-action", "destination": "/api/credito-client-form-action" },
-    { "source": "/api/credito-client-form-draft", "destination": "/api/credito-client-form-draft" }
+    { "source": "/api/credito-client-form-draft", "destination": "/api/credito-client-form-draft" },
+    { "source": "/api/credito-client-form-proof", "destination": "/api/credito-client-form-proof" }
   ],
   "headers": [
     {
