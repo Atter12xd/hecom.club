@@ -2,355 +2,860 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
   <title>Formulario de Cliente | Holistic</title>
   <link rel="icon" type="image/png" href="/favicon/favicon.png" />
   <link rel="shortcut icon" type="image/png" href="/favicon/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/pendientes/holistic-design-system.css">
   <style>
     :root {
-      --bg: var(--color-bg, #f8fafc);
-      --card: var(--color-surface, #ffffff);
-      --text: var(--color-text, #0f172a);
-      --muted: var(--color-text-muted, #64748b);
-      --line: var(--color-border, #e2e8f0);
-      --brand: var(--color-primary, #ea580c);
+      --bg-1: #f6f7fb;
+      --bg-2: #eef1f7;
+      --card: #ffffff;
+      --text: #0b1220;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --line-strong: #d1d5db;
+      --brand: #ea580c;
+      --brand-2: #f97316;
+      --brand-soft: #fff7ed;
+      --brand-ink: #7c2d12;
+      --ok: #16a34a;
+      --ok-2: #22c55e;
+      --err: #dc2626;
     }
     * { box-sizing: border-box; }
+    html, body { height: auto; }
     body {
       margin: 0;
-      font-family: var(--font-body, Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       color: var(--text);
-      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      background:
+        radial-gradient(900px 480px at 12% -10%, #ffe4cf 0%, rgba(255, 228, 207, 0) 60%),
+        radial-gradient(800px 460px at 100% 0%, #e0e7ff 0%, rgba(224, 231, 255, 0) 60%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
       min-height: 100vh;
-      padding: 18px;
+      padding: 22px 18px 40px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
-    .wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 12px; }
+    .wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 14px; }
+    .topbar {
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: saturate(180%) blur(10px);
+      -webkit-backdrop-filter: saturate(180%) blur(10px);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, .06);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .topbar-left img { height: 38px; width: 170px; object-fit: contain; display: block; }
+    .topbar-divider { width: 1px; height: 26px; background: var(--line); }
+    .topbar-meta { display: flex; flex-direction: column; min-width: 0; }
+    .topbar-meta strong { font-size: 13px; font-weight: 800; color: var(--text); letter-spacing: -.005em; line-height: 1.2; }
+    .topbar-meta span { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+    .topbar-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand-ink);
+      border: 1px solid #fed7aa;
+      white-space: nowrap;
+    }
+    .topbar-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px rgba(234,88,12,.15); }
+
     .layout {
       display: grid;
-      grid-template-columns: 280px minmax(0, 1fr);
-      gap: 12px;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 14px;
       align-items: start;
     }
-    .mini-sidebar {
-      background: linear-gradient(180deg, var(--sidebar-bg, #ffffff) 0%, #f8fafc 100%);
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      background: #fff;
       border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
+      border-radius: 18px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, .06);
+      overflow: hidden;
+      position: sticky;
+      top: 18px;
+    }
+    .client-hero {
+      padding: 18px;
+      background:
+        radial-gradient(380px 180px at 100% 0%, rgba(249, 115, 22, .18), transparent 70%),
+        linear-gradient(180deg, #0b1220 0%, #1e293b 100%);
+      color: #fff;
+      position: relative;
       overflow: hidden;
     }
-    .mini-sidebar .brand {
-      border: none;
-      border-radius: 0;
-      box-shadow: none;
-      padding: 14px 14px 12px;
-      border-bottom: 1px solid var(--line);
+    .client-hero::after {
+      content: "";
+      position: absolute;
+      right: -40px; bottom: -40px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle at 30% 30%, rgba(249,115,22,.35), rgba(249,115,22,0));
+      filter: blur(2px);
     }
-    .mini-sidebar-body { padding: 12px; display: grid; gap: 10px; }
-    .mini-card {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      padding: 11px;
+    .client-avatar {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(249, 115, 22, .35);
+      letter-spacing: -.02em;
     }
-    .mini-card h4 {
-      margin: 0 0 6px;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      color: #64748b;
-    }
-    .mini-client {
-      font-size: 14px;
-      font-weight: 700;
-      color: #0f172a;
-      line-height: 1.35;
+    .client-name {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -.01em;
       word-break: break-word;
+      color: #fff;
     }
-    .mini-note {
-      margin-top: 6px;
-      font-size: 12px;
-      color: #64748b;
-      line-height: 1.4;
+    .client-id {
+      margin-top: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,.75);
+      word-break: break-all;
     }
-    .mini-badge {
+    .client-pill {
+      margin-top: 12px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-top: 8px;
       font-size: 11px;
       font-weight: 700;
-      padding: 5px 9px;
+      padding: 5px 10px;
       border-radius: 999px;
-      border: 1px solid #e2e8f0;
-      background: #f8fafc;
-      color: #0f172a;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff;
       text-transform: uppercase;
       letter-spacing: .04em;
+      backdrop-filter: blur(8px);
     }
-    .mini-badge i {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #64748b;
-      display: inline-block;
+    .client-pill .ring {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--ok-2);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, .2);
     }
-    .mini-badge[data-type="garantia"] { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
-    .mini-badge[data-type="garantia"] i { background: #10b981; }
-    .mini-badge[data-type="recarga"] { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
-    .mini-badge[data-type="recarga"] i { background: #3b82f6; }
-    .mini-badge[data-type="cobro"] { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
-    .mini-badge[data-type="cobro"] i { background: #f97316; }
-    .mini-badge[data-type="gasto_ads"] { background: #f5f3ff; border-color: #ddd6fe; color: #5b21b6; }
-    .mini-badge[data-type="gasto_ads"] i { background: #8b5cf6; }
-    .brand {
-      background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+
+    .side-body { padding: 14px; display: grid; gap: 12px; }
+    .side-card {
       border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 10px 26px rgba(15, 23, 42, .06);
-      padding: 12px 16px;
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px 13px;
+    }
+    .side-card h4 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .summary-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+      font-size: 13px;
     }
-    .brand img {
-      height: 42px;
-      width: 180px;
-      object-fit: contain;
-      display: block;
-      max-width: 100%;
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row .lbl { color: var(--muted); font-weight: 600; }
+    .summary-row .val { color: var(--text); font-weight: 700; max-width: 60%; text-align: right; word-break: break-word; }
+    .summary-row .val.empty { color: #94a3b8; font-weight: 600; font-style: italic; }
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .04em;
     }
-    .brand small {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 600;
-      text-align: right;
+    .type-badge i {
+      width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; display: inline-block;
     }
+    .type-badge[data-type="garantia"] { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+    .type-badge[data-type="garantia"] i { background: #10b981; }
+    .type-badge[data-type="recarga"] { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+    .type-badge[data-type="recarga"] i { background: #3b82f6; }
+    .type-badge[data-type="cobro"] { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+    .type-badge[data-type="cobro"] i { background: #f97316; }
+    .type-badge[data-type="gasto_ads"] { background: #f5f3ff; border-color: #ddd6fe; color: #5b21b6; }
+    .type-badge[data-type="gasto_ads"] i { background: #8b5cf6; }
+    .type-badge[data-type="otro"] { background: #f1f5f9; border-color: #e2e8f0; color: #334155; }
+    .type-badge[data-type="otro"] i { background: #64748b; }
+
+    .side-help { display: flex; gap: 10px; align-items: flex-start; }
+    .side-help-ico {
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border: 1px solid #fed7aa;
+    }
+    .side-help-text { font-size: 12px; line-height: 1.5; color: var(--muted); }
+    .side-help-text strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 12.5px; font-weight: 700; }
+
+    /* ===== Card form ===== */
     .card {
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 16px;
-      box-shadow: 0 14px 34px rgba(15, 23, 42, .08);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, .08);
       overflow: hidden;
     }
     .head {
-      padding: 18px 20px;
+      padding: 22px 24px;
       border-bottom: 1px solid var(--line);
-      background: linear-gradient(135deg, #fff7ed, #ffedd5);
-      color: #7c2d12;
+      background:
+        radial-gradient(420px 200px at 100% 0%, rgba(249, 115, 22, .12), transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
     }
-    .title { margin: 0 0 4px; font-size: 24px; font-weight: 800; letter-spacing: -.02em; font-family: var(--font-display, Inter, sans-serif); }
-    .sub { margin: 0; opacity: .92; font-size: 13px; color: #9a3412; }
-    .body { padding: 20px; display: grid; gap: 14px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .field { display: grid; gap: 6px; }
-    .field label { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #334155; display: inline-flex; align-items: center; gap: 6px; }
-    .label-ico {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background: #fff7ed;
-      color: #c2410c;
-      border: 1px solid #fed7aa;
+    .head .eyebrow {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
+      gap: 8px;
       font-size: 11px;
       font-weight: 800;
-      flex-shrink: 0;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--brand);
     }
+    .head .eyebrow .bar { width: 18px; height: 2px; background: var(--brand); border-radius: 2px; }
+    .head .title {
+      margin: 8px 0 4px;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      color: var(--text);
+    }
+    .head .sub { margin: 0; font-size: 13.5px; color: var(--muted); font-weight: 500; }
+
+    .body { padding: 22px 24px 24px; display: grid; gap: 18px; }
+    .section {
+      display: grid;
+      gap: 10px;
+    }
+    .section-head {
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    .section-head .ico {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      border: 1px solid #fed7aa;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .section-head h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .field { display: grid; gap: 6px; }
+    .field label {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .field label .req { color: var(--brand); margin-left: 2px; }
     .field input, .field select, .field textarea {
       width: 100%;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--line-strong);
       border-radius: 12px;
-      padding: 11px 12px;
+      padding: 12px 13px;
       font-size: 14px;
-      color: #0f172a;
+      color: var(--text);
       background: #fff;
       outline: none;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      font-family: inherit;
     }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(234, 88, 12, .14); }
-    .field textarea { min-height: 106px; resize: vertical; }
-    .muted { color: var(--muted); font-size: 12px; }
-    .preview {
-      border: 1px dashed #94a3b8;
-      border-radius: 12px;
-      min-height: 154px;
-      padding: 10px;
-      background: #f8fafc;
-      display: grid;
-      place-items: center;
-      color: #64748b;
-      text-align: center;
-      font-size: 13px;
+    .field input::placeholder, .field textarea::placeholder { color: #94a3b8; }
+    .field input:hover, .field select:hover, .field textarea:hover { border-color: #94a3b8; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px rgba(234, 88, 12, .12);
+      background: #fffdf9;
     }
-    .preview img { max-width: 100%; max-height: 290px; border-radius: 10px; object-fit: contain; display: block; }
-    .actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 6px; }
-    button {
-      border: none; border-radius: 12px; padding: 11px 16px;
-      font-weight: 700; font-size: 14px; cursor: pointer;
-    }
-    .btn-main { background: linear-gradient(135deg, #ea580c, #f97316); color: #fff; }
-    .btn-main:disabled { opacity: .55; cursor: not-allowed; }
-    .btn-main.is-loading {
-      position: relative;
+    .field textarea { min-height: 96px; resize: vertical; line-height: 1.5; }
+
+    .field.has-prefix { position: relative; }
+    .field.has-prefix .prefix {
+      position: absolute;
+      left: 13px;
+      bottom: 11px;
+      font-weight: 800;
+      color: #6b7280;
+      font-size: 14px;
       pointer-events: none;
-      opacity: .9;
-      padding-left: 40px;
+      transition: color .15s;
     }
+    .field.has-prefix input { padding-left: 30px; }
+    .field.has-prefix input:focus + .prefix,
+    .field.has-prefix:focus-within .prefix { color: var(--brand); }
+
+    .select-wrap { position: relative; }
+    .select-wrap select {
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .select-wrap::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      width: 8px; height: 8px;
+      border-right: 2px solid #6b7280;
+      border-bottom: 2px solid #6b7280;
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .helper { font-size: 12px; color: var(--muted); }
+    .helper.warning { color: #b45309; }
+
+    /* ===== Drop zone ===== */
+    .drop {
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 18px;
+      background: #f8fafc;
+      transition: border-color .15s, background .15s, transform .15s;
+      cursor: pointer;
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      text-align: center;
+    }
+    .drop:hover { border-color: var(--brand); background: #fff7ed; }
+    .drop.is-drag {
+      border-color: var(--brand);
+      background: #fff7ed;
+      transform: scale(1.005);
+    }
+    .drop input[type="file"] { display: none; }
+    .drop-ico {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid; place-items: center;
+      color: var(--brand);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, .05);
+    }
+    .drop-title { font-size: 13.5px; font-weight: 700; color: var(--text); }
+    .drop-sub { font-size: 12px; color: var(--muted); }
+    .drop-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brand);
+      background: #fff;
+      border: 1px solid #fed7aa;
+      padding: 6px 11px;
+      border-radius: 999px;
+      margin-top: 4px;
+    }
+
+    .preview {
+      margin-top: 4px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      padding: 12px;
+      display: none;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .preview.show { display: flex; }
+    .preview img { width: 110px; height: 110px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .preview-info { flex: 1; min-width: 0; }
+    .preview-info .name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      word-break: break-all;
+      line-height: 1.35;
+    }
+    .preview-info .meta { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+    .preview-info .actions-mini { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-link {
+      background: none;
+      border: 1px solid var(--line);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .btn-link:hover { border-color: var(--line-strong); background: #f8fafc; }
+    .btn-link.danger { color: var(--err); border-color: #fecaca; }
+    .btn-link.danger:hover { background: #fef2f2; }
+
+    /* ===== Footer / actions ===== */
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 6px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .actions .left-note { font-size: 12px; color: var(--muted); }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-main {
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(234, 88, 12, .25);
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-main:hover { transform: translateY(-1px); box-shadow: 0 14px 26px rgba(234, 88, 12, .32); }
+    .btn-main:active { transform: translateY(0); }
+    .btn-main:disabled { opacity: .65; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-main.is-loading { padding-left: 40px; pointer-events: none; }
     .btn-main.is-loading::before {
       content: "";
       position: absolute;
-      left: 14px;
-      top: 50%;
-      width: 14px;
-      height: 14px;
-      margin-top: -7px;
+      width: 14px; height: 14px;
+      margin-left: -26px;
       border-radius: 50%;
       border: 2px solid rgba(255,255,255,.45);
       border-top-color: #fff;
-      animation: hmSpin .75s linear infinite;
+      animation: hmSpin .7s linear infinite;
     }
-    .is-submitting .body { opacity: .72; }
+    .btn-main { position: relative; }
+
+    .is-submitting .body { opacity: .75; pointer-events: none; }
     @keyframes hmSpin { to { transform: rotate(360deg); } }
+
+    /* ===== Toast ===== */
     .toast {
-      position: fixed; right: 18px; bottom: 18px; z-index: 999999;
-      background: linear-gradient(135deg, #16a34a, #22c55e);
-      color: #fff; border-radius: 12px; padding: 11px 14px;
-      box-shadow: 0 12px 28px rgba(22, 163, 74, .25);
-      font: 600 13px/1.3 Inter, system-ui, sans-serif;
-      opacity: 0; transform: translateY(8px);
-      transition: opacity .18s ease, transform .18s ease;
+      position: fixed; right: 22px; bottom: 22px; z-index: 999999;
+      background: linear-gradient(135deg, var(--ok), var(--ok-2));
+      color: #fff;
+      border-radius: 14px;
+      padding: 13px 16px;
+      box-shadow: 0 16px 36px rgba(22, 163, 74, .3);
+      font: 700 13px/1.3 'Inter', system-ui, sans-serif;
+      opacity: 0; transform: translateY(8px) scale(.98);
+      transition: opacity .2s ease, transform .2s ease;
+      display: inline-flex; align-items: center; gap: 10px;
+      max-width: calc(100vw - 44px);
     }
-    .toast.error { background: linear-gradient(135deg, #b91c1c, #dc2626); box-shadow: 0 12px 28px rgba(220, 38, 38, .25); }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    @media (max-width: 740px) {
+    .toast .ico {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.2);
+      display: grid; place-items: center;
+    }
+    .toast.error { background: linear-gradient(135deg, #b91c1c, var(--err)); box-shadow: 0 16px 36px rgba(220, 38, 38, .3); }
+    .toast.show { opacity: 1; transform: translateY(0) scale(1); }
+
+    /* ===== Success overlay ===== */
+    .success-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, .42);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      z-index: 999998;
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+    .success-overlay.show { display: grid; opacity: 1; }
+    .success-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 30px 36px;
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      max-width: 360px;
+      box-shadow: 0 30px 60px rgba(15, 23, 42, .35);
+      transform: scale(.92);
+      transition: transform .25s cubic-bezier(.2,.9,.4,1.1);
+    }
+    .success-overlay.show .success-card { transform: scale(1); }
+    .success-check {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ok), var(--ok-2));
+      display: grid; place-items: center;
+      box-shadow: 0 14px 30px rgba(22, 163, 74, .35);
+      animation: hmPop .35s cubic-bezier(.2,.9,.4,1.1);
+    }
+    .success-check svg path {
+      stroke-dasharray: 36;
+      stroke-dashoffset: 36;
+      animation: hmDraw .4s .12s ease forwards;
+    }
+    @keyframes hmPop {
+      0% { transform: scale(.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes hmDraw { to { stroke-dashoffset: 0; } }
+    .success-card h3 { margin: 0; font-size: 18px; font-weight: 800; }
+    .success-card p { margin: 0; font-size: 13.5px; color: var(--muted); text-align: center; line-height: 1.5; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 880px) {
       .layout { grid-template-columns: 1fr; }
-      .grid { grid-template-columns: 1fr; }
-      .title { font-size: 21px; }
-      .brand { flex-direction: column; align-items: flex-start; }
-      .brand small { text-align: left; }
+      .sidebar { position: static; }
+    }
+    @media (max-width: 600px) {
+      body { padding: 14px 12px 30px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .topbar { flex-wrap: wrap; }
+      .head { padding: 18px 18px; }
+      .head .title { font-size: 22px; }
+      .body { padding: 18px; }
+      .actions { flex-direction: column-reverse; align-items: stretch; }
+      .actions .btn-main { justify-content: center; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="layout">
-      <aside class="mini-sidebar">
-        <div class="brand">
-          <img src="/credito-app/logo/logoh.png" alt="Holistic Marketing" />
-          <small>Formulario cliente<br>Holistic Credit</small>
+    <div class="topbar">
+      <div class="topbar-left">
+        <img src="/credito-app/logo/logoh.png" alt="Holistic Marketing" />
+        <div class="topbar-divider"></div>
+        <div class="topbar-meta">
+          <strong>Holistic Credit</strong>
+          <span>Registro de garantia, recarga y cobro</span>
         </div>
-        <div class="mini-sidebar-body">
-          <div class="mini-card">
-            <h4>Cliente</h4>
-            <div class="mini-client" id="client-name-side">Cargando...</div>
-            <div class="mini-note" id="client-id-side">ID: -</div>
-            <div class="mini-badge" id="type-badge" data-type="garantia"><i></i><span>Garantia</span></div>
+      </div>
+      <span class="topbar-pill"><span class="dot"></span>Formulario seguro</span>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="client-hero">
+          <div class="client-avatar" id="client-avatar">A</div>
+          <div class="client-name" id="client-name-side">Cargando...</div>
+          <div class="client-id" id="client-id-side">ID: -</div>
+          <div class="client-pill"><span class="ring"></span><span>Sesion activa</span></div>
+        </div>
+        <div class="side-body">
+          <div class="side-card">
+            <h4>Resumen</h4>
+            <div class="summary-row"><span class="lbl">Tipo</span><span class="val"><span class="type-badge" id="type-badge" data-type="garantia"><i></i><span>Garantia</span></span></span></div>
+            <div class="summary-row"><span class="lbl">Monto</span><span class="val empty" id="sum-monto">-</span></div>
+            <div class="summary-row"><span class="lbl">Fecha</span><span class="val empty" id="sum-fecha">-</span></div>
+            <div class="summary-row"><span class="lbl">Comprobante</span><span class="val empty" id="sum-file">Sin adjuntar</span></div>
           </div>
-          <div class="mini-card">
-            <h4>Nota</h4>
-            <div class="mini-note">Completa los datos y sube el comprobante para registrar garantia, recarga o cobro.</div>
+          <div class="side-card">
+            <div class="side-help">
+              <div class="side-help-ico">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+              </div>
+              <div class="side-help-text">
+                <strong>Como llenar</strong>
+                Selecciona el tipo, ingresa monto y fecha de pago. Adjunta el comprobante (foto del depositos o transferencia).
+              </div>
+            </div>
           </div>
         </div>
       </aside>
+
       <section class="card">
         <header class="head">
-          <h1 class="title">Formulario de Garantia / Recarga</h1>
+          <span class="eyebrow"><span class="bar"></span>Holistic Credit</span>
+          <h1 class="title">Registrar pago del cliente</h1>
           <p class="sub" id="client-meta">Cargando datos del cliente...</p>
         </header>
-        <form id="client-form" class="body">
-          <div class="grid">
-            <div class="field">
-              <label for="tipo"><span class="label-ico">T</span>Tipo</label>
-              <select id="tipo" required>
-                <option value="garantia">Garantia</option>
-                <option value="recarga">Recarga</option>
-                <option value="cobro">Cobro</option>
-                <option value="gasto_ads">Gasto Ads</option>
-                <option value="otro">Otro</option>
-              </select>
+
+        <form id="client-form" class="body" novalidate>
+          <div class="section">
+            <div class="section-head">
+              <div class="ico">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path><path d="M12 7v5l3 3"></path></svg>
+              </div>
+              <h3>Datos del pago</h3>
             </div>
-            <div class="field">
-              <label for="monto"><span class="label-ico">$</span>Monto (USD)</label>
-              <input id="monto" type="number" min="0" step="0.01" placeholder="Ej: 150" required />
+            <div class="grid-2">
+              <div class="field">
+                <label for="tipo">Tipo<span class="req">*</span></label>
+                <div class="select-wrap">
+                  <select id="tipo" required>
+                    <option value="garantia">Garantia</option>
+                    <option value="recarga">Recarga</option>
+                    <option value="cobro">Cobro</option>
+                    <option value="gasto_ads">Gasto Ads</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field has-prefix">
+                <label for="monto">Monto (USD)<span class="req">*</span></label>
+                <input id="monto" type="number" min="0" step="0.01" placeholder="0.00" required inputmode="decimal" />
+                <span class="prefix">$</span>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="fecha">Fecha de pago<span class="req">*</span></label>
+                <input id="fecha" type="date" required />
+              </div>
+              <div class="field">
+                <label for="telefono">Telefono</label>
+                <input id="telefono" type="tel" placeholder="+1 809 000 0000" />
+              </div>
             </div>
           </div>
-          <div class="grid">
-            <div class="field">
-              <label for="fecha"><span class="label-ico">F</span>Fecha de pago</label>
-              <input id="fecha" type="date" required />
+
+          <div class="section">
+            <div class="section-head">
+              <div class="ico">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+              <h3>Detalle / Nota</h3>
             </div>
             <div class="field">
-              <label for="telefono"><span class="label-ico">T</span>Telefono</label>
-              <input id="telefono" type="text" placeholder="+1 809..." />
+              <label for="detalle">Mensaje (opcional)</label>
+              <textarea id="detalle" placeholder="Escribe aqui cualquier nota relevante, numero de operacion, banco emisor, etc."></textarea>
             </div>
           </div>
-          <div class="field">
-            <label for="detalle"><span class="label-ico">N</span>Detalle / Nota</label>
-            <textarea id="detalle" placeholder="Agrega aqui cualquier detalle importante..."></textarea>
+
+          <div class="section">
+            <div class="section-head">
+              <div class="ico">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+              </div>
+              <h3>Comprobante</h3>
+            </div>
+
+            <label class="drop" id="drop-zone" for="comprobante">
+              <div class="drop-ico">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              </div>
+              <div class="drop-title">Arrastra una imagen o haz click para subir</div>
+              <div class="drop-sub">JPG, PNG o WEBP. Maximo 4 MB.</div>
+              <span class="drop-cta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Seleccionar archivo
+              </span>
+              <input id="comprobante" type="file" accept="image/*" />
+            </label>
+
+            <div class="preview" id="preview">
+              <img id="preview-img" alt="Comprobante" />
+              <div class="preview-info">
+                <div class="name" id="preview-name">comprobante.jpg</div>
+                <div class="meta" id="preview-meta">-</div>
+                <div class="actions-mini">
+                  <button type="button" class="btn-link" id="preview-replace">Reemplazar</button>
+                  <button type="button" class="btn-link danger" id="preview-remove">Quitar</button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="field">
-            <label for="comprobante"><span class="label-ico">C</span>Comprobante (imagen)</label>
-            <input id="comprobante" type="file" accept="image/*" />
-            <span class="muted">Se permite imagen JPG, PNG o WEBP. Max recomendado: 4MB.</span>
-          </div>
-          <div id="preview" class="preview">La vista previa del comprobante aparecera aqui.</div>
+
           <div class="actions">
-            <button type="submit" class="btn-main" id="send-btn">Enviar formulario</button>
+            <span class="left-note">Tus datos se envian de forma segura.</span>
+            <button type="submit" class="btn-main" id="send-btn">
+              <span>Enviar formulario</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
           </div>
         </form>
       </section>
     </div>
   </div>
+
   <div id="toast" class="toast"></div>
+  <div class="success-overlay" id="success-overlay" aria-hidden="true">
+    <div class="success-card">
+      <div class="success-check">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4L19 6"></path></svg>
+      </div>
+      <h3>Formulario enviado</h3>
+      <p>Hemos recibido tus datos correctamente. Ya puedes cerrar esta ventana.</p>
+    </div>
+  </div>
 
   <script>
     (function () {
       var qs = new URLSearchParams(window.location.search || "");
       var clientId = (qs.get("clientId") || "").trim();
       var clientName = (qs.get("clientName") || "").trim();
-      var form = document.getElementById("client-form");
-      var clientMeta = document.getElementById("client-meta");
-      var clientNameSide = document.getElementById("client-name-side");
-      var clientIdSide = document.getElementById("client-id-side");
-      var fileInput = document.getElementById("comprobante");
-      var typeSelect = document.getElementById("tipo");
-      var typeBadge = document.getElementById("type-badge");
-      var preview = document.getElementById("preview");
-      var sendBtn = document.getElementById("send-btn");
+
+      var $ = function (id) { return document.getElementById(id); };
+      var form = $("client-form");
+      var clientMeta = $("client-meta");
+      var clientNameSide = $("client-name-side");
+      var clientIdSide = $("client-id-side");
+      var clientAvatar = $("client-avatar");
+      var fileInput = $("comprobante");
+      var typeSelect = $("tipo");
+      var typeBadge = $("type-badge");
+      var dropZone = $("drop-zone");
+      var preview = $("preview");
+      var previewImg = $("preview-img");
+      var previewName = $("preview-name");
+      var previewMeta = $("preview-meta");
+      var previewReplace = $("preview-replace");
+      var previewRemove = $("preview-remove");
+      var montoInput = $("monto");
+      var fechaInput = $("fecha");
+      var sumMonto = $("sum-monto");
+      var sumFecha = $("sum-fecha");
+      var sumFile = $("sum-file");
+      var sendBtn = $("send-btn");
       var card = document.querySelector(".card");
+      var successOverlay = $("success-overlay");
       var selectedFile = null;
 
+      var initials = (function () {
+        var parts = (clientName || "Cliente").trim().split(/\s+/);
+        var a = parts[0] ? parts[0][0] : "C";
+        var b = parts[1] ? parts[1][0] : "";
+        return (a + b).toUpperCase();
+      })();
+      if (clientAvatar) clientAvatar.textContent = initials;
+
       clientMeta.textContent = clientId
-        ? ("Cliente: " + (clientName || "(sin nombre)") + " - ID: " + clientId)
+        ? ("Cliente: " + (clientName || "(sin nombre)") + " — ID " + clientId.slice(0, 8) + "...")
         : "Link invalido: falta clientId.";
       if (clientNameSide) clientNameSide.textContent = clientName || "(sin nombre)";
       if (clientIdSide) clientIdSide.textContent = "ID: " + (clientId || "-");
+
+      try {
+        var today = new Date();
+        var iso = today.toISOString().slice(0, 10);
+        if (fechaInput && !fechaInput.value) fechaInput.value = iso;
+      } catch (_) {}
+
+      function fmtMoney(n) {
+        var v = Number(n || 0);
+        if (!v) return "-";
+        try {
+          return v.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        } catch (_) {
+          return "$" + v.toFixed(2);
+        }
+      }
+      function fmtBytes(b) {
+        if (!b) return "0 KB";
+        if (b < 1024) return b + " B";
+        if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
+        return (b / (1024 * 1024)).toFixed(2) + " MB";
+      }
+      function fmtFecha(s) {
+        if (!s) return "-";
+        try {
+          var d = new Date(s + "T12:00:00");
+          return d.toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" });
+        } catch (_) {
+          return s;
+        }
+      }
+
+      function refreshSummary() {
+        if (sumMonto) {
+          var v = Number(montoInput.value || 0);
+          sumMonto.textContent = v > 0 ? fmtMoney(v) : "-";
+          sumMonto.classList.toggle("empty", !(v > 0));
+        }
+        if (sumFecha) {
+          var f = fechaInput.value;
+          sumFecha.textContent = f ? fmtFecha(f) : "-";
+          sumFecha.classList.toggle("empty", !f);
+        }
+      }
       function updateTypeBadge() {
         if (!typeBadge || !typeSelect) return;
         var t = (typeSelect.value || "garantia").trim();
         var lbl = typeSelect.options[typeSelect.selectedIndex] ? typeSelect.options[typeSelect.selectedIndex].textContent : t;
         typeBadge.dataset.type = t;
-        var sp = typeBadge.querySelector("span");
+        var sp = typeBadge.querySelector("span:last-child");
         if (sp) sp.textContent = lbl || "Tipo";
       }
-      if (typeSelect) typeSelect.addEventListener("change", updateTypeBadge);
+      typeSelect.addEventListener("change", updateTypeBadge);
+      montoInput.addEventListener("input", refreshSummary);
+      fechaInput.addEventListener("change", refreshSummary);
       updateTypeBadge();
+      refreshSummary();
 
       function showToast(msg, isError) {
-        var t = document.getElementById("toast");
-        t.textContent = msg || "";
+        var t = $("toast");
+        t.innerHTML = '<span class="ico">' +
+          (isError
+            ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>'
+            : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+          ) + '</span><span>' + (msg || "") + '</span>';
         t.className = "toast" + (isError ? " error" : "");
         setTimeout(function () { t.classList.add("show"); }, 5);
         clearTimeout(window.__HM_FORM_TOAST__);
         window.__HM_FORM_TOAST__ = setTimeout(function () {
           t.classList.remove("show");
-        }, 2200);
+        }, 2400);
       }
 
       function fileToDataUrl(file) {
@@ -362,25 +867,53 @@
         });
       }
 
-      fileInput.addEventListener("change", function (ev) {
-        var f = ev.target && ev.target.files && ev.target.files[0];
-        selectedFile = f || null;
+      function setFile(f) {
         if (!f) {
-          preview.textContent = "La vista previa del comprobante aparecera aqui.";
+          selectedFile = null;
+          fileInput.value = "";
+          preview.classList.remove("show");
+          if (sumFile) { sumFile.textContent = "Sin adjuntar"; sumFile.classList.add("empty"); }
           return;
         }
         if (!/^image\//i.test(f.type || "")) {
-          preview.textContent = "Formato no soportado. Sube una imagen.";
-          selectedFile = null;
-          fileInput.value = "";
+          showToast("Formato no soportado. Sube una imagen.", true);
           return;
         }
-        var img = document.createElement("img");
-        img.alt = "Comprobante";
-        img.src = URL.createObjectURL(f);
-        preview.innerHTML = "";
-        preview.appendChild(img);
+        if (f.size > 4 * 1024 * 1024) {
+          showToast("El comprobante supera 4 MB.", true);
+          return;
+        }
+        selectedFile = f;
+        previewImg.src = URL.createObjectURL(f);
+        previewName.textContent = f.name || "comprobante.jpg";
+        previewMeta.textContent = (f.type || "image/*") + " · " + fmtBytes(f.size);
+        preview.classList.add("show");
+        if (sumFile) { sumFile.textContent = f.name || "Adjuntado"; sumFile.classList.remove("empty"); }
+      }
+
+      fileInput.addEventListener("change", function (ev) {
+        var f = ev.target && ev.target.files && ev.target.files[0];
+        setFile(f || null);
       });
+      if (previewReplace) previewReplace.addEventListener("click", function () { fileInput.click(); });
+      if (previewRemove) previewRemove.addEventListener("click", function () { setFile(null); });
+
+      ["dragenter", "dragover"].forEach(function (ev) {
+        dropZone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); dropZone.classList.add("is-drag"); });
+      });
+      ["dragleave", "drop"].forEach(function (ev) {
+        dropZone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); dropZone.classList.remove("is-drag"); });
+      });
+      dropZone.addEventListener("drop", function (e) {
+        var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) setFile(f);
+      });
+
+      function showSuccessOverlay() {
+        if (!successOverlay) return;
+        successOverlay.classList.add("show");
+        setTimeout(function () { successOverlay.classList.remove("show"); }, 1700);
+      }
 
       form.addEventListener("submit", async function (ev) {
         ev.preventDefault();
@@ -391,11 +924,11 @@
         var payload = {
           client_id: clientId,
           client_name: clientName || null,
-          tipo: (document.getElementById("tipo").value || "").trim(),
-          monto: Number(document.getElementById("monto").value || 0),
-          fecha_pago: document.getElementById("fecha").value || null,
-          telefono: (document.getElementById("telefono").value || "").trim() || null,
-          detalle: (document.getElementById("detalle").value || "").trim() || null
+          tipo: (typeSelect.value || "").trim(),
+          monto: Number(montoInput.value || 0),
+          fecha_pago: fechaInput.value || null,
+          telefono: ($("telefono").value || "").trim() || null,
+          detalle: ($("detalle").value || "").trim() || null
         };
         if (!payload.tipo || !payload.fecha_pago || !payload.monto || payload.monto <= 0) {
           showToast("Completa tipo, monto y fecha.", true);
@@ -405,10 +938,11 @@
         sendBtn.disabled = true;
         sendBtn.classList.add("is-loading");
         if (card) card.classList.add("is-submitting");
-        sendBtn.textContent = "Enviando...";
+        var labelSpan = sendBtn.querySelector("span");
+        var oldLabel = labelSpan ? labelSpan.textContent : "";
+        if (labelSpan) labelSpan.textContent = "Enviando...";
         try {
           if (selectedFile) {
-            if (selectedFile.size > 4 * 1024 * 1024) throw new Error("El comprobante supera 4MB.");
             payload.file_name = selectedFile.name || "comprobante.jpg";
             payload.file_type = selectedFile.type || "image/jpeg";
             payload.file_data_url = await fileToDataUrl(selectedFile);
@@ -422,17 +956,24 @@
           if (!res.ok || !out.ok) {
             throw new Error((out && out.error) || ("HTTP " + res.status));
           }
-          form.reset();
-          selectedFile = null;
-          preview.textContent = "Formulario enviado correctamente.";
+          showSuccessOverlay();
           showToast("Formulario enviado con exito.", false);
+          setTimeout(function () {
+            form.reset();
+            setFile(null);
+            updateTypeBadge();
+            refreshSummary();
+            if (fechaInput) {
+              try { fechaInput.value = new Date().toISOString().slice(0, 10); } catch (_) {}
+            }
+          }, 600);
         } catch (err) {
           showToast((err && err.message) ? err.message : "No se pudo enviar.", true);
         } finally {
           sendBtn.disabled = false;
           sendBtn.classList.remove("is-loading");
           if (card) card.classList.remove("is-submitting");
-          sendBtn.textContent = "Enviar formulario";
+          if (labelSpan) labelSpan.textContent = oldLabel || "Enviar formulario";
         }
       });
     })();
