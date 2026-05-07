@@ -808,6 +808,38 @@
         } catch (_) {}
         return false;
       }
+      function showCopyToast(message) {
+        var id = "hm-client-link-toast";
+        var t = document.getElementById(id);
+        if (!t) {
+          t = document.createElement("div");
+          t.id = id;
+          t.style.cssText = [
+            "position:fixed",
+            "right:18px",
+            "bottom:18px",
+            "z-index:999999",
+            "background:linear-gradient(135deg,#16a34a,#22c55e)",
+            "color:#fff",
+            "padding:11px 14px",
+            "border-radius:12px",
+            "font:600 13px/1.3 Inter,system-ui,-apple-system,Segoe UI,sans-serif",
+            "box-shadow:0 12px 28px rgba(22,163,74,.28)",
+            "opacity:0",
+            "transform:translateY(8px)",
+            "transition:opacity .18s ease,transform .18s ease"
+          ].join(";");
+          document.body.appendChild(t);
+        }
+        t.textContent = message || "Copiado";
+        t.style.opacity = "1";
+        t.style.transform = "translateY(0)";
+        clearTimeout(window.__HM_COPY_TOAST_TIMER__);
+        window.__HM_COPY_TOAST_TIMER__ = setTimeout(function () {
+          t.style.opacity = "0";
+          t.style.transform = "translateY(8px)";
+        }, 1700);
+      }
       function ensurePassLinkButton() {
         var clientId = parseClientIdFromHash();
         var current = document.getElementById(BTN_ID);
@@ -846,7 +878,7 @@
           if (!link) return;
           var copied = await copyText(link);
           if (copied) {
-            alert("Link copiado para este cliente.");
+            showCopyToast("Link copiado para este cliente");
           } else {
             window.prompt("Copiá y pasá este link al cliente:", link);
           }

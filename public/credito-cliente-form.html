@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario de Cliente | Holistic</title>
+  <style>
+    :root {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --ok: #16a34a;
+      --ok-soft: #dcfce7;
+      --brand: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #eef4ff 0%, var(--bg) 55%);
+      min-height: 100vh;
+      padding: 18px;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 44px rgba(15, 23, 42, .08);
+      overflow: hidden;
+    }
+    .head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+    }
+    .title { margin: 0 0 4px; font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+    .sub { margin: 0; opacity: .88; font-size: 13px; }
+    .body { padding: 20px; display: grid; gap: 14px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #334155; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+      color: #0f172a;
+      background: #fff;
+      outline: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(37, 99, 235, .14); }
+    .field textarea { min-height: 106px; resize: vertical; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .preview {
+      border: 1px dashed #94a3b8;
+      border-radius: 12px;
+      min-height: 154px;
+      padding: 10px;
+      background: #f8fafc;
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      text-align: center;
+      font-size: 13px;
+    }
+    .preview img { max-width: 100%; max-height: 290px; border-radius: 10px; object-fit: contain; display: block; }
+    .actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+    button {
+      border: none; border-radius: 12px; padding: 11px 16px;
+      font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+    .btn-main { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+    .btn-main:disabled { opacity: .55; cursor: not-allowed; }
+    .toast {
+      position: fixed; right: 18px; bottom: 18px; z-index: 999999;
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #fff; border-radius: 12px; padding: 11px 14px;
+      box-shadow: 0 12px 28px rgba(22, 163, 74, .25);
+      font: 600 13px/1.3 Inter, system-ui, sans-serif;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .toast.error { background: linear-gradient(135deg, #b91c1c, #dc2626); box-shadow: 0 12px 28px rgba(220, 38, 38, .25); }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 740px) { .grid { grid-template-columns: 1fr; } .title { font-size: 21px; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <header class="head">
+        <h1 class="title">Formulario de Garantia / Recarga</h1>
+        <p class="sub" id="client-meta">Cargando datos del cliente...</p>
+      </header>
+      <form id="client-form" class="body">
+        <div class="grid">
+          <div class="field">
+            <label for="tipo">Tipo</label>
+            <select id="tipo" required>
+              <option value="garantia">Garantia</option>
+              <option value="recarga">Recarga</option>
+              <option value="cobro">Cobro</option>
+              <option value="gasto_ads">Gasto Ads</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="monto">Monto (USD)</label>
+            <input id="monto" type="number" min="0" step="0.01" placeholder="Ej: 150" required />
+          </div>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label for="fecha">Fecha de pago</label>
+            <input id="fecha" type="date" required />
+          </div>
+          <div class="field">
+            <label for="telefono">Telefono</label>
+            <input id="telefono" type="text" placeholder="+1 809..." />
+          </div>
+        </div>
+        <div class="field">
+          <label for="detalle">Detalle / Nota</label>
+          <textarea id="detalle" placeholder="Agrega aqui cualquier detalle importante..."></textarea>
+        </div>
+        <div class="field">
+          <label for="comprobante">Comprobante (imagen)</label>
+          <input id="comprobante" type="file" accept="image/*" />
+          <span class="muted">Se permite imagen JPG, PNG o WEBP. Max recomendado: 4MB.</span>
+        </div>
+        <div id="preview" class="preview">La vista previa del comprobante aparecera aqui.</div>
+        <div class="actions">
+          <button type="submit" class="btn-main" id="send-btn">Enviar formulario</button>
+        </div>
+      </form>
+    </section>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    (function () {
+      var qs = new URLSearchParams(window.location.search || "");
+      var clientId = (qs.get("clientId") || "").trim();
+      var clientName = (qs.get("clientName") || "").trim();
+      var form = document.getElementById("client-form");
+      var clientMeta = document.getElementById("client-meta");
+      var fileInput = document.getElementById("comprobante");
+      var preview = document.getElementById("preview");
+      var sendBtn = document.getElementById("send-btn");
+      var selectedFile = null;
+
+      clientMeta.textContent = clientId
+        ? ("Cliente: " + (clientName || "(sin nombre)") + " - ID: " + clientId)
+        : "Link invalido: falta clientId.";
+
+      function showToast(msg, isError) {
+        var t = document.getElementById("toast");
+        t.textContent = msg || "";
+        t.className = "toast" + (isError ? " error" : "");
+        setTimeout(function () { t.classList.add("show"); }, 5);
+        clearTimeout(window.__HM_FORM_TOAST__);
+        window.__HM_FORM_TOAST__ = setTimeout(function () {
+          t.classList.remove("show");
+        }, 2200);
+      }
+
+      function fileToDataUrl(file) {
+        return new Promise(function (resolve, reject) {
+          var r = new FileReader();
+          r.onload = function () { resolve(r.result || ""); };
+          r.onerror = reject;
+          r.readAsDataURL(file);
+        });
+      }
+
+      fileInput.addEventListener("change", function (ev) {
+        var f = ev.target && ev.target.files && ev.target.files[0];
+        selectedFile = f || null;
+        if (!f) {
+          preview.textContent = "La vista previa del comprobante aparecera aqui.";
+          return;
+        }
+        if (!/^image\//i.test(f.type || "")) {
+          preview.textContent = "Formato no soportado. Sube una imagen.";
+          selectedFile = null;
+          fileInput.value = "";
+          return;
+        }
+        var img = document.createElement("img");
+        img.alt = "Comprobante";
+        img.src = URL.createObjectURL(f);
+        preview.innerHTML = "";
+        preview.appendChild(img);
+      });
+
+      form.addEventListener("submit", async function (ev) {
+        ev.preventDefault();
+        if (!clientId) {
+          showToast("No se detecto el cliente en este link.", true);
+          return;
+        }
+        var payload = {
+          client_id: clientId,
+          client_name: clientName || null,
+          tipo: (document.getElementById("tipo").value || "").trim(),
+          monto: Number(document.getElementById("monto").value || 0),
+          fecha_pago: document.getElementById("fecha").value || null,
+          telefono: (document.getElementById("telefono").value || "").trim() || null,
+          detalle: (document.getElementById("detalle").value || "").trim() || null
+        };
+        if (!payload.tipo || !payload.fecha_pago || !payload.monto || payload.monto <= 0) {
+          showToast("Completa tipo, monto y fecha.", true);
+          return;
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.textContent = "Enviando...";
+        try {
+          if (selectedFile) {
+            if (selectedFile.size > 4 * 1024 * 1024) throw new Error("El comprobante supera 4MB.");
+            payload.file_name = selectedFile.name || "comprobante.jpg";
+            payload.file_type = selectedFile.type || "image/jpeg";
+            payload.file_data_url = await fileToDataUrl(selectedFile);
+          }
+          var res = await fetch("/api/credito-cliente-form-submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          var out = await res.json().catch(function () { return {}; });
+          if (!res.ok || !out.ok) {
+            throw new Error((out && out.error) || ("HTTP " + res.status));
+          }
+          form.reset();
+          selectedFile = null;
+          preview.textContent = "Formulario enviado correctamente.";
+          showToast("Formulario enviado con exito.", false);
+        } catch (err) {
+          showToast((err && err.message) ? err.message : "No se pudo enviar.", true);
+        } finally {
+          sendBtn.disabled = false;
+          sendBtn.textContent = "Enviar formulario";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
